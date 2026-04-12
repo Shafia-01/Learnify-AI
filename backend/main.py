@@ -15,14 +15,13 @@ from config import settings
 from database import close_db, init_db
 
 # ── Router imports ───────────────────────────────────────────────────────
-# Each feature module will provide its own APIRouter.  They are imported
-# here and mounted under the appropriate prefix.  Until the downstream
-# agents create these modules, lightweight placeholder routers are defined
-# inline so the app starts cleanly.
+# Agent 2 provides the real ingestion router; all other feature routers
+# remain as lightweight stubs until downstream agents replace them.
 
 from fastapi import APIRouter
 
-ingest_router = APIRouter(prefix="/ingest", tags=["Ingestion"])
+from routers.ingest import router as ingest_router
+
 query_router = APIRouter(prefix="/query", tags=["Query"])
 quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
 gamification_router = APIRouter(prefix="/gamification", tags=["Gamification"])
@@ -33,11 +32,6 @@ graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 
 # ── Placeholder endpoints ────────────────────────────────────────────────
 # These give downstream agents concrete routes to replace with real logic.
-
-@ingest_router.get("/status")
-async def ingest_status() -> Dict[str, str]:
-    """Return ingestion service readiness."""
-    return {"service": "ingest", "status": "ready"}
 
 
 @query_router.get("/status")
