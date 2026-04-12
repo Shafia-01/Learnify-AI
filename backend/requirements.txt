@@ -1,51 +1,51 @@
-# ── Learnify AI — Backend Dependencies ───────────────────────
 # Core API
-fastapi>=0.115.0
-uvicorn[standard]>=0.32.0
+fastapi
+uvicorn[standard]
 
 # Configuration
-pydantic>=2.9.0
-pydantic-settings>=2.6.0
+pydantic
+pydantic-settings
 
 # Database
-motor>=3.6.0
-pymongo>=4.10.0
+motor
+pymongo
 
 # LangChain + RAG
-langchain>=0.3.0
-langchain-community>=0.3.0
-langchain-google-genai>=2.0.0
-langchain-groq>=0.2.0
-faiss-cpu>=1.9.0
+langchain
+langchain-community
+langchain-google-genai
+langchain-groq
+langchain-text-splitters
+faiss-cpu
 
 # Document processing
-PyPDF2>=3.0.0
-pypdf>=5.0.0
-pdfplumber>=0.11.0
-python-pptx>=1.0.0
-youtube-transcript-api>=0.6.0
-beautifulsoup4>=4.12.0
-unstructured>=0.16.0
-reportlab>=4.2.0
+PyPDF2
+pypdf
+pdfplumber
+python-pptx
+youtube-transcript-api
+beautifulsoup4
+unstructured
+reportlab
 
 # Embeddings
-sentence-transformers>=3.0.0
-numpy>=1.26.0
+sentence-transformers
+numpy
 
 # Voice
-gTTS>=2.5.0
-openai-whisper>=20240930
+gTTS
+openai-whisper
 
 # Emotion detection
-mediapipe>=0.10.18
-deepface>=0.0.93
-opencv-python>=4.10.0
+mediapipe
+deepface
+opencv-python
 
 # Utilities
-python-dotenv>=1.0.0
-python-multipart>=0.0.17
-httpx>=0.28.0
+python-dotenv
+python-multipart
+httpx
 
 # Testing
-pytest>=8.0.0
-pytest-asyncio>=0.24.0
+pytest
+pytest-asyncio

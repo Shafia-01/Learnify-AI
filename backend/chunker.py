@@ -10,7 +10,7 @@ the splitting process.
 from typing import Any, Dict, List
 from uuid import uuid4
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # ── Shared splitter instance ─────────────────────────────────────────────
 # 500-character chunks with 50-character overlap balances retrieval
