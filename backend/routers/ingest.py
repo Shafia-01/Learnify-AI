@@ -73,7 +73,7 @@ class IngestResponse(BaseModel):
 
 
 async def _run_pipeline(
-    raw_items: list,
+    raw_items: list[dict[str, Any]],
     source_type: str,
     db: AsyncIOMotorDatabase,
 ) -> int:
