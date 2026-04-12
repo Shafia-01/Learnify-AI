@@ -24,6 +24,8 @@ pdfplumber>=0.11.0
 python-pptx>=1.0.0
 youtube-transcript-api>=0.6.0
 beautifulsoup4>=4.12.0
+unstructured>=0.16.0
+reportlab>=4.2.0
 
 # Embeddings
 sentence-transformers>=3.0.0
