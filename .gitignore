@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# FAISS indexes
+*.faiss
+faiss_index/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML model caches
+*.pt
+*.bin
+*.onnx
+models_cache/
+
+# Logs
+*.log
+logs/
