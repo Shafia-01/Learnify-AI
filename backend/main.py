@@ -21,8 +21,8 @@ from database import close_db, init_db
 from fastapi import APIRouter
 
 from routers.ingest import router as ingest_router
+from routers.query import router as query_router
 
-query_router = APIRouter(prefix="/query", tags=["Query"])
 quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
 gamification_router = APIRouter(prefix="/gamification", tags=["Gamification"])
 analytics_router = APIRouter(prefix="/analytics", tags=["Analytics"])
@@ -34,10 +34,7 @@ graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 # These give downstream agents concrete routes to replace with real logic.
 
 
-@query_router.get("/status")
-async def query_status() -> Dict[str, str]:
-    """Return query service readiness."""
-    return {"service": "query", "status": "ready"}
+# The query router and its status endpoint are provided by routers.query
 
 
 @quiz_router.get("/status")
@@ -80,7 +77,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     On startup: connect to MongoDB and ensure required collections exist.
     On shutdown: close the database connection pool.
     """
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Could not initialize MongoDB. Running without DB: %s", e)
     yield
     await close_db()
 
