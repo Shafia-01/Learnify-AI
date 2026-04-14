@@ -13,8 +13,8 @@ import re
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
-# Reuse the LLM routing logic from llm_chain
-from rag.llm_chain import _get_active_llms
+# Use central LLM provider
+from rag.llm_provider import get_llm
 
 logger = logging.getLogger(__name__)
 
@@ -50,23 +50,15 @@ async def generate_learning_path(chunk_texts: List[str]) -> List[str]:
 
     combined_texts = "\n\n---\n\n".join(chunk_texts)
     
-    primary_llm, fallback_llm = _get_active_llms()
+    llm = get_llm()
     output_parser = StrOutputParser()
-    chain = _prompt | primary_llm | output_parser
+    chain = _prompt | llm | output_parser
 
     try:
         raw_output = await chain.ainvoke({"texts": combined_texts})
     except Exception as exc:
-        logger.warning("Primary LLM learning path generation failed: %s", exc)
-        if fallback_llm is None:
-            return []
-        
-        fallback_chain = _prompt | fallback_llm | output_parser
-        try:
-            raw_output = await fallback_chain.ainvoke({"texts": combined_texts})
-        except Exception as fallback_exc:
-            logger.error("Fallback LLM learning path generation failed: %s", fallback_exc)
-            return []
+        logger.error("LLM learning path generation failed: %s", exc)
+        return []
 
     # Clean the raw output in case the LLM ignored instructions and used markdown
     clean_output = raw_output.strip()
