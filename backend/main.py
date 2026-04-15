@@ -5,6 +5,10 @@ Registers all route modules, configures CORS for development, wires up the
 async MongoDB lifecycle, and exposes a /health endpoint for readiness checks.
 """
 
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Dict
 

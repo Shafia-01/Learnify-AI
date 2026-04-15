@@ -9,7 +9,8 @@ seamlessly swap models without restarting the server.
 import logging
 from typing import Any, Dict
 
-from langchain_community.chat_models import ChatOllama
+
+from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 
@@ -19,12 +20,11 @@ logger = logging.getLogger(__name__)
 
 # Modifiable at runtime to allow provider hot-swapping
 runtime_config = {
-    "provider": "gemini",
-    "gemini_model": "gemini-pro",
+    "provider": "groq",  # default to groq during development
+    "gemini_model": "gemini-3.1-flash-lite",
     "groq_model": "llama-3.1-8b-instant",
-    "ollama_model": "llama3",
+    "ollama_model": "llama3"
 }
-
 
 def set_provider(provider: str, model: str = None) -> Dict[str, str]:
     """
