@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 _INDEX_PATH = Path(settings.FAISS_INDEX_PATH)
 _SIDECAR_PATH = Path(str(settings.FAISS_INDEX_PATH) + ".json")
 
-# Embedding dimension produced by all-MiniLM-L6-v2
-_EMBEDDING_DIM: int = 384
+# Embedding dimension produced by models/text-embedding-004
+_EMBEDDING_DIM: int = 768
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ def _load_index() -> faiss.Index:
 
     Returns:
         A FAISS ``IndexFlatL2`` — either restored from disk or freshly
-        initialised with dimension 384.
+        initialised with dimension 768.
     """
     if _INDEX_PATH.exists():
         logger.info("Loading existing FAISS index from '%s'.", _INDEX_PATH)
@@ -92,7 +92,7 @@ def build_or_update_index(
     updated chunk_id sidecar back to disk atomically.
 
     Args:
-        embeddings: A NumPy array of shape ``(N, 384)`` with dtype
+        embeddings: A NumPy array of shape ``(N, 768)`` with dtype
                     ``float32`` containing the new embedding vectors.
         chunk_ids:  List of ``N`` chunk_id strings corresponding row-for-row
                     to ``embeddings``.
@@ -135,8 +135,8 @@ def search_index(
     Retrieve the chunk_ids of the top-k nearest neighbours for a query vector.
 
     Args:
-        query_embedding: A 1-D NumPy array of shape ``(384,)`` or a 2-D
-                         array of shape ``(1, 384)``.
+        query_embedding: A 1-D NumPy array of shape ``(768,)`` or a 2-D
+                         array of shape ``(1, 768)``.
         top_k:           Number of nearest neighbours to return.  Defaults
                          to 5.
 
@@ -156,7 +156,7 @@ def search_index(
     index = _load_index()
     chunk_ids = _load_sidecar()
 
-    # Normalise shape to (1, 384) float32
+    # Normalise shape to (1, 768) float32
     query = np.array(query_embedding, dtype=np.float32)
     if query.ndim == 1:
         query = query.reshape(1, -1)

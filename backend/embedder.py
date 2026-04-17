@@ -1,26 +1,29 @@
 """
 Learnify AI — Embedding Generator.
 
-Loads the ``all-MiniLM-L6-v2`` sentence-transformers model once at module
-level (singleton pattern) and exposes a function to embed a batch of text
-chunks.  The model produces 384-dimensional normalised vectors and is
-lightweight enough to run on CPU.
+Loads the `GoogleGenerativeAIEmbeddings` using `models/text-embedding-004`
+to embed a batch of text chunks. The model produces 768-dimensional normalised vectors.
 """
 
 import logging
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+from config import settings
 
 logger = logging.getLogger(__name__)
 
 # ── Singleton model ──────────────────────────────────────────────────────
 # Loaded once on first import; subsequent imports reuse the same instance.
-_model: SentenceTransformer = SentenceTransformer("all-MiniLM-L6-v2")
+_model: GoogleGenerativeAIEmbeddings = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    google_api_key=settings.GEMINI_API_KEY
+)
 
 # Embedding dimension for this model (used for empty-input fallback)
-_EMBEDDING_DIM: int = 384
+_EMBEDDING_DIM: int = 768
 
 
 def embed_chunks(
@@ -40,7 +43,7 @@ def embed_chunks(
         A tuple of:
             - A Python list of embedding vectors (``list[list[float]]``) —
               one per chunk, for MongoDB storage.
-            - A NumPy 2-D array of shape ``(N, 384)`` — for FAISS indexing.
+            - A NumPy 2-D array of shape ``(N, 768)`` — for FAISS indexing.
     """
     texts = [chunk.get("text", "") for chunk in chunks]
 
@@ -48,15 +51,11 @@ def embed_chunks(
         logger.warning("embed_chunks called with empty chunk list.")
         return [], np.empty((0, _EMBEDDING_DIM), dtype=np.float32)
 
-    # SentenceTransformer.encode returns ndarray of shape (N, 384)
-    embeddings_array: np.ndarray = _model.encode(
-        texts,
-        show_progress_bar=False,
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-    ).astype(np.float32)
-
-    embeddings_list: List[List[float]] = embeddings_array.tolist()
+    # GoogleGenerativeAIEmbeddings.embed_documents returns List[List[float]]
+    embeddings_list: List[List[float]] = _model.embed_documents(texts)
+    
+    # Needs to be a float32 ndarray for FAISS
+    embeddings_array: np.ndarray = np.array(embeddings_list, dtype=np.float32)
 
     logger.info(
         "Generated %d embeddings of dimension %d.",
