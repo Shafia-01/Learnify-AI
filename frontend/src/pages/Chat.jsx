@@ -60,15 +60,20 @@ const Chat = () => {
       <div className="w-1/2 flex flex-col border-r border-gray-700">
         <div className="p-4 bg-gray-800 flex justify-between items-center border-b border-gray-700">
           <h2 className="font-bold text-xl">Chat</h2>
-          <select 
-            value={level} 
-            onChange={(e) => setLevel(e.target.value)}
-            className="bg-gray-700 p-2 rounded outline-none border border-gray-600"
-          >
-            <option>Beginner</option>
-            <option>Intermediate</option>
-            <option>Advanced</option>
-          </select>
+          <div className="flex gap-3 items-center">
+            <span className="px-3 py-1 bg-green-900 text-green-400 font-bold rounded-full text-xs border border-green-700">
+              {localStorage.getItem('provider') || 'Provider'}
+            </span>
+            <select 
+              value={level} 
+              onChange={(e) => setLevel(e.target.value)}
+              className="bg-gray-700 p-2 rounded outline-none border border-gray-600"
+            >
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
