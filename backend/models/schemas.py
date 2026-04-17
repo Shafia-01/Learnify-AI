@@ -82,6 +82,7 @@ class UserProfile(BaseModel):
     xp: int = Field(default=0, ge=0, description="Total experience points earned")
     badges: List[str] = Field(default_factory=list, description="List of earned badge identifiers")
     streak_days: int = Field(default=0, ge=0, description="Current consecutive-day learning streak")
+    last_active_date: Optional[datetime] = Field(default=None, description="Last date the user was active")
 
 
 class SessionEvent(BaseModel):
