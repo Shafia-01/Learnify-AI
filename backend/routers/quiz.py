@@ -9,6 +9,8 @@ from models.schemas import QuizQuestion, QuizAttempt, QuestionType
 from quiz.adaptive_selector import select_next_questions
 from quiz.difficulty_engine import update_score
 from rag.llm_provider import get_llm
+from summaries.daily_summary import generate_daily_summary
+from summaries.flashcard_generator import generate_flashcards
 
 router = APIRouter(prefix="/quiz", tags=["Quiz"])
 
@@ -92,3 +94,33 @@ async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(g
         "explanation": explanation,
         "xp_awarded": xp_awarded
     }
+
+@router.get("/summary/{user_id}")
+async def get_summary(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    pipeline = [{"$sample": {"size": 3}}]
+    chunk_docs = await db["chunks"].aggregate(pipeline).to_list(length=3)
+    chunk_texts = [doc["text"] for doc in chunk_docs]
+    if not chunk_texts:
+        chunk_texts = ["No recent content available for summary."]
+    summary = await generate_daily_summary(db, user_id, chunk_texts)
+    return {"summary": summary}
+
+@router.get("/flashcards/{user_id}")
+async def get_flashcards(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    user = await db["users"].find_one({"user_id": user_id})
+    weak_topics = ["overall"]
+    if user and "quiz_scores" in user:
+        weak_topics = [t for t, s in user["quiz_scores"].items() if s < 50]
+        
+    if not weak_topics:
+        weak_topics = ["overall"]
+        
+    pipeline = [{"$sample": {"size": 3}}]
+    chunk_docs = await db["chunks"].aggregate(pipeline).to_list(length=3)
+    chunk_texts = [doc["text"] for doc in chunk_docs]
+    if not chunk_texts:
+        chunk_texts = ["Machine learning is great.", "Deep learning uses neural networks."]
+        
+    flashcards = await generate_flashcards(chunk_texts)
+    return flashcards
+
