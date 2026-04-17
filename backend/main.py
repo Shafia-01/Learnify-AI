@@ -26,6 +26,7 @@ from fastapi import APIRouter
 
 from routers.ingest import router as ingest_router
 from routers.query import router as query_router
+from routers.websocket import router as websocket_router
 
 quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
 gamification_router = APIRouter(prefix="/gamification", tags=["Gamification"])
@@ -121,6 +122,7 @@ app.include_router(gamification_router)
 app.include_router(analytics_router)
 app.include_router(voice_router)
 app.include_router(graph_router)
+app.include_router(websocket_router)
 
 
 # ── Health check ─────────────────────────────────────────────────────────
