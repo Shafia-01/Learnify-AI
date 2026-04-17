@@ -70,9 +70,6 @@ async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(g
     # Update score
     await update_score(db, req.user_id, is_correct, req.topic)
     
-    # Calculate XP
-    xp_awarded = 10 if is_correct else 0
-    
     # Store Attempt
     attempt = QuizAttempt(
         user_id=req.user_id,
@@ -82,17 +79,16 @@ async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(g
     )
     await db["quiz_attempts"].insert_one(attempt.model_dump())
     
-    # Update user XP
-    if xp_awarded > 0:
-        await db["users"].update_one(
-            {"user_id": req.user_id},
-            {"$inc": {"xp": xp_awarded}}
-        )
-        
+    # Update XP and check badges via gamification engine
+    from gamification.xp_engine import award_xp
+    xp_result = await award_xp(db, req.user_id, "quiz_correct" if is_correct else "quiz_wrong")
+    
     return {
         "is_correct": is_correct,
         "explanation": explanation,
-        "xp_awarded": xp_awarded
+        "xp_awarded": xp_result["xp_awarded"],
+        "badge_unlocked": xp_result["badge_unlocked"],
+        "new_total_xp": xp_result["new_total"]
     }
 
 @router.get("/summary/{user_id}")
