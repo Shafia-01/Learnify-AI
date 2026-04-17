@@ -28,9 +28,9 @@ from routers.ingest import router as ingest_router
 from routers.query import router as query_router
 from routers.websocket import router as websocket_router
 from routers.gamification import router as gamification_router
+from routers.analytics import router as analytics_router
 
 quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
-analytics_router = APIRouter(prefix="/analytics", tags=["Analytics"])
 voice_router = APIRouter(prefix="/voice", tags=["Voice"])
 graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 
@@ -46,18 +46,6 @@ graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 async def quiz_status() -> Dict[str, str]:
     """Return quiz service readiness."""
     return {"service": "quiz", "status": "ready"}
-
-
-@gamification_router.get("/status")
-async def gamification_status() -> Dict[str, str]:
-    """Return gamification service readiness."""
-    return {"service": "gamification", "status": "ready"}
-
-
-@analytics_router.get("/status")
-async def analytics_status() -> Dict[str, str]:
-    """Return analytics service readiness."""
-    return {"service": "analytics", "status": "ready"}
 
 
 @voice_router.get("/status")
