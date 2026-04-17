@@ -24,6 +24,7 @@ _REQUIRED_COLLECTIONS = [
     "users",
     "chunks",
     "sessions",
+    "quiz_questions",
     "quiz_attempts",
     "knowledge_nodes",
     "emotion_events",
