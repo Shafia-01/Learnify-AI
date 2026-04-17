@@ -27,9 +27,9 @@ from fastapi import APIRouter
 from routers.ingest import router as ingest_router
 from routers.query import router as query_router
 from routers.websocket import router as websocket_router
+from routers.gamification import router as gamification_router
 
 quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
-gamification_router = APIRouter(prefix="/gamification", tags=["Gamification"])
 analytics_router = APIRouter(prefix="/analytics", tags=["Analytics"])
 voice_router = APIRouter(prefix="/voice", tags=["Voice"])
 graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
