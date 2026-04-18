@@ -26,12 +26,12 @@ from fastapi import APIRouter
 
 from routers.ingest import router as ingest_router
 from routers.query import router as query_router
+from routers.quiz import router as quiz_router
+from routers.voice import router as voice_router
 from routers.websocket import router as websocket_router
 from routers.gamification import router as gamification_router
 from routers.analytics import router as analytics_router
 
-quiz_router = APIRouter(prefix="/quiz", tags=["Quiz"])
-voice_router = APIRouter(prefix="/voice", tags=["Voice"])
 graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 
 
@@ -40,18 +40,6 @@ graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 
 
 # The query router and its status endpoint are provided by routers.query
-
-
-@quiz_router.get("/status")
-async def quiz_status() -> Dict[str, str]:
-    """Return quiz service readiness."""
-    return {"service": "quiz", "status": "ready"}
-
-
-@voice_router.get("/status")
-async def voice_status() -> Dict[str, str]:
-    """Return voice service readiness."""
-    return {"service": "voice", "status": "ready"}
 
 
 @graph_router.get("/status")
