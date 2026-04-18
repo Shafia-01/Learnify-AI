@@ -18,13 +18,13 @@ export const transcribeAudio = async (audioBlob) => {
 };
 
 /**
- * Convert text to speech. Returns audio blob URL.
+ * Convert text to speech. Returns audio URL for direct use in <audio> tags.
  * @param {string} text 
- * @returns {Promise<string>}
+ * @param {string} [language='en']
+ * @returns {string}
  */
-export const speakText = async (text) => {
-  const response = await client.post('/api/voice/speak', { text }, {
-    responseType: 'blob'
-  });
-  return URL.createObjectURL(response.data);
+export const speakText = (text, language = 'en') => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+  const params = new URLSearchParams({ text, language });
+  return `${baseUrl}/api/voice/speak?${params.toString()}`;
 };

@@ -60,11 +60,11 @@ const Chat = () => {
     }
   };
 
-  const handleSpeak = async (text) => {
+  const handleSpeak = (text) => {
     if (!text || isSpeaking) return;
     setIsSpeaking(true);
     try {
-      const audioUrl = await speakText(text);
+      const audioUrl = speakText(text);
       const audio = new Audio(audioUrl);
       audio.onended = () => setIsSpeaking(false);
       audio.play();
