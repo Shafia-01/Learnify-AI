@@ -92,14 +92,14 @@ app.add_middleware(
 
 # ── Register routers ────────────────────────────────────────────────────
 
-app.include_router(ingest_router)
-app.include_router(query_router)
-app.include_router(quiz_router)
-app.include_router(gamification_router)
-app.include_router(analytics_router)
-app.include_router(voice_router)
-app.include_router(settings_router)
-app.include_router(graph_router)
+app.include_router(ingest_router, prefix="/api")
+app.include_router(query_router, prefix="/api")
+app.include_router(quiz_router, prefix="/api")
+app.include_router(gamification_router, prefix="/api")
+app.include_router(analytics_router, prefix="/api")
+app.include_router(voice_router, prefix="/api")
+app.include_router(settings_router, prefix="/api")
+app.include_router(graph_router, prefix="/api")
 app.include_router(websocket_router)
 
 
