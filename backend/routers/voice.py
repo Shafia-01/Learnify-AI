@@ -37,17 +37,29 @@ async def transcribe(file: UploadFile = File(...)):
 async def speak(request: SpeakRequest):
     """
     Synthesize text into speech and return the audio file (MP3).
-    Uses gTTS for free, multilingual speech synthesis.
+    Uses gTTS for free, multilingual speech synthesis. (POST version)
     """
-    if not request.text:
+    return await _process_speak(request.text, request.language)
+
+
+@router.get("/speak")
+async def speak_get(text: str, language: str = "en"):
+    """
+    Synthesize text into speech and return the audio file (MP3).
+    Allows calling via GET for easy integration with <audio> tags.
+    """
+    return await _process_speak(text, language)
+
+
+async def _process_speak(text: str, language: str) -> Response:
+    """Internal helper to process speech synthesis."""
+    if not text:
         raise HTTPException(status_code=400, detail="Text for speech synthesis cannot be empty.")
         
     try:
         # Run synchronous synthesis in a thread pool
-        audio_bytes = await anyio.to_thread.run_sync(synthesize_speech, request.text, request.language)
+        audio_bytes = await anyio.to_thread.run_sync(synthesize_speech, text, language)
         return Response(content=audio_bytes, media_type="audio/mpeg")
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Speak router error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
