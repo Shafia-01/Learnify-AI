@@ -5,8 +5,14 @@ import client from './client';
  * @param {string} query 
  * @returns {Promise<Object>}
  */
-export const askQuestion = async (query) => {
-  const response = await client.post('/api/query', { query });
+export const askQuestion = async (query, level = 'intermediate', language = 'English') => {
+  const user_id = localStorage.getItem('user_id') || 'default';
+  const response = await client.post('/api/query/ask', {
+    question: query,
+    user_id,
+    level,
+    language,
+  });
   return response.data;
 };
 
@@ -15,8 +21,8 @@ export const askQuestion = async (query) => {
  * @param {string} topic 
  * @returns {Promise<Object>}
  */
-export const getLearningPath = async (topic) => {
-  const response = await client.get(`/api/learning-path?topic=${encodeURIComponent(topic)}`);
+export const getLearningPath = async (userId = 'default') => {
+  const response = await client.get(`/api/query/learning-path/${encodeURIComponent(userId)}`);
   return response.data;
 };
 
@@ -25,7 +31,7 @@ export const getLearningPath = async (topic) => {
  * @param {string} query 
  * @returns {Promise<Object>}
  */
-export const getKnowledgeGraph = async (query) => {
-  const response = await client.get(`/api/knowledge-graph?query=${encodeURIComponent(query)}`);
+export const getKnowledgeGraph = async (userId = 'default') => {
+  const response = await client.get(`/api/query/knowledge-graph/${encodeURIComponent(userId)}`);
   return response.data;
 };

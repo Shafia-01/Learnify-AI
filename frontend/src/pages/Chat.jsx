@@ -33,10 +33,14 @@ const Chat = () => {
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
 
     try {
-      const response = await askQuestion(userMsg);
-      // fallback in case real endpoint is not ready
-      const aiResponse = response.answer || "This is a mock answer.";
-      const citations = response.citations || [{ source: "book.pdf", page: 12, text: "Mock snippet" }];
+      const response = await askQuestion(userMsg, level.toLowerCase());
+      const aiResponse = response.answer || "No answer returned.";
+      // Normalise citations: backend returns source_file / page_or_timestamp
+      const citations = (response.citations || []).map(c => ({
+        source: c.source_file || c.source || '',
+        page: c.page_or_timestamp || c.page || '',
+        text: c.text || '',
+      }));
       
       setMessages(prev => [...prev, { role: 'ai', content: aiResponse, citations }]);
     } catch (e) {
