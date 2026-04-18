@@ -105,6 +105,14 @@ app.include_router(websocket_router)
 
 # ── Health check ─────────────────────────────────────────────────────────
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    """Redirect root to /docs for easier navigation."""
+    return RedirectResponse(url="/docs")
+
+
 @app.get("/health", tags=["System"])
 async def health_check() -> Dict[str, str]:
     """
