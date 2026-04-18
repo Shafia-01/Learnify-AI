@@ -9,7 +9,7 @@ import logging
 from typing import List
 
 from models.schemas import ContentChunk
-from embedder import embed_chunks
+from embedder import embed_query
 from vector_store import search_index
 import database
 
@@ -35,14 +35,11 @@ async def retrieve_chunks(query: str, top_k: int = 5) -> List[ContentChunk]:
         Returns an empty list if no chunks are found or the index is empty.
     """
     # 1. Embed query
-    _, query_embedding_array = embed_chunks([{"text": query}])
+    query_vector = embed_query(query)
     
-    if query_embedding_array.size == 0:
+    if query_vector.size == 0:
         logger.warning("Query embedding failed or query is empty.")
         return []
-
-    # First element of the batch
-    query_vector = query_embedding_array[0]
 
     # 2. Search FAISS index for candidate IDs
     try:
