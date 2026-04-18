@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadFile, uploadYoutube } from '../api/ingest';
 
@@ -8,16 +8,28 @@ const Upload = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
+  const addFiles = (rawFiles) => {
+    const accepted = Array.from(rawFiles).filter(f => 
+      f.name.endsWith('.pdf') || f.name.endsWith('.ppt') || f.name.endsWith('.txt') || f.name.endsWith('.pptx')
+    );
+    setFiles(prev => [...prev, ...accepted.map(file => ({ type: 'file', data: file, status: 'pending' }))]);
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedFiles = Array.from(e.dataTransfer.files).filter(f => 
-      f.name.endsWith('.pdf') || f.name.endsWith('.ppt') || f.name.endsWith('.txt') || f.name.endsWith('.pptx')
-    );
-    setFiles(prev => [...prev, ...droppedFiles.map(file => ({ type: 'file', data: file, status: 'pending' }))]);
+    addFiles(e.dataTransfer.files);
   };
 
   const handleDragOver = (e) => e.preventDefault();
+
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      addFiles(e.target.files);
+      e.target.value = '';
+    }
+  };
 
   const handleAddYoutube = () => {
     if (youtubeUrl && (youtubeUrl.includes('youtube.com') || youtubeUrl.includes('youtu.be'))) {
@@ -63,14 +75,31 @@ const Upload = () => {
       <div className="max-w-3xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-blue-400">Upload Knowledge Source</h1>
         
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.ppt,.pptx,.txt"
+          multiple
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+        />
+
         <div 
           onDrop={handleDrop} 
           onDragOver={handleDragOver}
-          className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-blue-500 transition-colors bg-gray-800"
+          onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-blue-500 transition-colors bg-gray-800 cursor-pointer"
         >
           <div className="text-5xl mb-4">📁</div>
           <p className="text-xl mb-2">Drag and drop files here</p>
-          <p className="text-gray-400">Supports PDF, PPT, TXT</p>
+          <p className="text-gray-400 mb-4">Supports PDF, PPT, TXT</p>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); fileInputRef.current && fileInputRef.current.click(); }}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
+          >
+            Browse Files
+          </button>
         </div>
 
         <div className="flex gap-4">

@@ -8,7 +8,7 @@ import client from './client';
 export const uploadFile = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await client.post('/api/ingest/file', formData, {
+  const response = await client.post('/api/ingest/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
