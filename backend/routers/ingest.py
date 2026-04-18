@@ -9,7 +9,7 @@ Exposes two POST endpoints that drive the full content-ingestion pipeline:
 Both endpoints:
   1. Route to the correct parser.
   2. Chunk the parsed items with LangChain RecursiveCharacterTextSplitter.
-  3. Generate 768-dimensional embeddings via Gemini.
+  3. Generate 384-dimensional embeddings via Sentence Transformers.
   4. Store chunk dicts in MongoDB (``chunks`` collection).
   5. Add embedding vectors to the FAISS index on disk.
   6. Return {"message": "processed", "chunks_created": N}.
