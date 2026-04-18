@@ -43,7 +43,10 @@ async def speak(request: SpeakRequest):
 
 
 @router.get("/speak")
-async def speak_get(text: str, language: str = "en"):
+async def speak_get(
+    text: str = "Welcome to Learnify AI. Please provide text to synthesize.", 
+    language: str = "en"
+):
     """
     Synthesize text into speech and return the audio file (MP3).
     Allows calling via GET for easy integration with <audio> tags.

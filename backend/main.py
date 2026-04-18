@@ -9,6 +9,11 @@ import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+import warnings
+# Silence TensorFlow deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=".*The name tf.losses.sparse_softmax_cross_entropy is deprecated.*")
+
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Dict
 
