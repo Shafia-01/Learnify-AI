@@ -35,6 +35,7 @@ numpy
 # Voice
 gTTS
 openai-whisper
+langdetect
 
 # Emotion detection
 mediapipe
