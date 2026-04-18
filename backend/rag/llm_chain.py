@@ -40,9 +40,9 @@ def _parse_citations(text: str) -> tuple[str, List[Dict[str, str]]]:
     Returns:
         A tuple of (clean_answer, list_of_citation_dicts).
     """
-    # Split specifically on a "Sources:" heading at the bottom of the response.
-    # regex accommodates markdown boldness on the word Sources.
-    split_text = re.split(r"\n(?:\*\*?)?Sources:(?:\*\*?)?\s*\n", text, flags=re.IGNORECASE)
+    # Split specifically on a "Sources:" or "Source:" heading at the bottom of the response.
+    # regex accommodates markdown boldness and singular/plural.
+    split_text = re.split(r"\n(?:\*\*?)?Sources?:(?:\*\*?)?\s*\n", text, flags=re.IGNORECASE)
 
     if len(split_text) == 1:
         # If the LLM failed to include a sources block, return the whole text.

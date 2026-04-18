@@ -1,3 +1,4 @@
+import anyio
 from fastapi import APIRouter, UploadFile, File, HTTPException, Response
 from pydantic import BaseModel
 from voice.stt import transcribe_audio
@@ -23,7 +24,8 @@ async def transcribe(file: UploadFile = File(...)):
         if not audio_bytes:
             raise HTTPException(status_code=400, detail="Empty audio file provided.")
             
-        text = transcribe_audio(audio_bytes)
+        # Run synchronous transcription in a thread pool to avoid blocking the event loop
+        text = await anyio.to_thread.run_sync(transcribe_audio, audio_bytes)
         return {"text": text}
     except HTTPException:
         raise
@@ -41,7 +43,8 @@ async def speak(request: SpeakRequest):
         raise HTTPException(status_code=400, detail="Text for speech synthesis cannot be empty.")
         
     try:
-        audio_bytes = synthesize_speech(request.text, request.language)
+        # Run synchronous synthesis in a thread pool
+        audio_bytes = await anyio.to_thread.run_sync(synthesize_speech, request.text, request.language)
         return Response(content=audio_bytes, media_type="audio/mpeg")
     except HTTPException:
         raise
