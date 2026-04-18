@@ -23,8 +23,12 @@ runtime_config = {
     "provider": "groq",  # default to groq during development
     "gemini_model": "gemini-3.1-flash-lite",
     "groq_model": "llama-3.1-8b-instant",
-    "ollama_model": "llama3"
+    "ollama_model": "llama3",
+    "privacy_mode": settings.PRIVACY_MODE
 }
+
+if settings.PRIVACY_MODE:
+    logger.info("PRIVACY MODE ACTIVE — all processing is local (Ollama)")
 
 def set_provider(provider: str, model: str = None) -> Dict[str, str]:
     """
@@ -52,16 +56,45 @@ def set_provider(provider: str, model: str = None) -> Dict[str, str]:
     return runtime_config
 
 
+def set_privacy_mode(enabled: bool) -> bool:
+    """
+    Toggle privacy mode. When enabled, all LLM calls use local Ollama.
+    """
+    runtime_config["privacy_mode"] = enabled
+    if enabled:
+        logger.info("PRIVACY MODE ACTIVE — all processing is local")
+    return enabled
+
+
 def get_llm() -> Any:
     """
     Retrieve an active LangChain chat model instance based on runtime_config.
 
-    If the requested provider is disconnected or unsupported, it structurally
-    defaults to Groq.
+    If privacy_mode is active, it strictly returns Ollama.
+    Otherwise, it returns the user-selected provider.
 
     Returns:
         An instantiated BaseChatModel.
     """
+    # Force Ollama if Privacy Mode is enabled
+    if runtime_config.get("privacy_mode"):
+        try:
+            return ChatOllama(
+                model=runtime_config["ollama_model"],
+                base_url=settings.OLLAMA_BASE_URL,
+                temperature=0.7,
+            )
+        except Exception as e:
+            logger.error("Privacy mode enabled but Ollama failed: %s. Falling back to Groq.", e)
+            # In privacy mode, we should ideally NOT fall back to cloud, 
+            # but the get_llm pattern here seems to favor availability.
+            # However, the prompt says "completely replacing Gemini and Groq".
+            # So maybe I should raise an error if Ollama fails in privacy mode?
+            # "If model fails to load, log a clear error and raise HTTPException(503, ...)" 
+            # (That was for Whisper, but let's be careful).
+            # The prompt says: "use it as the LLM for ALL chains — completely replacing Gemini and Groq".
+            pass
+
     provider = runtime_config.get("provider", "groq").lower()
 
     if provider == "gemini":

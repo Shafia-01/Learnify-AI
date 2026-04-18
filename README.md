@@ -153,6 +153,13 @@ breakdown of data flow, system components, and design decisions.
 
 ---
 
+## ⚠️ Known Limitations
+
+- **Ollama Privacy Mode**: This feature works only when running the platform locally on a machine with Ollama installed and running. It will not be available on the Render free deployment or any cloud hosting that lacks a local Ollama instance.
+- **Whisper & OpenCV**: Local models (Whisper for STT and DeepFace for emotion detection) require significant CPU/RAM resources. Performance may vary on low-end machines.
+
+---
+
 ## 📜 License
 
 This project is for educational purposes.

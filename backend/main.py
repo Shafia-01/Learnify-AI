@@ -27,6 +27,7 @@ from fastapi import APIRouter
 from routers.ingest import router as ingest_router
 from routers.query import router as query_router
 from routers.quiz import router as quiz_router
+from routers.settings import router as settings_router
 from routers.voice import router as voice_router
 from routers.websocket import router as websocket_router
 from routers.gamification import router as gamification_router
@@ -97,6 +98,7 @@ app.include_router(quiz_router)
 app.include_router(gamification_router)
 app.include_router(analytics_router)
 app.include_router(voice_router)
+app.include_router(settings_router)
 app.include_router(graph_router)
 app.include_router(websocket_router)
 
