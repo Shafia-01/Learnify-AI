@@ -9,7 +9,9 @@ const VoiceButton = ({ onTranscription }) => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      // Let the browser choose the best supported mimeType
+      mediaRecorder.current = new MediaRecorder(stream);
       audioChunks.current = [];
 
       mediaRecorder.current.ondataavailable = (event) => {
@@ -17,7 +19,7 @@ const VoiceButton = ({ onTranscription }) => {
       };
 
       mediaRecorder.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunks.current);
         try {
           const res = await transcribeAudio(audioBlob);
           if (res && res.text) {
@@ -35,6 +37,7 @@ const VoiceButton = ({ onTranscription }) => {
       setIsRecording(true);
     } catch (err) {
       console.error("Mic access denied or error", err);
+      alert("Could not access microphone. Please check permissions.");
     }
   };
 

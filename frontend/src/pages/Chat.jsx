@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
+import { speakText } from '../api/voice';
 import KnowledgeGraph from '../components/KnowledgeGraph';
 import VoiceButton from '../components/VoiceButton';
 
@@ -8,6 +9,7 @@ const Chat = () => {
   const [input, setInput] = useState('');
   const [level, setLevel] = useState(localStorage.getItem('level') || 'Beginner');
   const [activeTab, setActiveTab] = useState('Learning Path');
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   // Tab states
   const [learningPath, setLearningPath] = useState([]);
@@ -58,6 +60,20 @@ const Chat = () => {
     }
   };
 
+  const handleSpeak = async (text) => {
+    if (!text || isSpeaking) return;
+    setIsSpeaking(true);
+    try {
+      const audioUrl = await speakText(text);
+      const audio = new Audio(audioUrl);
+      audio.onended = () => setIsSpeaking(false);
+      audio.play();
+    } catch (e) {
+      console.error("Speech failed", e);
+      setIsSpeaking(false);
+    }
+  };
+
   return (
     <div className="h-screen flex bg-gray-900 text-white overflow-hidden">
       {/* Left panel: Chat */}
@@ -83,8 +99,17 @@ const Chat = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] p-4 rounded-xl ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-800'}`}>
+              <div className={`max-w-[80%] p-4 rounded-xl ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-800'} relative group`}>
                 <p>{msg.content}</p>
+                {msg.role === 'ai' && (
+                  <button 
+                    onClick={() => handleSpeak(msg.content)}
+                    className="absolute -right-10 top-2 p-2 bg-gray-700 hover:bg-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Speak"
+                  >
+                    {isSpeaking ? '⏳' : '🔊'}
+                  </button>
+                )}
                 {msg.citations && msg.citations.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {msg.citations.map((cit, i) => (
