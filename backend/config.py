@@ -13,15 +13,17 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-# Resolve the project root (.env lives next to the /backend folder)
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# The backend directory (where this config.py lives) — .env is here
+_BACKEND_DIR = Path(__file__).resolve().parent
+# The project root (one level up) — faiss_index lives here
+_PROJECT_ROOT = _BACKEND_DIR.parent
 
 
 class Settings(BaseSettings):
     """Application-wide settings sourced from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=str(_PROJECT_ROOT / ".env"),
+        env_file=str(_BACKEND_DIR / ".env"),  # .env is in backend/, not project root
         env_file_encoding="utf-8",
         extra="ignore",
     )
