@@ -54,34 +54,30 @@ def _extract_video_id(url: str) -> str:
 def parse_youtube(url: str) -> List[Dict[str, Any]]:
     """
     Fetch the transcript of a YouTube video and group segments into chunks.
-
-    Each chunk contains approximately 500 words.  The ``timestamp_start``
-    field records the start time (in seconds) of the first segment in
-    each chunk, enabling playback-position linking in the frontend.
-
-    Args:
-        url: A YouTube video URL.
-
-    Returns:
-        A list of dicts, each containing:
-            - ``text`` — The transcript chunk (~500 words).
-            - ``timestamp_start`` — Start time in seconds for the chunk.
-            - ``source_file`` — The original YouTube URL.
-
-    Raises:
-        HTTPException: If no captions are available for the video.
+    Works for both manually uploaded and auto-generated captions.
     """
     video_id = _extract_video_id(url)
 
     try:
-        transcript_segments = YouTubeTranscriptApi.get_transcript(video_id)
+        # Using list() and find_transcript() is more robust than get_transcript()
+        # as it allows better control over fallbacks.
+        transcript_list = YouTubeTranscriptApi.list(video_id)
+        
+        # Try to find english transcript (manual then auto)
+        try:
+            transcript = transcript_list.find_transcript(['en'])
+        except:
+            # If English is not available, just take the first one available
+            transcript = next(iter(transcript_list))
+            
+        transcript_segments = transcript.fetch()
     except Exception as exc:
         logger.error(
             "Failed to fetch transcript for video '%s': %s", video_id, exc
         )
         raise HTTPException(
             status_code=404,
-            detail="No captions available for this video.",
+            detail="No captions (manual or auto-generated) available for this video.",
         ) from exc
 
     # ── Group segments into ~500-word chunks ──────────────────────────
