@@ -23,31 +23,51 @@ const Settings = () => {
     localStorage.setItem('level', level);
   }, [language, level]);
 
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await client.get('/api/settings/status');
+        setPrivacyMode(res.data.privacy_mode);
+        // Sync with what's in backend if not in localstorage
+        if (!localStorage.getItem('provider')) {
+          setProvider(res.data.llm_provider.charAt(0).toUpperCase() + res.data.llm_provider.slice(1));
+          setModel(res.data.current_model);
+        }
+      } catch (e) {
+        console.error("Failed to fetch settings status", e);
+      }
+    };
+    fetchStatus();
+  }, []);
+
   const togglePrivacyMode = async () => {
     const newMode = !privacyMode;
     setPrivacyMode(newMode);
     try {
-      await client.patch('/api/settings/privacy', { privacy_mode: newMode });
+      await client.post('/api/settings/privacy', { enabled: newMode });
     } catch (e) {
       console.error("Failed to toggle privacy mode", e);
+      setPrivacyMode(!newMode); // revert
     }
   };
 
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const res = await client.get(`/api/settings/providers?provider=${provider}`);
-        setAvailableModels(res.data.models || []);
-        if (provider === 'Ollama') {
-          setOllamaStatus(res.data.status || 'available');
+        const res = await client.get('/api/settings/providers');
+        // Find the provider in the list (case insensitive)
+        const selectedProv = res.data.providers.find(p => p.id === provider.toLowerCase());
+        setAvailableModels(selectedProv?.models || []);
+        if (provider.toLowerCase() === 'ollama') {
+          setOllamaStatus(selectedProv?.status || 'available');
         }
       } catch (e) {
         // Fallback for mock frontend
-        if (provider === 'Gemini') setAvailableModels(['gemini-pro', 'gemini-1.5-flash']);
-        if (provider === 'Groq') setAvailableModels(['llama3-8b-8192', 'llama3-70b-8192']);
+        if (provider === 'Gemini') setAvailableModels(['gemini-3.1-flash-lite']);
+        if (provider === 'Groq') setAvailableModels(['llama-3.1-8b-instant', 'llama3-70b-8192']);
         if (provider === 'Ollama') {
           setAvailableModels(['llama3', 'mistral']);
-          setOllamaStatus('unavailable'); // Mock check
+          setOllamaStatus('unavailable');
         }
       }
     };
@@ -59,7 +79,10 @@ const Settings = () => {
     localStorage.setItem('provider', provider);
     localStorage.setItem('model', model);
     try {
-      await client.post('/api/settings/provider', { provider, model });
+      await client.post('/api/settings/provider', { 
+        provider: provider.toLowerCase(), 
+        model 
+      });
       alert(`Successfully switched to ${provider} (${model})`);
     } catch (e) {
       alert("Error switching provider");

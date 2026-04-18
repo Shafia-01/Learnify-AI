@@ -14,7 +14,7 @@ function App() {
     const savedProvider = localStorage.getItem('provider');
     const savedModel = localStorage.getItem('model');
     if (savedProvider && savedModel) {
-      client.post('/api/settings/provider', { provider: savedProvider, model: savedModel })
+      client.post('/api/settings/provider', { provider: savedProvider.toLowerCase(), model: savedModel })
         .catch(err => console.error("Failed to restore provider on load", err));
     }
   }, []);

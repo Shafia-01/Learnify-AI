@@ -25,6 +25,8 @@ frontend/.vite/
 # FAISS indexes
 *.faiss
 faiss_index/
+faiss_index
+faiss_index.json
 
 # IDE
 .vscode/

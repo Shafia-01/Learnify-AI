@@ -85,15 +85,8 @@ def get_llm() -> Any:
                 temperature=0.7,
             )
         except Exception as e:
-            logger.error("Privacy mode enabled but Ollama failed: %s. Falling back to Groq.", e)
-            # In privacy mode, we should ideally NOT fall back to cloud, 
-            # but the get_llm pattern here seems to favor availability.
-            # However, the prompt says "completely replacing Gemini and Groq".
-            # So maybe I should raise an error if Ollama fails in privacy mode?
-            # "If model fails to load, log a clear error and raise HTTPException(503, ...)" 
-            # (That was for Whisper, but let's be careful).
-            # The prompt says: "use it as the LLM for ALL chains — completely replacing Gemini and Groq".
-            pass
+            logger.error("Privacy mode enabled but Ollama failed: %s. Blocking fallback to cloud.", e)
+            raise RuntimeError(f"Privacy Mode is ACTIVE but local Ollama failed: {e}") from e
 
     provider = runtime_config.get("provider", "groq").lower()
 
