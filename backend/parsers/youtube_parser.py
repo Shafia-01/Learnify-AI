@@ -59,9 +59,9 @@ def parse_youtube(url: str) -> List[Dict[str, Any]]:
     video_id = _extract_video_id(url)
 
     try:
-        # Using list() and find_transcript() is more robust than get_transcript()
+        # Using list_transcripts() is more robust than get_transcript()
         # as it allows better control over fallbacks.
-        transcript_list = YouTubeTranscriptApi.list(video_id)
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         
         # Try to find english transcript (manual then auto)
         try:
