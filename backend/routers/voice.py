@@ -57,12 +57,17 @@ async def speak_get(
 async def _process_speak(text: str, language: str) -> Response:
     """Internal helper to process speech synthesis."""
     if not text:
-        raise HTTPException(status_code=400, detail="Text for speech synthesis cannot be empty.")
+        # Fallback to a default message if text is absolutely missing
+        text = "Welcome to Learnify AI. Please provide text to synthesize."
         
     try:
         # Run synchronous synthesis in a thread pool
         audio_bytes = await anyio.to_thread.run_sync(synthesize_speech, text, language)
-        return Response(content=audio_bytes, media_type="audio/mpeg")
+        return Response(
+            content=audio_bytes, 
+            media_type="audio/mpeg",
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+        )
     except Exception as e:
         logger.error(f"Speak router error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
