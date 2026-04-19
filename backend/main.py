@@ -38,6 +38,7 @@ from routers.websocket import router as websocket_router
 from routers.gamification import router as gamification_router
 from routers.analytics import router as analytics_router
 from routers.auth import router as auth_router
+from routers.games import router as games_router
 
 graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
 
@@ -107,6 +108,7 @@ app.include_router(voice_router, prefix="/api")
 app.include_router(settings_router, prefix="/api")
 app.include_router(graph_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
+app.include_router(games_router, prefix="/api")
 app.include_router(websocket_router)
 
 
