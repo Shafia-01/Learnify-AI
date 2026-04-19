@@ -31,17 +31,18 @@ def _extract_video_id(url: str) -> str:
         detail=f"Could not extract video ID from URL: {url}",
     )
 
-def _fetch_with_ytdlp(video_id: str, cookie_path=None):
+
+def _fetch_with_ytdlp(video_id: str) -> List[Dict[str, Any]]:
+    """Fetch transcript via yt-dlp — handles cloud IP blocks better."""
     import yt_dlp
 
     ydl_opts = {
         "writesubtitles": True,
         "writeautomaticsub": True,
-        "subtitleslangs": ["en", "en-orig"],
+        "subtitleslangs": ["en"],
         "skip_download": True,
         "quiet": True,
         "no_warnings": True,
-        "cookiesfrombrowser": ("chrome",),   # <-- add this one line
     }
 
     # Optional: add proxy from env var
