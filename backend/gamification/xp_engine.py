@@ -34,6 +34,8 @@ async def award_xp(db: AsyncIOMotorDatabase, user_id: str, event_type: str) -> d
         await db["users"].insert_one(user_doc)
     else:
         # Use Pydantic to validate and handle the document
+        if "name" not in user_doc:
+            user_doc["name"] = f"Learner_{user_id[:4]}"
         user_profile = UserProfile(**user_doc)
         
     new_total = user_profile.xp + xp_to_add

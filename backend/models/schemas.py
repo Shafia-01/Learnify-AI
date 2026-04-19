@@ -75,15 +75,15 @@ class ContentChunk(BaseModel):
 class UserProfile(BaseModel):
     """Learner profile with gamification state."""
 
-    user_id: str = Field(default_factory=lambda: uuid4().hex, description="Unique user identifier")
-    name: str = Field(default="Learner", description="Display name of the learner")
-    level: UserLevel = Field(default=UserLevel.BEGINNER, description="Current proficiency level")
-    language: str = Field(default="en", description="Preferred language code (ISO 639-1)")
-    xp: int = Field(default=0, ge=0, description="Total experience points earned")
-    badges: List[str] = Field(default_factory=list, description="List of earned badge identifiers")
-    streak_days: int = Field(default=0, ge=0, description="Current consecutive-day learning streak")
-    quiz_scores: Dict[str, int] = Field(default_factory=dict, description="Topic-specific proficiency scores")
-    last_active_date: Optional[datetime] = Field(default=None, description="Last date the user was active")
+    user_id: str = Field(default_factory=lambda: uuid4().hex)
+    name: str = "Learner"
+    level: UserLevel = UserLevel.BEGINNER
+    language: str = "en"
+    xp: int = 0
+    badges: List[str] = Field(default_factory=list)
+    streak_days: int = 0
+    quiz_scores: Dict[str, int] = Field(default_factory=dict)
+    last_active_date: Optional[datetime] = None
 
 
 class SessionEvent(BaseModel):

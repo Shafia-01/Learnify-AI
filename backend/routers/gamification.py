@@ -18,8 +18,13 @@ async def get_profile(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
     if not user_doc:
         # Instead of 404, we'll create a default profile for new users
         new_profile = UserProfile(user_id=user_id, name=f"Learner_{user_id[:4]}")
-        await db["users"].insert_one(new_profile.dict())
+        await db["users"].insert_one(new_profile.model_dump())
         return new_profile
+    
+    # Robustness: ensuring name exists in the doc
+    if "name" not in user_doc:
+        user_doc["name"] = f"Learner_{user_id[:4]}"
+    
     return UserProfile(**user_doc)
 
 @router.post("/award/{user_id}")
@@ -40,6 +45,8 @@ async def award_user(user_id: str, payload: Dict[str, Any], db: AsyncIOMotorData
     
     # 3. Retrieve final state
     user_doc = await db["users"].find_one({"user_id": user_id})
+    if "name" not in user_doc:
+        user_doc["name"] = f"Learner_{user_id[:4]}"
     
     return {
         "event_processed": event_type,
@@ -57,4 +64,8 @@ async def get_leaderboard(db: AsyncIOMotorDatabase = Depends(get_db)):
     """
     cursor = db["users"].find().sort("xp", -1).limit(10)
     users = await cursor.to_list(length=10)
+    for u in users:
+        if "name" not in u:
+            uid = u.get("user_id", "unknown")
+            u["name"] = f"Learner_{uid[:4]}"
     return [UserProfile(**u) for u in users]
