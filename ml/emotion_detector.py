@@ -1,9 +1,18 @@
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import cv2
 import asyncio
 import json
 import websockets
 import time
+import warnings
 from deepface import DeepFace
+
+# Silence TensorFlow deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=".*The name tf.losses.sparse_softmax_cross_entropy is deprecated.*")
 
 EMOTION_MAP = {
     "happy": "attention",
