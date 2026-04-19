@@ -51,3 +51,7 @@ httpx
 # Testing
 pytest
 pytest-asyncio
+
+# Authentication
+passlib[bcrypt]
+python-jose[cryptography]
