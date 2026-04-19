@@ -28,6 +28,8 @@ _REQUIRED_COLLECTIONS = [
     "quiz_attempts",
     "knowledge_nodes",
     "emotion_events",
+    "revoked_tokens",
+    "registered_users",
 ]
 
 
@@ -50,6 +52,15 @@ async def init_db() -> None:
     for collection_name in _REQUIRED_COLLECTIONS:
         if collection_name not in existing:
             await _db.create_collection(collection_name)
+
+    # ── Auth Indexes ──────────────────────────────────────────────────
+    # TTL index to automatically remove expired tokens after their expiry time
+    await _db["revoked_tokens"].create_index(
+        "expires_at", expireAfterSeconds=0, background=True
+    )
+    # Ensure unique identity for registered users
+    await _db["registered_users"].create_index("email", unique=True, background=True)
+    await _db["registered_users"].create_index("username", unique=True, background=True)
 
 
 async def close_db() -> None:
