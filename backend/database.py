@@ -31,6 +31,7 @@ _REQUIRED_COLLECTIONS = [
     "revoked_tokens",
     "registered_users",
     "game_sessions",
+    "learning_goals",
 ]
 
 
@@ -68,6 +69,13 @@ async def init_db() -> None:
     await _db["game_sessions"].create_index(
         [("user_id", 1), ("game_name", 1)], background=True
     )
+
+    # ── Learning Goal Indexes ─────────────────────────────────────────
+    # Optimized for filtering by status and tracking deadlines
+    await _db["learning_goals"].create_index(
+        [("user_id", 1), ("status", 1)], background=True
+    )
+    await _db["learning_goals"].create_index("deadline_date", background=True)
 
 
 async def close_db() -> None:
