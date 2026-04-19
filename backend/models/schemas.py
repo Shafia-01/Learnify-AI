@@ -217,3 +217,56 @@ class UsernameCheckResponse(BaseModel):
     username: str
     available: bool
     message: str
+
+
+# ── Game Schemas ─────────────────────────────────────────────────
+
+
+class GameName(str, Enum):
+    """Supported mini games on the platform."""
+
+    SNAKE = "snake"
+    TIC_TAC_TOE = "tic_tac_toe"
+    MEMORY_MATCH = "memory_match"
+    WORD_SCRAMBLE = "word_scramble"
+    FALLING_QUIZ = "falling_quiz"
+
+
+class SubmitScoreRequest(BaseModel):
+    """Payload for submitting a completed game session score."""
+
+    user_id: str
+    game_name: GameName
+    score: int = Field(..., ge=0)
+    duration_seconds: int = Field(..., ge=0)
+
+
+class GameScoreResponse(BaseModel):
+    """Response returned after a score submission, detailing XP gains and records."""
+
+    game_name: GameName
+    submitted_score: int
+    previous_high_score: int
+    new_high_score: int
+    is_new_record: bool
+    xp_awarded: int
+    message: str
+
+
+class GameLeaderboardEntry(BaseModel):
+    """Represents a ranked user on a specific game leaderboard."""
+
+    rank: int
+    user_id: str
+    username: str
+    name: str
+    score: int
+    avatar_emoji: str
+
+
+class WordScrambleWord(BaseModel):
+    """Data for a single word in the Word Scramble game."""
+
+    original: str
+    scrambled: str
+    hint: str
