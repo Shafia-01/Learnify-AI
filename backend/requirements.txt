@@ -23,6 +23,7 @@ PyPDF2
 pypdf
 pdfplumber
 python-pptx
+yt-dlp
 youtube-transcript-api
 beautifulsoup4
 unstructured
