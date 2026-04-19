@@ -155,3 +155,65 @@ class EmotionEvent(BaseModel):
         default=False,
         description="Whether an adaptive intervention was triggered by this detection",
     )
+
+
+# ── Authentication Schemas ───────────────────────────────────────
+
+
+class RegisterRequest(BaseModel):
+    """Request schema for new user registration."""
+
+    username: str = Field(..., min_length=3, max_length=20, pattern="^[a-zA-Z0-9_]+$")
+    email: str
+    password: str = Field(..., min_length=8)
+    name: str = "Learner"
+    level: UserLevel = UserLevel.BEGINNER
+    language: str = "en"
+
+
+class LoginRequest(BaseModel):
+    """Request schema for user login via email or username."""
+
+    identifier: str = Field(..., description="Email or Username")
+    password: str
+
+
+class AuthUserResponse(BaseModel):
+    """User profile data safe for public/frontend consumption."""
+
+    user_id: str
+    username: str
+    name: str
+    email: str
+    level: UserLevel
+    language: str
+    xp: int
+    badges: List[str]
+    streak_days: int
+    avatar_emoji: str = "🎓"
+    created_at: datetime
+
+
+class AuthResponse(BaseModel):
+    """Response containing JWT and user profile details."""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: AuthUserResponse
+
+
+class ProfileUpdateRequest(BaseModel):
+    """Request schema for partial profile updates."""
+
+    name: Optional[str] = None
+    level: Optional[UserLevel] = None
+    language: Optional[str] = None
+    avatar_emoji: Optional[str] = None
+
+
+class UsernameCheckResponse(BaseModel):
+    """Response schema for username availability check."""
+
+    username: str
+    available: bool
+    message: str
