@@ -270,3 +270,74 @@ class WordScrambleWord(BaseModel):
     original: str
     scrambled: str
     hint: str
+
+
+# ── Learning Goal Schemas ────────────────────────────────────────
+
+
+class GoalStatus(str, Enum):
+    """Lifecycle states of a learning goal."""
+
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+
+
+class ConceptItem(BaseModel):
+    """An individual topic or concept within a learning goal."""
+
+    name: str
+    completed: bool = False
+    completed_at: Optional[datetime] = None
+    notes: str = Field(default="", max_length=500)
+
+
+class LearningGoal(BaseModel):
+    """A comprehensive learning goal with deadline and study tracking."""
+
+    goal_id: str = Field(default_factory=lambda: uuid4().hex)
+    user_id: str
+    topic_name: str
+    concepts: List[ConceptItem] = Field(..., min_length=1)
+    total_concepts: int
+    completed_concepts: int
+    deadline_days: int
+    daily_time_minutes: int = Field(default=30, ge=5, le=480)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    deadline_date: datetime
+    status: GoalStatus = GoalStatus.ACTIVE
+    progress_percent: float = 0.0
+    daily_plan: Optional[str] = None
+    daily_plan_generated_at: Optional[datetime] = None
+
+
+class CreateGoalRequest(BaseModel):
+    """Payload for creating a new learning goal."""
+
+    user_id: str
+    topic_name: str
+    concepts: List[str] = Field(..., min_length=1)
+    deadline_days: int = Field(..., ge=1, le=365)
+    daily_time_minutes: int = 30
+
+
+class UpdateConceptRequest(BaseModel):
+    """Payload for updating completion status of a specific concept."""
+
+    concept_name: str
+    completed: bool
+    notes: Optional[str] = None
+
+
+class GoalSummary(BaseModel):
+    """Lightweight view of a learning goal for dashboard listing."""
+
+    goal_id: str
+    topic_name: str
+    total_concepts: int
+    completed_concepts: int
+    progress_percent: float
+    deadline_date: datetime
+    status: GoalStatus
+    days_remaining: int
+    on_track: bool
