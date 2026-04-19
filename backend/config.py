@@ -48,6 +48,11 @@ class Settings(BaseSettings):
     APP_NAME: str = "Learnify AI"
     DEBUG: bool = True
 
+    # ── JWT Authentication ───────────────────────────────────────────
+    JWT_SECRET_KEY: str = "your-super-secret-key-change-this"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_DAYS: int = 7
+
 
 # Singleton instance — import this everywhere
 settings = Settings()
