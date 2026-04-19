@@ -30,6 +30,7 @@ _REQUIRED_COLLECTIONS = [
     "emotion_events",
     "revoked_tokens",
     "registered_users",
+    "game_sessions",
 ]
 
 
@@ -61,6 +62,12 @@ async def init_db() -> None:
     # Ensure unique identity for registered users
     await _db["registered_users"].create_index("email", unique=True, background=True)
     await _db["registered_users"].create_index("username", unique=True, background=True)
+
+    # ── Game Indexes ──────────────────────────────────────────────────
+    # Quick lookup for user game history and leaderboards
+    await _db["game_sessions"].create_index(
+        [("user_id", 1), ("game_name", 1)], background=True
+    )
 
 
 async def close_db() -> None:
