@@ -1,11 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { uploadFile, uploadYoutube } from '../api/ingest';
+import { uploadFile } from '../api/ingest';
 
 const Upload = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
-    const [youtubeUrl, setYoutubeUrl] = useState('');
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [overallProgress, setOverallProgress] = useState(0);
@@ -35,19 +34,7 @@ const Upload = () => {
         addFiles(e.dataTransfer.files);
     };
 
-    const handleAddYoutube = () => {
-        if (!youtubeUrl.trim()) return;
-        const newItem = {
-            id: Math.random().toString(36).substr(2, 9),
-            type: 'youtube',
-            name: youtubeUrl,
-            data: youtubeUrl,
-            status: 'PENDING',
-            progress: 0
-        };
-        setFiles(prev => [...prev, newItem]);
-        setYoutubeUrl('');
-    };
+
 
     const processAll = async () => {
         if (files.length === 0) return;
@@ -67,8 +54,6 @@ const Upload = () => {
             try {
                 if (item.type === 'file') {
                     await uploadFile(item.data);
-                } else {
-                    await uploadYoutube(item.data);
                 }
                 
                 setFiles(prev => prev.map(f => f.id === item.id ? { ...f, status: 'DONE', progress: 100 } : f));
@@ -134,27 +119,7 @@ const Upload = () => {
                 </div>
             </div>
 
-            {/* YouTube Row */}
-            <div className="flex gap-2">
-                <div className="flex-1 bg-white border border-[#F97316]/30 rounded-[10px] p-1.5 flex items-center gap-3 focus-within:ring-2 ring-orange-500/10 transition-all">
-                    <div className="pl-2">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                    </div>
-                    <input 
-                        type="text" 
-                        value={youtubeUrl}
-                        onChange={(e) => setYoutubeUrl(e.target.value)}
-                        placeholder="Paste YouTube video URL..."
-                        className="flex-1 bg-transparent border-none outline-none text-[13.5px] text-gray-700 font-medium"
-                    />
-                </div>
-                <button 
-                    onClick={handleAddYoutube}
-                    className="bg-[#F97316] hover:bg-[#EA580C] text-white px-6 rounded-[10px] text-[13px] font-bold shadow-sm transition-all"
-                >
-                    Add
-                </button>
-            </div>
+
 
             {/* Queue Panel */}
             {files.length > 0 && (

@@ -2,7 +2,7 @@
 
 Learnify AI is an **adaptive, AI-powered learning platform** that uses
 Retrieval-Augmented Generation (RAG) to deliver personalised study
-experiences. Upload PDFs, PowerPoints, text files, or YouTube links, and
+experiences. Upload PDFs, PowerPoints, or text files, and
 the platform ingests, chunks, and indexes the content so you can ask
 questions, take auto-generated quizzes, explore a knowledge graph, and
 track your progress — all with real-time emotion-aware feedback and voice

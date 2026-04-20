@@ -42,7 +42,7 @@ def chunk_content(
                    minimum a ``text`` key and a ``source_file`` key.
                    May also contain ``page``, ``slide``, or
                    ``timestamp_start`` depending on source type.
-        source_type: One of ``"pdf"``, ``"ppt"``, ``"txt"``, ``"youtube"``.
+        source_type: One of ``"pdf"``, ``"ppt"``, ``"txt"``.
 
     Returns:
         A list of dicts matching the ``ContentChunk`` schema shape.
@@ -58,8 +58,7 @@ def chunk_content(
             page_or_timestamp = str(item.get("page", ""))
         elif source_type == "ppt":
             page_or_timestamp = str(item.get("slide", ""))
-        elif source_type == "youtube":
-            page_or_timestamp = str(item.get("timestamp_start", ""))
+
         else:
             # For plain text and any unknown types, no positional info
             page_or_timestamp = ""

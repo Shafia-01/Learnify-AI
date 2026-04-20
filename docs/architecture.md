@@ -20,7 +20,7 @@ Generation (RAG) to deliver personalised, adaptive learning experiences.
 ## Data Flow
 
 ```
-User uploads content (PDF/PPT/TXT/YouTube)
+User uploads content (PDF/PPT/TXT)
         │
         ▼
   Ingestion Pipeline (chunking, embedding)
