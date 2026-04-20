@@ -81,7 +81,7 @@ async def list_providers():
         {
             "id": "gemini",
             "name": "Google Gemini",
-            "models": ["gemini-3.1-flash-lite"], 
+            "models": ["gemini-1.5-flash", "gemini-2.0-flash"],
             "requires_key": True,
             "status": "available" if settings.GEMINI_API_KEY else "unavailable"
         },

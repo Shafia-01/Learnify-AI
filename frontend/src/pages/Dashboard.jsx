@@ -17,7 +17,7 @@ const Dashboard = () => {
         const fetchData = async () => {
             try {
                 const [profileData, leaderboardData, pathData] = await Promise.all([
-                    getProfile(),
+                    getProfile(userId),
                     getLeaderboard(),
                     getLearningPath(userId)
                 ]);
@@ -44,7 +44,7 @@ const Dashboard = () => {
                     <div className="space-y-1">
                         <h1 className="text-[17px] font-semibold leading-tight">Keep the momentum going!</h1>
                         <p className="text-[13px] text-white/80 leading-relaxed font-medium">
-                            You're on a {profile.streak}-day streak. Complete today's quiz to unlock the Week Warrior badge.
+                            You're on a {profile.streak_days}-day streak. Complete today's quiz to unlock the Week Warrior badge.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -69,7 +69,7 @@ const Dashboard = () => {
                         <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">XP Points</div>
                     </div>
                     <div className="bg-white/12 border border-white/10 px-5 py-3 rounded-[10px] text-center min-w-[110px]">
-                        <div className="text-[18px] font-bold font-mono">{profile.streak} Days</div>
+                        <div className="text-[18px] font-bold font-mono">{profile.streak_days} Days</div>
                         <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">Current Streak</div>
                     </div>
                 </div>

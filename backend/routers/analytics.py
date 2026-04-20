@@ -18,7 +18,7 @@ async def log_event(event: SessionEvent, db: AsyncIOMotorDatabase = Depends(get_
         db (AsyncIOMotorDatabase): Database handle.
     """
     # Ensure timestamp is datetime object if it comes as string
-    event_dict = event.dict()
+    event_dict = event.model_dump()
     if isinstance(event_dict["timestamp"], str):
         event_dict["timestamp"] = datetime.fromisoformat(event_dict["timestamp"].replace("Z", "+00:00"))
         
