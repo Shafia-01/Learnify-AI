@@ -9,7 +9,7 @@ const navItems = [
   { path: '/games', label: 'Games', iconColor: '#EAB308' },
   { path: '/knowledge-graph', label: 'Knowledge Graph', iconColor: '#14B8A6' },
   { path: '/analytics', label: 'Analytics', iconColor: '#60A5FA' },
-  { path: '/settings', label: 'Settings', iconColor: '#94A3B8' },
+  { path: '/settings', label: 'Settings', iconColor: '#3B82F6' },
 ];
 
 const Icon = ({ name, color, isActive }) => {

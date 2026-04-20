@@ -9,8 +9,10 @@ import Settings from './pages/Settings';
 import Games from './pages/Games';
 import GamePlaceholder from './pages/GamePlaceholder';
 import KnowledgePage from './pages/KnowledgePage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import client from './api/client';
 import Layout from './components/Layout';
+import { ToastProvider } from './context/ToastContext';
 
 function App() {
   useEffect(() => {
@@ -24,8 +26,9 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Layout>
+    <ToastProvider>
+      <BrowserRouter>
+        <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/onboarding" />} />
           <Route path="/onboarding" element={<Onboarding />} />
@@ -36,11 +39,12 @@ function App() {
           <Route path="/games" element={<Games />} />
           <Route path="/games/:gameId" element={<GamePlaceholder />} />
           <Route path="/knowledge-graph" element={<KnowledgePage />} />
-          <Route path="/analytics" element={<div className="p-8">Analytics coming soon</div>} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>
     </BrowserRouter>
+    </ToastProvider>
   );
 }
 
