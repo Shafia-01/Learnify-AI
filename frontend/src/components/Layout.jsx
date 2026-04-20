@@ -8,9 +8,9 @@ const pageStyles = {
   '/chat': { bg: '#F5F0FF', accent: '#8B5CF6' },
   '/quiz': { bg: '#F7FFED', accent: '#84CC16' },
   '/upload': { bg: '#FFF7F3', accent: '#F97316' },
-  '/games': { bg: '#FFFBEB', accent: '#EAB308' },
+  '/games': { bg: '#FEFCE8', accent: '#EAB308' },
   '/settings': { bg: '#EFF6FF', accent: '#3B82F6' },
-  '/knowledge': { bg: '#F0FDFA', accent: '#14B8A6' },
+  '/knowledge-graph': { bg: '#F0FDFA', accent: '#14B8A6' },
   '/analytics': { bg: '#F0F9FF', accent: '#60A5FA' },
   '/onboarding': { bg: '#FFF0F6', accent: '#EC4899' },
 };

@@ -2,112 +2,157 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Onboarding = () => {
-  const [step, setStep] = useState(1);
-  const [name, setName] = useState('');
-  const [level, setLevel] = useState('');
-  const [language, setLanguage] = useState('');
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const [step, setStep] = useState(1);
+    const [name, setName] = useState('');
+    const [level, setLevel] = useState('Intermediate');
+    const [language, setLanguage] = useState('English');
 
-  const handleNext = () => setStep((s) => s + 1);
-  const handleBack = () => setStep((s) => s - 1);
+    const handleComplete = () => {
+        const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('user_id', userId);
+        localStorage.setItem('name', name);
+        localStorage.setItem('level', level);
+        localStorage.setItem('language', language);
+        navigate('/upload');
+    };
 
-  const handleComplete = () => {
-    const userId = crypto.randomUUID();
-    localStorage.setItem('user_id', userId);
-    localStorage.setItem('name', name);
-    localStorage.setItem('level', level);
-    localStorage.setItem('language', language);
-    navigate('/upload');
-  };
+    const steps = [
+        { id: 1, title: 'Name entry' },
+        { id: 2, title: 'Level selection' },
+        { id: 3, title: 'Language selection' }
+    ];
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-gray-800 p-8 rounded-xl shadow-2xl">
-        <h1 className="text-3xl font-bold mb-6 text-center text-blue-400">Welcome to Learnify AI</h1>
-        
-        {step === 1 && (
-          <div className="space-y-4 animate-fadeIn">
-            <h2 className="text-xl">Step 1: What's your name?</h2>
-            <input 
-              type="text" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 outline-none"
-              placeholder="Enter your name"
-            />
-            <button 
-              onClick={handleNext}
-              disabled={!name}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded font-semibold disabled:opacity-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4 animate-fadeIn">
-            <h2 className="text-xl mb-4">Step 2: Select your level</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                { id: 'Beginner', desc: 'Starting from scratch. Needs simple explanations.' },
-                { id: 'Intermediate', desc: 'Has some background knowledge. Needs deeper dives.' },
-                { id: 'Advanced', desc: 'Expert level. Needs concise, technical answers.' }
-              ].map((lvl) => (
-                <div 
-                  key={lvl.id}
-                  onClick={() => setLevel(lvl.id)}
-                  className={`p-4 rounded-lg cursor-pointer transition-all border-2 ${level === lvl.id ? 'border-blue-500 bg-gray-700' : 'border-gray-600 hover:border-gray-500'}`}
-                >
-                  <h3 className="font-bold text-lg">{lvl.id}</h3>
-                  <p className="text-sm text-gray-400 mt-2">{lvl.desc}</p>
+    return (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 animate-page-enter">
+            <div className="max-w-md w-full space-y-8">
+                {/* Logo & Step Indicator */}
+                <div className="text-center space-y-6">
+                    <div className="text-2xl font-black text-[#EC4899] tracking-tighter flex items-center justify-center gap-2">
+                        <div className="w-8 h-8 bg-[#EC4899] rounded-lg flex items-center justify-center text-white text-sm">L</div>
+                        Learnify AI
+                    </div>
+                    <div className="flex gap-2 justify-center">
+                        {steps.map((s) => (
+                            <div 
+                                key={s.id} 
+                                className={`h-1 w-12 rounded-full transition-all duration-500 ${s.id <= step ? 'bg-[#EC4899]' : 'bg-[#FBCFE8]'}`}
+                            ></div>
+                        ))}
+                    </div>
                 </div>
-              ))}
-            </div>
-            <div className="flex gap-4 mt-6">
-              <button onClick={handleBack} className="w-1/3 py-3 bg-gray-600 hover:bg-gray-500 rounded font-semibold transition-colors">Back</button>
-              <button 
-                onClick={handleNext}
-                disabled={!level}
-                className="w-2/3 py-3 bg-blue-600 hover:bg-blue-700 rounded font-semibold disabled:opacity-50 transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
 
-        {step === 3 && (
-          <div className="space-y-4 animate-fadeIn">
-            <h2 className="text-xl">Step 3: Select preferred language</h2>
-            <select 
-              value={language} 
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full p-3 bg-gray-700 rounded border border-gray-600 outline-none"
-            >
-              <option value="">Choose a language</option>
-              <option value="English">English</option>
-              <option value="Hindi">Hindi</option>
-              <option value="Urdu">Urdu</option>
-              <option value="French">French</option>
-              <option value="Spanish">Spanish</option>
-              <option value="German">German</option>
-            </select>
-            <div className="flex gap-4 mt-6">
-              <button onClick={handleBack} className="w-1/3 py-3 bg-gray-600 hover:bg-gray-500 rounded font-semibold transition-colors">Back</button>
-              <button 
-                onClick={handleComplete}
-                disabled={!language}
-                className="w-2/3 py-3 bg-green-600 hover:bg-green-700 rounded font-semibold disabled:opacity-50 transition-colors"
-              >
-                Get Started
-              </button>
+                {/* Content Card */}
+                <div className="bg-white/40 backdrop-blur-xl rounded-[24px] p-8 shadow-xl shadow-pink-500/5 border border-white/60">
+                    {step === 1 && (
+                        <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+                            <div className="space-y-1">
+                                <h1 className="text-[20px] font-black text-[#9D174D]">What's your name?</h1>
+                                <p className="text-[13px] text-pink-400 font-medium whitespace-nowrap">We'll use this to personalize your journey</p>
+                            </div>
+                            <input 
+                                type="text" 
+                                value={name}
+                                autoFocus
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Enter your name"
+                                className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[15px] font-bold text-gray-800 outline-none focus:ring-4 ring-pink-500/10 focus:border-[#EC4899] transition-all"
+                            />
+                            <button 
+                                onClick={() => setStep(2)}
+                                disabled={!name.trim()}
+                                className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+                            <h1 className="text-[20px] font-black text-[#9D174D]">Select your level</h1>
+                            <div className="space-y-3">
+                                {[
+                                    { id: 'Beginner', desc: 'Starting from scratch. Simple explanations.' },
+                                    { id: 'Intermediate', desc: 'Has some background knowledge. Deeper dives.' },
+                                    { id: 'Advanced', desc: 'Expert level. Technical, concise answers.' }
+                                ].map((lvl) => (
+                                    <button
+                                        key={lvl.id}
+                                        onClick={() => setLevel(lvl.id)}
+                                        className={`w-full text-left p-4 rounded-[16px] transition-all border ${
+                                            level === lvl.id 
+                                                ? 'bg-[#FDF2F8] border-[#EC4899] border-[1.5px] shadow-sm' 
+                                                : 'bg-white border-pink-50 hover:border-pink-200'
+                                        }`}
+                                    >
+                                        <div className="text-[14px] font-bold text-[#9D174D]">{lvl.id}</div>
+                                        <div className="text-[11px] text-pink-400 font-medium">{lvl.desc}</div>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => setStep(1)}
+                                    className="px-6 text-pink-400 font-bold hover:bg-pink-50 rounded-[12px] transition-all"
+                                >
+                                    Back
+                                </button>
+                                <button 
+                                    onClick={() => setStep(3)}
+                                    className="flex-1 bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all"
+                                >
+                                    Next — Choose Language
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+                            <h1 className="text-[20px] font-black text-[#9D174D]">Preferred language</h1>
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-bold text-pink-400 uppercase tracking-wider">Select language</label>
+                                <select 
+                                    value={language}
+                                    onChange={(e) => setLanguage(e.target.value)}
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[15px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                >
+                                    <option>English</option>
+                                    <option>Spanish</option>
+                                    <option>French</option>
+                                    <option>German</option>
+                                    <option>Hindi</option>
+                                    <option>Urdu</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => setStep(2)}
+                                    className="px-6 text-pink-400 font-bold hover:bg-pink-50 rounded-[12px] transition-all"
+                                >
+                                    Back
+                                </button>
+                                <button 
+                                    onClick={handleComplete}
+                                    className="flex-1 bg-[#10B981] hover:bg-[#059669] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
+                                >
+                                    Get Started
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+        </div>
+    );
 };
 
 export default Onboarding;
