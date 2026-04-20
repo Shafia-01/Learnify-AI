@@ -35,17 +35,27 @@ const Layout = ({ children }) => {
 
   return (
     <div 
-        className="min-h-screen flex text-[#1a1a1a]"
-        style={{ '--accent': style.accent }}
+        className="h-screen flex flex-col transition-colors duration-500 overflow-hidden text-[#1a1a1a]"
+        style={{ backgroundColor: style.bg, '--accent': style.accent }}
     >
-      <Sidebar />
-      <div 
-        className="flex-1 ml-[--sidebar-width] min-h-screen transition-colors duration-500 overflow-hidden flex flex-col"
-        style={{ backgroundColor: style.bg }}
-      >
-        <Topbar />
-        <main className="mt-[--topbar-height] p-6 h-[calc(100vh-var(--topbar-height))] overflow-y-auto animate-page-enter">
-          {children}
+      {/* 1. Full-Width Fixed Topbar */}
+      <Topbar />
+
+      {/* 2. Lower Area: Sidebar + Main Content */}
+      <div className="flex flex-1 mt-[--topbar-height] relative overflow-hidden">
+        {/* Sidebar: Anchored below Topbar */}
+        <Sidebar aria-label="Sidebar Navigation" />
+
+        {/* Main Content Area: Clearly offset from Sidebar */}
+        <main 
+            className="flex-1 overflow-y-auto p-12 lg:p-16"
+            style={{ scrollBehavior: 'smooth' }}
+        >
+          <div className="max-w-7xl mx-auto space-y-12">
+            {children}
+          </div>
+          {/* Bottom Buffer to ensure nothing is cut off */}
+          <div className="h-20 w-full flex-shrink-0" />
         </main>
       </div>
     </div>
