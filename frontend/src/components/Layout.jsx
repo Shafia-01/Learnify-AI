@@ -8,6 +8,7 @@ const pageStyles = {
   '/chat': { bg: '#F5F0FF', accent: '#8B5CF6' },
   '/quiz': { bg: '#F7FFED', accent: '#84CC16' },
   '/upload': { bg: '#FFF7F3', accent: '#F97316' },
+  '/games': { bg: '#FFFBEB', accent: '#EAB308' },
   '/settings': { bg: '#EFF6FF', accent: '#3B82F6' },
   '/knowledge': { bg: '#F0FDFA', accent: '#14B8A6' },
   '/analytics': { bg: '#F0F9FF', accent: '#60A5FA' },
@@ -18,16 +19,13 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // Default to Dashboard style if path not found
   const style = pageStyles[currentPath] || { bg: '#FDFAF4', accent: '#7C3AED' };
-
-  // Onboarding has a special case (usually no sidebar/topbar)
   const isOnboarding = currentPath === '/onboarding' || currentPath === '/';
 
   if (isOnboarding) {
     return (
       <div 
-        className="min-h-screen transition-colors duration-500" 
+        className="min-h-screen transition-colors duration-500 flex flex-col" 
         style={{ backgroundColor: style.bg }}
       >
         {children}
@@ -36,14 +34,17 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div 
+        className="min-h-screen flex text-[#1a1a1a]"
+        style={{ '--accent': style.accent }}
+    >
       <Sidebar />
       <div 
-        className="flex-1 ml-64 min-h-screen transition-colors duration-500"
+        className="flex-1 ml-[--sidebar-width] min-h-screen transition-colors duration-500 overflow-hidden flex flex-col"
         style={{ backgroundColor: style.bg }}
       >
         <Topbar />
-        <main className="pt-16 p-8 min-h-[calc(100vh-64px)]">
+        <main className="mt-[--topbar-height] p-6 h-[calc(100vh-var(--topbar-height))] overflow-y-auto animate-page-enter">
           {children}
         </main>
       </div>
