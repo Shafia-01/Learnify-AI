@@ -24,8 +24,6 @@ from rag.prompts import (
 
 logger = logging.getLogger(__name__)
 
-# LLMs are now managed by rag.llm_provider.get_llm()
-
 
 def _parse_citations(text: str) -> tuple[str, List[Dict[str, str]]]:
     """

@@ -17,7 +17,6 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
-      console.log('Emotion WebSocket Connected');
       setIsConnected(true);
     };
 
@@ -27,7 +26,6 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
     };
 
     ws.current.onclose = () => {
-      console.log('Emotion WebSocket Disconnected');
       setIsConnected(false);
       // Reconnect after 5 seconds
       setTimeout(connectWS, 5000);

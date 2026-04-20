@@ -18,7 +18,7 @@ const KnowledgePage = () => {
                 if (data) setGraphData(data);
             } catch (err) {
                 console.error("Failed to fetch graph data", err);
-                // Mock data for demo
+                // Graceful degradation: show sample graph so the page is usable even when the backend is unavailable
                 setGraphData({
                     nodes: [
                         { id: '1', label: 'React 19' },

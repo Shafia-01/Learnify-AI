@@ -60,7 +60,7 @@ const WordScramble = () => {
                 score: score,
                 duration_seconds: 60
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Failed to submit WordScramble score", err); }
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#EAB308] font-bold animate-pulse">Loading Words...</div>;

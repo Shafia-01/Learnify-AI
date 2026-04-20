@@ -43,7 +43,7 @@ const FlashcardFlip = () => {
                 score: cards.length * 10,
                 duration_seconds: 120
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Failed to submit FlashcardFlip score", err); }
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#8B5CF6] font-bold animate-pulse">Preparing Cards...</div>;

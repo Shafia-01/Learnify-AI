@@ -23,11 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from database import close_db, init_db
 
-# ── Router imports ───────────────────────────────────────────────────────
-# Agent 2 provides the real ingestion router; all other feature routers
-# remain as lightweight stubs until downstream agents replace them.
-
-from fastapi import APIRouter
+# ── Router imports ──────────────────────────────────────────────────────
 
 from routers.ingest import router as ingest_router
 from routers.query import router as query_router
@@ -41,20 +37,6 @@ from routers.auth import router as auth_router
 from routers.games import router as games_router
 from routers.learning_goals import router as learning_goals_router
 
-graph_router = APIRouter(prefix="/graph", tags=["Knowledge Graph"])
-
-
-# ── Placeholder endpoints ────────────────────────────────────────────────
-# These give downstream agents concrete routes to replace with real logic.
-
-
-# The query router and its status endpoint are provided by routers.query
-
-
-@graph_router.get("/status")
-async def graph_status() -> Dict[str, str]:
-    """Return knowledge-graph service readiness."""
-    return {"service": "graph", "status": "ready"}
 
 
 # ── Application lifespan ────────────────────────────────────────────────
@@ -107,7 +89,6 @@ app.include_router(gamification_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(voice_router, prefix="/api")
 app.include_router(settings_router, prefix="/api")
-app.include_router(graph_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(games_router, prefix="/api")
 app.include_router(learning_goals_router, prefix="/api")

@@ -3,7 +3,6 @@ from models.schemas import UserProfile
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 BADGE_DEFINITIONS = [
-    {"id": "first_quiz", "name": "Quiz Starter", "description": "Complete your first quiz", "xp_threshold": None, "trigger": "quiz_complete_1"},
     {"id": "streak_7", "name": "Week Warrior", "description": "7-day learning streak", "xp_threshold": None, "trigger": "streak_7"},
     {"id": "xp_100", "name": "Century Scholar", "description": "Earn 100 XP", "xp_threshold": 100, "trigger": None},
     {"id": "xp_500", "name": "Knowledge Knight", "description": "Earn 500 XP", "xp_threshold": 500, "trigger": None},
@@ -39,18 +38,11 @@ async def check_and_award_badges(db: AsyncIOMotorDatabase, user_id: str, user_pr
             if user_profile.xp >= badge["xp_threshold"]:
                 unlocked = True
         
-        # Check triggers
-        # Note: Triggers like quiz_complete_1 or streak_7 would usually be checked
-        # by looking at other collections or user fields.
-        # For 'streak_7', we check streak_days.
+        # Check trigger: streak_7 requires 7+ consecutive learning days
         if badge["trigger"] == "streak_7":
             if user_profile.streak_days >= 7:
                 unlocked = True
-        
-        # 'quiz_complete_1' trigger would be set if the event_type was quiz_complete
-        # In this simplified engine, we'll assume the caller might pass trigger status
-        # but for now we follow the explicit xp_threshold check.
-        
+
         if unlocked:
             newly_unlocked.append(badge_id)
     

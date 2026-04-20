@@ -51,10 +51,7 @@ async def award_xp(db: AsyncIOMotorDatabase, user_id: str, event_type: str) -> d
     
     # Check for new badges
     newly_unlocked = await check_and_award_badges(db, user_id, user_profile)
-    
-    # If the event is quiz related and first time, we might want to trigger 'quiz_complete_1'
-    # But for simplicity, we focus on XP-based badges here.
-    
+
     return {
         "xp_awarded": xp_to_add,
         "new_total": new_total,
