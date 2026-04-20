@@ -11,71 +11,68 @@ A core philosophy of Learnify AI is its local-first approach for privacy-sensiti
 ```mermaid
 flowchart TD
     subgraph CLIENT["🖥️ Client (React 19 + Vite)"]
-        UI[User Interface]
-        WC[Webcam Feed]
-        MIC[Microphone Input]
+        UI["User Interface"]
+        WC["Webcam Feed"]
+        MIC["Microphone Input"]
     end
 
     subgraph INGEST["📥 Ingestion Pipeline"]
-        UP[File Upload\nPDF / PPT / TXT]
-        YT[YouTube URL]
-        PARSE[Parser Layer\npdf_parser / ppt_parser\ntxt_parser / youtube_parser]
-        CHUNK[Chunker\nRecursiveCharacterTextSplitter\n500 chars / 50 overlap]
-        EMBED[Embedder\nall-MiniLM-L6-v2\n384 dimensions]
-        FAISS[(FAISS Index\nIndexFlatL2)]
-        MONGO[(MongoDB\nchunks collection)]
+        UP["File Upload<br>PDF / PPT / TXT"]
+        PARSE["Parser Layer<br>pdf_parser / ppt_parser<br>txt_parser"]
+        CHUNK["Chunker<br>RecursiveCharacterTextSplitter<br>500 chars / 50 overlap"]
+        EMBED["Embedder<br>all-MiniLM-L6-v2<br>384 dimensions"]
+        FAISS[("FAISS Index<br>IndexFlatL2")]
+        MONGO[("MongoDB<br>chunks collection")]
     end
 
     subgraph QUERY["🔍 Query Pipeline"]
-        Q[User Question]
-        QE[Query Embedder]
-        SEARCH[FAISS Search\nTop-K Nearest Neighbours]
-        HYDRATE[MongoDB Hydration\nFetch full chunk text]
-        LLM_CHAIN[LLM Chain\nPrompt + Context + Question]
+        Q["User Question"]
+        QE["Query Embedder"]
+        SEARCH["FAISS Search<br>Top-K Nearest Neighbours"]
+        HYDRATE["MongoDB Hydration<br>Fetch full chunk text"]
+        LLM_CHAIN["LLM Chain<br>Prompt + Context + Question"]
     end
 
     subgraph LLM["🤖 LLM Provider Layer"]
-        GEMINI[Google Gemini\ngoogle-generativeai]
-        GROQ[Groq LLaMA\nlangchain-groq]
-        OLLAMA[Ollama Local\nlangchain-ollama]
-        PRIVACY{Privacy Mode?}
+        GEMINI["Google Gemini<br>google-generativeai"]
+        GROQ["Groq LLaMA<br>langchain-groq"]
+        OLLAMA["Ollama Local<br>langchain-ollama"]
+        PRIVACY{"Privacy Mode?"}
     end
 
     subgraph RESPONSE["📤 Response Layer"]
-        ANS[Answer + Citations]
-        LEVEL[Level-Adaptive Prompt\nBeginner / Intermediate / Advanced]
-        LANG[Language Instruction\nEnglish / Hindi / French ...]
+        ANS["Answer + Citations"]
+        LEVEL["Level-Adaptive Prompt<br>Beginner / Intermediate / Advanced"]
+        LANG["Language Instruction<br>English / Hindi / French ..."]
     end
 
     subgraph FEATURES["🎮 Platform Features"]
-        QUIZ[Adaptive Quiz Engine\nDifficulty 1-5\nMCQ / Fill / Short Answer]
-        KG[Knowledge Graph\nNLTK NP Extraction\nNetworkX + D3.js]
-        GAME[Mini Games\nSnake / Memory / Scramble\nFlashcard / Falling / TicTacToe]
-        GOALS[Learning Goals\nDeadline Tracking\nAI Study Plans]
-        GAMIFY[Gamification\nXP / Badges / Streaks\nLeaderboard]
+        QUIZ["Adaptive Quiz Engine<br>Difficulty 1-5<br>MCQ / Fill / Short Answer"]
+        KG["Knowledge Graph<br>NLTK NP Extraction<br>NetworkX + D3.js"]
+        GAME["Mini Games<br>Snake / Memory / Scramble<br>Flashcard / Falling / TicTacToe"]
+        GOALS["Learning Goals<br>Deadline Tracking<br>AI Study Plans"]
+        GAMIFY["Gamification<br>XP / Badges / Streaks<br>Leaderboard"]
     end
 
     subgraph VOICE["🎙️ Voice Layer"]
-        STT[Whisper STT\nLocal Inference]
-        TTS[gTTS TTS\n40+ Languages]
+        STT["Whisper STT<br>Local Inference"]
+        TTS["gTTS TTS<br>40+ Languages"]
     end
 
     subgraph EMOTION["👁️ Emotion Engine"]
-        WS[WebSocket\n/ws/emotion/session_id]
-        DEEPFACE[DeepFace Analysis\nEmotion Detection]
-        INTERV[Adaptive Intervention\nSimplify / Break / Analogy]
+        WS["WebSocket<br>/ws/emotion/session_id"]
+        DEEPFACE["DeepFace Analysis<br>Emotion Detection"]
+        INTERV["Adaptive Intervention<br>Simplify / Break / Analogy"]
     end
 
     subgraph AUTH["🔐 Auth Layer"]
-        JWT[JWT Tokens\npython-jose]
-        BCRYPT[bcrypt Password Hashing]
-        REVOKE[(Revoked Tokens\nMongoDB TTL Index)]
+        JWT["JWT Tokens<br>python-jose"]
+        BCRYPT["bcrypt Password Hashing"]
+        REVOKE[("Revoked Tokens<br>MongoDB TTL Index")]
     end
 
     UI -->|Upload| UP
-    UI -->|YouTube URL| YT
     UP --> PARSE
-    YT --> PARSE
     PARSE --> CHUNK
     CHUNK --> EMBED
     EMBED --> FAISS
@@ -126,11 +123,10 @@ flowchart TD
 
 | Module | File(s) | Responsibility |
 |---|---|---|
-| Ingestion Router | `routers/ingest.py` | Accepts file uploads and YouTube URLs, orchestrates parse→chunk→embed→store pipeline |
+| Ingestion Router | `routers/ingest.py` | Accepts file uploads, orchestrates parse→chunk→embed→store pipeline |
 | PDF Parser | `parsers/pdf_parser.py` | Extracts text page-by-page using pdfplumber, skips encrypted/image-only pages |
 | PPT Parser | `parsers/ppt_parser.py` | Extracts text from every text frame on each slide using python-pptx |
 | TXT Parser | `parsers/txt_parser.py` | Splits plain text on double newlines into paragraph-level items |
-| YouTube Parser | `parsers/youtube_parser.py` | Multi-strategy transcript fetcher with 8 fallback strategies for cloud IP blocking |
 | Chunker | `chunker.py` | Splits parsed items using LangChain RecursiveCharacterTextSplitter (500 chars, 50 overlap) |
 | Embedder | `embedder.py` | Generates 384-dim vectors using sentence-transformers/all-MiniLM-L6-v2 |
 | Vector Store | `vector_store.py` | Manages FAISS IndexFlatL2 with JSON sidecar mapping positions to chunk_ids |
@@ -155,7 +151,7 @@ flowchart TD
 
 ## Section 4 — Data Flow: Ingestion Pipeline
 
-1. **Upload/Input**: The user uploads a file (PDF, PPT, TXT) or submits a YouTube URL via the React interface.
+1. **Upload/Input**: The user uploads a file (PDF, PPT, TXT) via the React interface.
 2. **Parsing**: The API routing delegates the input to the appropriate parser. Text is extracted linearly into raw strings.
 3. **Chunking**: `RecursiveCharacterTextSplitter` breaks the raw text into manageable chunks of ~500 characters with a 50-character overlap to preserve context between segments.
 4. **Embedding**: Each chunk is passed to the local `all-MiniLM-L6-v2` model, generating a 384-dimensional dense vector representation.
