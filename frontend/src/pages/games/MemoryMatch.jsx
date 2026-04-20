@@ -24,7 +24,7 @@ const MemoryMatch = () => {
                 });
                 setCards(gameCards.sort(() => Math.random() - 0.5));
             } catch (err) {
-                console.error(err);
+                console.error("Failed to fetch memory match pairs", err);
             } finally {
                 setIsLoading(false);
             }
@@ -63,7 +63,7 @@ const MemoryMatch = () => {
                 score: score,
                 duration_seconds: 90
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Failed to submit MemoryMatch score", err); }
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#10B981] font-bold animate-pulse">Shuffling Cards...</div>;

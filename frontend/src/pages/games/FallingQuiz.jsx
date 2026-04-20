@@ -20,7 +20,7 @@ const FallingQuiz = () => {
                 const res = await client.get(`/api/games/quiz-content/${userId}`);
                 setQuestions(res.data);
                 if (res.data.length > 0) setCurrentQuestion(res.data[0]);
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Failed to fetch quiz content for FallingQuiz", err); }
             finally { setIsLoading(false); }
         };
         fetchQuestions();
@@ -80,7 +80,7 @@ const FallingQuiz = () => {
                 score: score,
                 duration_seconds: 45
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Failed to submit FallingQuiz score", err); }
     };
 
     const handleMove = (e) => {

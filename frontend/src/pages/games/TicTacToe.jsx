@@ -19,7 +19,7 @@ const TicTacToe = () => {
             try {
                 const res = await client.get(`/api/games/quiz-content/${userId}`);
                 setQuestions(res.data);
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Failed to fetch quiz content for TicTacToe", err); }
             finally { setIsLoading(false); }
         };
         fetchQuestions();
@@ -71,7 +71,7 @@ const TicTacToe = () => {
                 score: finalScore,
                 duration_seconds: 120
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Failed to submit TicTacToe score", err); }
     };
 
     const aiMove = (currentBoard) => {

@@ -26,11 +26,7 @@ const Chat = () => {
     const [isRecording, setIsRecording] = useState(false);
     
     // Data states
-    const [learningPath, setLearningPath] = useState([
-        { id: 1, name: 'Understanding React 19 Concurrent Features', status: 'Done', progress: 100 },
-        { id: 2, name: 'Deep Dive into Tailwind v4 JIT Engine', status: 'Active', progress: 60 },
-        { id: 3, name: 'State Management with Server Components', status: 'Upcoming', progress: 0 },
-    ]);
+    const [learningPath, setLearningPath] = useState([]);
     const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
     
     const messagesEndRef = useRef(null);
@@ -96,7 +92,7 @@ const Chat = () => {
             };
             mediaRecorder.current.start();
             setIsRecording(true);
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Microphone access error", err); }
     };
 
     const stopRecording = () => {
