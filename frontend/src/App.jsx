@@ -7,6 +7,7 @@ import Quiz from './pages/Quiz';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import client from './api/client';
+import Layout from './components/Layout';
 
 function App() {
   useEffect(() => {
@@ -21,15 +22,17 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/onboarding" />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/quiz" element={<Quiz />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/onboarding" />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   );
 }
