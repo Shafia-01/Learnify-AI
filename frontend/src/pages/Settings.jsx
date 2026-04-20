@@ -224,6 +224,31 @@ const Settings = () => {
                 </button>
             </div>
 
+            {/* Danger Zone Section */}
+            <div className="card p-6 bg-red-50/30 border-[0.5px] border-red-500/20 space-y-6">
+                <div className="text-[13px] font-bold text-red-600 uppercase tracking-wider">Danger Zone</div>
+                
+                <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                        <div className="text-[14px] font-bold text-gray-800">Fresh Start</div>
+                        <div className="text-[11px] text-red-600/70 font-medium leading-normal max-w-[280px]">
+                            Clear all local data and re-authenticate to start from scratch.
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => {
+                            if (window.confirm("Are you sure? This will log you out and clear all your local session data.")) {
+                                localStorage.clear();
+                                window.location.href = '/onboarding';
+                            }
+                        }}
+                        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-[12px] font-bold transition-all shadow-md active:scale-95"
+                    >
+                        Reset All Data
+                    </button>
+                </div>
+            </div>
+
             <style>{`
                 @keyframes slideUp {
                     from { transform: translate(-50%, 20px); opacity: 0; }

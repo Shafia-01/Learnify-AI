@@ -225,11 +225,12 @@ class UsernameCheckResponse(BaseModel):
 class GameName(str, Enum):
     """Supported mini games on the platform."""
 
-    SNAKE = "snake"
-    TIC_TAC_TOE = "tic_tac_toe"
-    MEMORY_MATCH = "memory_match"
-    WORD_SCRAMBLE = "word_scramble"
-    FALLING_QUIZ = "falling_quiz"
+    SNAKE_QUIZ = "snake"
+    TIC_TAC_TOE = "tictactoe"
+    MEMORY_MATCH = "memory"
+    WORD_SCRAMBLE = "scramble"
+    FALLING_QUIZ = "falling"
+    FLASHCARD_FLIP = "flashcard"
 
 
 class SubmitScoreRequest(BaseModel):
@@ -270,6 +271,21 @@ class WordScrambleWord(BaseModel):
     original: str
     scrambled: str
     hint: str
+
+
+class MemoryPair(BaseModel):
+    """A pair for the Memory Match game."""
+
+    term: str
+    match: str
+
+
+class FlashcardCard(BaseModel):
+    """A single flashcard for the Flashcard Flip game."""
+
+    front: str
+    back: str
+    hint: Optional[str] = None
 
 
 # ── Learning Goal Schemas ────────────────────────────────────────

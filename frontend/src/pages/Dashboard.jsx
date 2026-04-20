@@ -8,18 +8,10 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const userId = localStorage.getItem('user_id') || 'default';
     
-    const [profile, setProfile] = useState({ xp: 1200, streak: 7, badges: 4 });
-    const [stats, setStats] = useState({ quizAvg: 84, chunksIndexed: 156 });
-    const [learningPath, setLearningPath] = useState([
-        { name: 'Introduction to React 19', chunks: 12, progress: 60, emoji: '⚛️', color: '#7C3AED' },
-        { name: 'Advanced Tailwind v4', chunks: 8, progress: 90, emoji: '🎨', color: '#10B981' },
-        { name: 'React Router v7 Data APIs', chunks: 15, progress: 17, emoji: '🛣️', color: '#F59E0B' },
-    ]);
-    const [leaderboard, setLeaderboard] = useState([
-        { name: 'Alex Major', xp: 14200, rank: 1, avatar: 'A' },
-        { name: 'Sarah Connor', xp: 12800, rank: 2, avatar: 'S' },
-        { name: 'You', xp: 1200, rank: 3, isMe: true, avatar: 'U' },
-    ]);
+    const [profile, setProfile] = useState({ xp: 0, streak: 0, badges: 0 });
+    const [stats, setStats] = useState({ quizAvg: 0, chunksIndexed: 0 });
+    const [learningPath, setLearningPath] = useState([]);
+    const [leaderboard, setLeaderboard] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {

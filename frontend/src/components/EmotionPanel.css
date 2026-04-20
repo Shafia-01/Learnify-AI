@@ -1,0 +1,114 @@
+.emotion-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 100%;
+  max-width: 350px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.panel-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.status-indicator {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status-indicator.online {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.status-indicator.offline {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.webcam-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.webcam-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.face-box {
+  position: absolute;
+  border: 2px solid;
+  border-radius: 4px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.emotion-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-item .label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-item .value {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.intervention-alert {
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+  animation: pulse-border 2s infinite;
+}
+
+.intervention-alert p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+@keyframes pulse-border {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}

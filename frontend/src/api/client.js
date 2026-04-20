@@ -6,9 +6,16 @@ const client = axios.create({
 
 client.interceptors.request.use((config) => {
   const userId = localStorage.getItem('user_id');
+  const token = localStorage.getItem('token');
+  
   if (userId) {
     config.headers['user_id'] = userId;
   }
+  
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  
   return config;
 }, (error) => {
   return Promise.reject(error);

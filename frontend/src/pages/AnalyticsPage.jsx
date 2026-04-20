@@ -2,10 +2,10 @@ import React from 'react';
 
 const AnalyticsPage = () => {
     const stats = [
-        { label: 'Study Time', value: '12.4h', trend: '+15%', color: '#60A5FA' },
-        { label: 'Retention', value: '88%', trend: '+2%', color: '#10B981' },
-        { label: 'Efficiency', value: '94%', trend: '+5%', color: '#F59E0B' },
-        { label: 'Focus Score', value: '4.2', trend: '-0.3', color: '#EC4899' },
+        { label: 'Study Time', value: '0h', trend: '0%', color: '#60A5FA' },
+        { label: 'Retention', value: '0%', trend: '0%', color: '#10B981' },
+        { label: 'Efficiency', value: '0%', trend: '0%', color: '#F59E0B' },
+        { label: 'Focus Score', value: '0', trend: '0', color: '#EC4899' },
     ];
 
     return (
