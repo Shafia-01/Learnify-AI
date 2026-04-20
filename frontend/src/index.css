@@ -104,6 +104,38 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+.skeleton {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-toast {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
 .card-tinted {
   background: color-mix(in srgb, var(--accent), transparent 92%);
   border: 0.5px solid color-mix(in srgb, var(--accent), transparent 80%);
