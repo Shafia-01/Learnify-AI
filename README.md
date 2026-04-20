@@ -1,165 +1,161 @@
-# 🧠 Learnify AI — Multimodal AI Learning Platform
+# 🧠 Learnify AI
 
-Learnify AI is an **adaptive, AI-powered learning platform** that uses
-Retrieval-Augmented Generation (RAG) to deliver personalised study
-experiences. Upload PDFs, PowerPoints, or text files, and
-the platform ingests, chunks, and indexes the content so you can ask
-questions, take auto-generated quizzes, explore a knowledge graph, and
-track your progress — all with real-time emotion-aware feedback and voice
-interaction.
+**An adaptive, multimodal AI learning platform that turns your study materials into a personalized tutor.**
 
----
+![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue) ![Node 20+](https://img.shields.io/badge/Node-20+-green) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?logo=fastapi) ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 
-## 📂 Folder Structure
+## What Is Learnify AI?
 
-```
-Learnify-AI/
-├── frontend/          # React SPA (Vite + Tailwind CSS)
-├── backend/           # FastAPI application
-│   ├── config.py      # Pydantic Settings — env-var loader
-│   ├── main.py        # App entry point, CORS, routers
-│   ├── database.py    # Async MongoDB (Motor) connection
-│   └── models/
-│       └── schemas.py # All Pydantic data models
-├── ml/                # Standalone ML scripts (emotion detection)
-├── docs/              # Architecture & design notes
-├── .env.example       # Backend env-var template
-└── README.md          # ← You are here
-```
+A student uploads a PDF, PPT, TXT file, or pastes a YouTube URL. The system ingests, chunks, and embeds the content into a FAISS vector index. The student then asks questions in natural language; the system retrieves the most relevant chunks and passes them to an LLM to generate a context-aware, level-appropriate answer with citations. Beyond Q&A, the platform generates adaptive quizzes, builds a visual knowledge graph of concepts, tracks XP and streaks, monitors emotional state via webcam, and offers mini educational games — all built around the student's own uploaded material.
 
----
+Most AI tutors are generic. They answer from their training data, not from your textbook. Learnify AI grounds every response in your actual study material. The system adapts difficulty based on quiz performance, adjusts explanations based on your proficiency level (beginner/intermediate/advanced), and even detects when you look confused or tired and changes its approach.
 
-## ⚡ Tech Stack
+This platform is for university students, self-learners, exam preppers, and educators who want to turn any document into an interactive AI tutor.
 
-| Layer            | Technology                            |
-|------------------|---------------------------------------|
-| Frontend         | React 19 + Vite + Tailwind CSS 4      |
-| Backend API      | FastAPI + Python 3.11+                |
-| RAG Pipeline     | LangChain + FAISS + Google Gemini     |
-| Database         | MongoDB (Motor async driver)          |
-| Emotion Engine   | MediaPipe + DeepFace + OpenCV         |
-| Voice            | Local Whisper (STT) + gTTS (TTS)      |
-| Privacy Mode     | Ollama (100 % offline local LLM)      |
+## Feature Matrix
 
-> **All services are free of cost.** No paid API keys (OpenAI, ElevenLabs,
-> etc.) are used anywhere. Whisper runs locally. TTS uses gTTS only.
+| Feature | Description | Status |
+|---|---|---|
+| **RAG Q&A** | Chat with your uploaded documents using Retrieval-Augmented Generation | ✅ Active |
+| **Adaptive Quiz** | Auto-generated quizzes that scale difficulty (1-5) based on performance | ✅ Active |
+| **Knowledge Graph** | Visual D3.js node map of core concepts extracted via NLTK | ✅ Active |
+| **Voice Input/Output** | Whisper local STT and gTTS multilingual synthesized speech | ✅ Active |
+| **Emotion Detection** | Webcam-based real-time facial analysis to adjust tutoring tone | ✅ Active |
+| **Gamification** | Earn XP, unlock badges, and maintain study streaks | ✅ Active |
+| **Mini Games** | 6 dynamic games (Snake, Memory, Word Scramble, etc.) using your content | ✅ Active |
+| **Privacy Mode** | Fully offline local LLM execution via Ollama | ✅ Active |
+| **Multi-LLM Support** | Hot-swappable providers: Gemini, Groq, and Ollama | ✅ Active |
+| **Multilingual Responses** | Chat and learn in your preferred target language | ✅ Active |
+| **Learning Goals Tracker** | Set deadlines and let the AI build daily study plans | ✅ Active |
+| **JWT Authentication** | Secure user registration and session management | ✅ Active |
 
----
+## Why This Tech Stack?
 
-## 🚀 Getting Started
+| Layer | Technology | Why This, Not That |
+|---|---|---|
+| **Backend API** | FastAPI | Async-first, auto OpenAPI docs, Pydantic validation baked in. Chosen over Flask because of native async support required for concurrent LLM calls and WebSockets. |
+| **RAG Pipeline** | LangChain + FAISS | LangChain provides provider-agnostic LLM abstractions so we can swap Gemini for Groq for Ollama with one config change. FAISS gives microsecond nearest-neighbour search without infrastructure overhead — no Pinecone billing, no Weaviate cluster to manage. |
+| **Embeddings** | sentence-transformers (all-MiniLM-L6-v2) | 384-dimensional embeddings, runs entirely locally, no API cost, fast inference. Produces embeddings good enough for educational document retrieval. |
+| **Database** | MongoDB (Motor async) | Schema-flexible for rapidly evolving data models (quiz attempts, emotion events, game sessions all have different shapes). Motor gives native async without blocking the event loop. |
+| **LLM Providers** | Gemini + Groq + Ollama | Three-tier strategy: Gemini for quality, Groq for speed (free tier, 500 req/day), Ollama for complete privacy. No vendor lock-in. |
+| **Frontend** | React 19 + Vite + Tailwind CSS 4 | React 19's concurrent features for smooth UI updates. Vite for sub-second HMR. Tailwind 4's JIT engine for zero-runtime CSS. |
+| **Voice** | Whisper (local STT) + gTTS | Whisper runs fully offline — student audio never leaves the machine. gTTS covers 40+ languages matching the multilingual response feature. |
+| **Emotion Detection** | DeepFace + OpenCV | DeepFace abstracts over multiple face analysis backends (RetinaFace, MTCNN). OpenCV handles frame capture and preprocessing. Runs locally — no biometric data leaves the device. |
+| **Knowledge Graph** | NLTK + NetworkX + D3.js | NLTK extracts noun phrases without an LLM call (fast, offline). NetworkX computes the graph. D3.js force simulation renders it interactively. |
 
-### Prerequisites
+## System Architecture
 
-- **Python 3.11+** — [python.org](https://www.python.org/downloads/)
-- **Node.js 20+** — [nodejs.org](https://nodejs.org/)
-- **MongoDB** — [mongodb.com/try/download/community](https://www.mongodb.com/try/download/community) (or use MongoDB Atlas free tier)
-- **Ollama** *(optional, for privacy mode)* — [ollama.com](https://ollama.com/)
+Learnify AI leverages a decoupled, event-driven architecture split into two primary pipelines. The **Ingestion Pipeline** orchestrates content flow from upload to storage: it parses documents (PDF/PPT/TXT) or YouTube URLs, chunks the text, embeds the segments locally using `sentence-transformers`, and stores the vectors in a flat FAISS index mapped to a MongoDB metadata collection. The **Query Pipeline** handles student interactions: it embeds the incoming question, retrieves the nearest chunks from FAISS, hydrates the full text from MongoDB, constructs a level-adaptive prompt, and calls the active LLM provider. See `docs/architecture.md` for the full system diagram and detailed component descriptions.
 
-### 1. Clone the repo
+## Problems Solved & Technical Decisions
+
+1. **YouTube transcript blocking on cloud IPs** — implemented 8-strategy fallback chain (youtube-transcript-api with cookies, with proxy, plain; yt-dlp with cookies, proxy, plain; combinations)
+2. **LLM provider hot-swapping without restart** — runtime_config dict acts as mutable singleton; set_provider() updates it at runtime; all LLM calls go through get_llm() which reads from it
+3. **Privacy mode enforcement** — when enabled, get_llm() blocks all non-Ollama calls and raises RuntimeError rather than silently falling back to cloud
+4. **Adaptive difficulty without user tagging** — quiz scores per topic stored as 0–100 running average; get_difficulty_level() maps score ranges to 1–5 difficulty; questions are fetched filtered by difficulty then generated if insufficient
+5. **Knowledge graph scalability** — top-40 concept pruning prevents graph from becoming unnavigable; co-occurrence within chunks creates edges naturally without LLM calls
+6. **Stale FAISS index on restart** — FAISS index written to disk after every ingest; JSON sidecar maps integer positions to chunk_id strings; index is loaded fresh on each search call
+7. **WebSocket emotion data with high-FPS preview** — analysis runs in a separate async task every 1.5 seconds while the main loop draws the webcam preview at full frame rate; latest analysis result is shared via a dict
+8. **Multi-language LLM responses** — language instruction injected into prompt template as a variable; LLM instructed to respond entirely in the target language; no translation API needed
+
+## Getting Started
+
+### Quick Start
 
 ```bash
 git clone https://github.com/Shafia-01/Learnify-AI.git
 cd Learnify-AI
+cp backend/.env.example backend/.env
+# Edit backend/.env to include MONGODB_URI and GEMINI_API_KEY
+npm install --prefix frontend && pip install -r backend/requirements.txt
 ```
 
-### 2. Backend setup
+### Prerequisites
+
+- **Python 3.11+**
+- **Node.js 20+**
+- **MongoDB**
+- **Ollama** *(optional, for privacy mode)*
+
+### 1. Backend setup
 
 ```bash
-# Create a virtual environment (recommended)
+cd backend
 python -m venv venv
 # Windows:
 venv\Scripts\activate
 # macOS / Linux:
 source venv/bin/activate
-
-# Install Python dependencies
-pip install -r backend/requirements.txt
-
-# Copy the env template and fill in your keys
-cp .env.example .env
-# Edit .env — at minimum set GEMINI_API_KEY and MONGODB_URI
+pip install -r requirements.txt
 ```
 
-### 3. Frontend setup
+### 2. Frontend setup
 
 ```bash
 cd frontend
-
-# Copy the env template
 cp .env.example .env
-
-# Install Node dependencies
 npm install
-
-cd ..
 ```
 
-### 4. Start the servers
+### 3. Start the servers
 
 Open **two terminals**:
 
 **Terminal 1 — Backend:**
-
 ```bash
 cd backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Terminal 2 — Frontend:**
-
 ```bash
 cd frontend
 npm run dev
 ```
 
-The API will be available at **http://localhost:8000** (docs at `/docs`).
-The frontend will be available at **http://localhost:5173**.
+## Environment Variables
 
-### 5. Verify
+### Backend (`backend/.env`)
 
-```bash
-# Health check
-curl http://localhost:8000/health
-# Expected: {"status": "ok"}
-```
-
----
-
-## 🔑 Environment Variables
-
-### Backend (`.env` at project root)
-
-| Variable           | Description                          | Default                          |
-|--------------------|--------------------------------------|----------------------------------|
-| `GEMINI_API_KEY`   | Google Gemini API key (free tier)     | —                                |
-| `GROQ_API_KEY`     | Groq API key (free tier)             | —                                |
-| `MONGODB_URI`      | MongoDB connection string            | `mongodb://localhost:27017/learnify` |
-| `OLLAMA_BASE_URL`  | Ollama local LLM URL                 | `http://localhost:11434`         |
-| `FAISS_INDEX_PATH` | Path to FAISS vector index directory | `./faiss_index`                  |
-| `PRIVACY_MODE`     | Enable fully offline mode            | `false`                          |
+| Variable | Description | Default | Required? |
+|---|---|---|---|
+| `GEMINI_API_KEY` | Google Gemini API key | — | Optional |
+| `GROQ_API_KEY` | Groq API key | — | Optional |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/learnify` | **Yes** |
+| `OLLAMA_BASE_URL` | Ollama local URL | `http://localhost:11434` | Optional |
+| `FAISS_INDEX_PATH` | Path to FAISS index | `./faiss_index` | Optional |
+| `PRIVACY_MODE` | Enable offline mode | `false` | Optional |
 
 ### Frontend (`frontend/.env`)
 
-| Variable             | Description                | Default                   |
-|----------------------|----------------------------|---------------------------|
-| `VITE_API_BASE_URL`  | Backend API base URL       | `http://localhost:8000`   |
+| Variable | Description | Default | Required? |
+|---|---|---|---|
+| `VITE_API_BASE_URL` | Backend API base URL | `http://localhost:8000` | Optional |
 
----
+## API Reference
 
-## 🏗️ Architecture
+| Prefix | Purpose | Key Endpoints |
+|---|---|---|
+| `/api/ingest` | Document & YouTube ingestion | `POST /upload`, `POST /youtube` |
+| `/api/query` | RAG Q&A, learning path, knowledge graph | `POST /ask`, `GET /learning-path/{id}`, `GET /knowledge-graph/{id}` |
+| `/api/quiz` | Quiz generation, submission, flashcards | `POST /generate`, `POST /submit`, `GET /flashcards/{id}` |
+| `/api/gamification` | XP, badges, streaks, leaderboard | `GET /profile/{id}`, `POST /award/{id}`, `GET /leaderboard` |
+| `/api/auth` | JWT auth, registration, profile | `POST /register`, `POST /login`, `GET /me` |
+| `/api/voice` | STT transcription, TTS synthesis | `POST /transcribe`, `GET /speak` |
+| `/api/games` | Mini games content & scoring | `GET /word-scramble/{id}`, `POST /score`, `GET /leaderboard/{game}` |
+| `/api/settings` | LLM provider switching, privacy mode | `GET /status`, `POST /provider`, `POST /privacy` |
+| `/api/goals` | Learning goal tracking & study plans | `POST /create`, `GET /{user_id}`, `GET /{goal_id}/daily-plan` |
+| `/ws/emotion/{session_id}` | Real-time emotion WebSocket | WebSocket stream |
 
-See [`docs/architecture.md`](docs/architecture.md) for a detailed
-breakdown of data flow, system components, and design decisions.
-
----
-
-## ⚠️ Known Limitations
+## Known Limitations
 
 - **Ollama Privacy Mode**: This feature works only when running the platform locally on a machine with Ollama installed and running. It will not be available on the Render free deployment or any cloud hosting that lacks a local Ollama instance.
 - **Whisper & OpenCV**: Local models (Whisper for STT and DeepFace for emotion detection) require significant CPU/RAM resources. Performance may vary on low-end machines.
+- **Knowledge graph quality depends on NLTK noun phrase extraction which is heuristic; complex academic terminology may not extract correctly**
+- **Emotion detection accuracy degrades in poor lighting or with glasses**
+- **FAISS flat-L2 index (IndexFlatL2) performs exact search which scales to ~100k chunks before needing to switch to IndexIVFFlat**
+- **Cookie-based YouTube ingestion requires manual cookie export every few weeks as sessions expire**
 
----
+## License
 
-## 📜 License
-
-This project is for educational purposes.
+MIT License — Educational Use
