@@ -13,10 +13,12 @@
   --border-hover: 0.5px solid rgba(0,0,0,0.16);
   --sidebar-bg: #1a1a1a;
   --topbar-bg: #1a1a1a;
+  --sidebar-width: 52px;
+  --topbar-height: 52px;
 }
 
 body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -25,4 +27,84 @@ body {
 
 .font-mono {
   font-family: 'DM Mono', monospace;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 0.4s ease-out forwards;
+}
+
+/* Design System Utilities */
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 8px 17px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: var(--transition);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-ghost:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-pill {
+  border-radius: var(--radius-pill);
+}
+
+.card {
+  background: white;
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: rgba(0,0,0,0.16);
+  box-shadow: var(--shadow-hover);
+}
+
+.card-tinted {
+  background: color-mix(in srgb, var(--accent), transparent 92%);
+  border: 0.5px solid color-mix(in srgb, var(--accent), transparent 80%);
 }
