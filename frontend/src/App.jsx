@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Games from './pages/Games';
 import GamePlaceholder from './pages/GamePlaceholder';
+import KnowledgePage from './pages/KnowledgePage';
 import client from './api/client';
 import Layout from './components/Layout';
 
@@ -34,7 +35,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/games" element={<Games />} />
           <Route path="/games/:gameId" element={<GamePlaceholder />} />
-          <Route path="/knowledge" element={<div className="p-8">Knowledge Graph coming soon</div>} />
+          <Route path="/knowledge-graph" element={<KnowledgePage />} />
           <Route path="/analytics" element={<div className="p-8">Analytics coming soon</div>} />
           <Route path="/settings" element={<Settings />} />
         </Routes>

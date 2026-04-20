@@ -7,7 +7,7 @@ const navItems = [
   { path: '/quiz', label: 'Quiz', iconColor: '#84CC16' },
   { path: '/upload', label: 'Upload', iconColor: '#F97316' },
   { path: '/games', label: 'Games', iconColor: '#EAB308' },
-  { path: '/knowledge', label: 'Knowledge Graph', iconColor: '#14B8A6' },
+  { path: '/knowledge-graph', label: 'Knowledge Graph', iconColor: '#14B8A6' },
   { path: '/analytics', label: 'Analytics', iconColor: '#60A5FA' },
   { path: '/settings', label: 'Settings', iconColor: '#94A3B8' },
 ];
