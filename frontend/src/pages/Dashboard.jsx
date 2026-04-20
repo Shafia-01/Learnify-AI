@@ -1,121 +1,231 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getProfile, getLeaderboard } from '../api/gamification';
+import { getLearningPath } from '../api/query';
+import client from '../api/client';
 
 const Dashboard = () => {
-  const chartData = [
-    { name: 'React', time: 120 },
-    { name: 'GraphQL', time: 80 },
-    { name: 'Python', time: 200 },
-    { name: 'Docker', time: 45 },
-  ];
+    const navigate = useNavigate();
+    const userId = localStorage.getItem('user_id') || 'default';
+    
+    const [profile, setProfile] = useState({ xp: 1200, streak: 7, badges: 4 });
+    const [stats, setStats] = useState({ quizAvg: 84, chunksIndexed: 156 });
+    const [learningPath, setLearningPath] = useState([
+        { name: 'Introduction to React 19', chunks: 12, progress: 60, emoji: '⚛️', color: '#7C3AED' },
+        { name: 'Advanced Tailwind v4', chunks: 8, progress: 90, emoji: '🎨', color: '#10B981' },
+        { name: 'React Router v7 Data APIs', chunks: 15, progress: 17, emoji: '🛣️', color: '#F59E0B' },
+    ]);
+    const [leaderboard, setLeaderboard] = useState([
+        { name: 'Alex Major', xp: 14200, rank: 1, avatar: 'A' },
+        { name: 'Sarah Connor', xp: 12800, rank: 2, avatar: 'S' },
+        { name: 'You', xp: 1200, rank: 3, isMe: true, avatar: 'U' },
+    ]);
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-8 pl-4 border-l-4 border-blue-500">Dashboard</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Left: Profile Card */}
-        <div className="bg-gray-800 p-6 rounded-xl flex flex-col items-center shadow-lg border border-gray-700">
-          <div className="w-24 h-24 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-4xl mb-4 text-white font-bold shadow-inner">
-            {localStorage.getItem('name')?.charAt(0) || 'U'}
-          </div>
-          <h2 className="text-2xl font-bold">{localStorage.getItem('name') || 'User'}</h2>
-          <p className="text-gray-400 mb-6">{localStorage.getItem('level') || 'Beginner'} Scholar</p>
-          
-          <div className="w-full mb-6">
-            <div className="flex justify-between text-sm mb-1">
-              <span>Level 5</span>
-              <span className="text-yellow-400 font-bold">1200 / 2000 XP</span>
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [profileData, leaderboardData, pathData] = await Promise.all([
+                    getProfile(),
+                    getLeaderboard(),
+                    getLearningPath(userId)
+                ]);
+                
+                if (profileData) setProfile(profileData);
+                if (leaderboardData) setLeaderboard(leaderboardData);
+                if (pathData) setLearningPath(pathData);
+
+                // Fetch extra stats manually if not in wrappers
+                const statsResponse = await client.get(`/api/analytics/stats/${userId}`);
+                if (statsResponse.data) setStats(statsResponse.data);
+            } catch (err) {
+                console.error("Failed to fetch dashboard data", err);
+            }
+        };
+        fetchData();
+    }, [userId]);
+
+    return (
+        <div className="max-w-6xl mx-auto space-y-6">
+            {/* Hero Banner */}
+            <section className="bg-[#2a2a2a] rounded-[12px] p-6 flex flex-col md:flex-row items-center justify-between text-white shadow-xl">
+                <div className="space-y-4 max-w-xl">
+                    <div className="space-y-1">
+                        <h1 className="text-[17px] font-semibold leading-tight">Keep the momentum going!</h1>
+                        <p className="text-[13px] text-white/80 leading-relaxed font-medium">
+                            You're on a {profile.streak}-day streak. Complete today's quiz to unlock the Week Warrior badge.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => navigate('/quiz')}
+                            className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-2 rounded-full text-[13px] font-semibold shadow-lg shadow-purple-500/20 transition-all"
+                        >
+                            Start Quiz
+                        </button>
+                        <button 
+                            onClick={() => navigate('/upload')}
+                            className="bg-transparent hover:bg-white/5 text-white px-6 py-2 rounded-full text-[13px] font-semibold border border-white/40 transition-all"
+                        >
+                            Upload Material
+                        </button>
+                    </div>
+                </div>
+                
+                <div className="flex gap-3 mt-6 md:mt-0">
+                    <div className="bg-white/12 border border-white/10 px-5 py-3 rounded-[10px] text-center min-w-[110px]">
+                        <div className="text-[18px] font-bold font-mono">{profile.xp.toLocaleString()}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">XP Points</div>
+                    </div>
+                    <div className="bg-white/12 border border-white/10 px-5 py-3 rounded-[10px] text-center min-w-[110px]">
+                        <div className="text-[18px] font-bold font-mono">{profile.streak} Days</div>
+                        <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">Current Streak</div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-[#FEF3C7] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#FDE68A]">
+                    <span className="text-[11px] font-bold text-[#92400E]/60 uppercase tracking-tight">Total XP</span>
+                    <div className="text-[22px] font-bold text-[#92400E] leading-none group-hover:scale-105 transition-transform origin-left">{profile.xp.toLocaleString()}</div>
+                    <div className="text-[11px] font-semibold text-green-600">+50 today</div>
+                </div>
+                <div className="bg-[#D1FAE5] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#A7F3D0]">
+                    <span className="text-[11px] font-bold text-[#065F46]/60 uppercase tracking-tight">Quiz Avg</span>
+                    <div className="text-[22px] font-bold text-[#065F46] leading-none group-hover:scale-105 transition-transform origin-left">{stats.quizAvg}%</div>
+                    <div className="text-[11px] font-semibold text-green-600">+6% this week</div>
+                </div>
+                <div className="bg-[#DBEAFE] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#BFDBFE]">
+                    <span className="text-[11px] font-bold text-[#1E40AF]/60 uppercase tracking-tight">Chunks Indexed</span>
+                    <div className="text-[22px] font-bold text-[#1E40AF] leading-none group-hover:scale-105 transition-transform origin-left">{stats.chunksIndexed}</div>
+                    <div className="text-[11px] font-semibold text-[#1E40AF]/60">3 sources</div>
+                </div>
+                <div className="bg-[#EDE9FE] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#DDD6FE]">
+                    <span className="text-[11px] font-bold text-[#5B21B6]/60 uppercase tracking-tight">Badges Earned</span>
+                    <div className="text-[22px] font-bold text-[#5B21B6] leading-none group-hover:scale-105 transition-transform origin-left">{profile.badges}</div>
+                    <div className="text-[11px] font-semibold text-amber-600">2 nearly unlocked</div>
+                </div>
             </div>
-            <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500" style={{ width: '60%' }}></div>
+
+            {/* Bottom Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Learning Path */}
+                <div className="card p-6 flex flex-col h-full">
+                    <h2 className="text-[15px] font-bold text-gray-800 mb-5">Your Learning Path</h2>
+                    <div className="flex-1 space-y-5">
+                        {learningPath.map((item, i) => (
+                            <div key={i} className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <div 
+                                        className="w-9 h-9 rounded-lg flex items-center justify-center text-lg"
+                                        style={{ backgroundColor: `${item.color}15` }}
+                                    >
+                                        {item.emoji}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[13px] font-semibold text-gray-900 truncate">{item.name}</div>
+                                        <div className="text-[11px] text-gray-500">{item.chunks} chunks mapped</div>
+                                    </div>
+                                </div>
+                                <div className="h-[3px] w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full transition-all duration-1000 ease-out"
+                                        style={{ width: `${item.progress}%`, backgroundColor: item.color }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="mt-8 pt-6 border-t border-gray-100">
+                        <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-wider mb-3">Weekly Streak</h3>
+                        <div className="flex justify-between items-center px-1">
+                            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
+                                const isDone = i < profile.streak % 7;
+                                const isToday = i === (new Date().getDay() + 6) % 7;
+                                return (
+                                    <div key={i} className="flex flex-col items-center gap-1.5">
+                                        <div 
+                                            className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${
+                                                isDone 
+                                                    ? 'bg-[#7C3AED] text-white shadow-md' 
+                                                    : isToday 
+                                                        ? 'border border-[#DDD6FE] text-[#7C3AED]' 
+                                                        : 'bg-gray-100 text-gray-400'
+                                            }`}
+                                        >
+                                            {day}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Stack */}
+                <div className="space-y-4">
+                    {/* Leaderboard */}
+                    <div className="card p-5 max-h-[280px] flex flex-col">
+                        <h2 className="text-[14px] font-bold text-gray-800 mb-4">Top Scholars</h2>
+                        <div className="space-y-2 overflow-y-auto pr-1">
+                            {leaderboard.map((user, i) => (
+                                <div 
+                                    key={i} 
+                                    className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors ${
+                                        user.isMe ? 'bg-[#EDE9FE] text-[#5B21B6]' : 'hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
+                                        i === 0 ? 'bg-amber-100 text-amber-600' : 
+                                        i === 1 ? 'bg-slate-100 text-slate-500' : 
+                                        'bg-orange-100 text-orange-600'
+                                    }`}>
+                                        {i + 1}
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[12px] font-bold border border-white">
+                                        {user.avatar}
+                                    </div>
+                                    <div className="flex-1 text-[13px] font-semibold">{user.isMe ? 'You' : user.name}</div>
+                                    <div className="text-[12px] font-bold font-mono">
+                                        {user.xp.toLocaleString()} <span className="text-[10px] opacity-50">XP</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Badges & Progress */}
+                    <div className="card p-5 bg-white relative overflow-hidden">
+                        <div className="flex justify-between items-start mb-4">
+                            <h2 className="text-[14px] font-bold text-gray-800">Your Badges</h2>
+                            <div className="text-[11px] font-bold text-[#7C3AED] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
+                                {profile.badges} Total
+                            </div>
+                        </div>
+                        <div className="flex gap-2 mb-6">
+                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center border border-amber-200 shadow-sm" title="Top Performer">🥇</div>
+                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center border border-purple-200 shadow-sm" title="Week Warrior">⚡</div>
+                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center border border-emerald-200 shadow-sm" title="Fast Learner">🚀</div>
+                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-200 text-gray-300 text-xs font-bold">?</div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-[11px] font-bold">
+                                <span className="text-gray-500 uppercase tracking-wider">Level 5 Progress</span>
+                                <span className="text-[#7C3AED] font-mono">{profile.xp} / 2,000 XP</span>
+                            </div>
+                            <div className="h-[6px] w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-[#7C3AED] to-[#A855F7] transition-all duration-1000"
+                                    style={{ width: `${(profile.xp / 2000) * 100}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div className="flex gap-4 w-full text-center">
-            <div className="flex-1 bg-gray-700 p-3 rounded-lg">
-              <div className="text-2xl mb-1">🔥</div>
-              <div className="font-bold font-mono">12</div>
-              <div className="text-xs text-gray-400">Day Streak</div>
-            </div>
-            <div className="flex-1 bg-gray-700 p-3 rounded-lg">
-              <div className="text-2xl mb-1">🏆</div>
-              <div className="font-bold font-mono">8</div>
-              <div className="text-xs text-gray-400">Badges</div>
-            </div>
-          </div>
         </div>
-
-        {/* Center: Chart */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 lg:col-span-1 flex flex-col">
-          <h2 className="text-xl font-bold mb-6">Study Time by Topic</h2>
-          <div className="flex-1 min-h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip cursor={{fill: '#374151'}} contentStyle={{backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff'}} />
-                <Bar dataKey="time" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Right: Weak Areas */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-bold mb-4">Focus Areas</h2>
-          <p className="text-sm text-gray-400 mb-4">Topics needing review based on recent quizzes:</p>
-          <ul className="space-y-3">
-            {['Docker Networking', 'React Context API', 'Data Structures'].map((area, i) => (
-              <li key={i} className="bg-gray-700 p-3 rounded flex justify-between items-center border-l-4 border-red-500">
-                <span>{area}</span>
-                <button className="text-xs bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded transition">Review</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom: Leaderboard */}
-      <div className="mt-6 bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-        <h2 className="text-xl font-bold mb-6 flex items-center justify-between">
-          <span>Global Leaderboard</span>
-          <span className="text-2xl">🌍</span>
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-gray-400 border-b border-gray-700">
-                <th className="pb-3 px-4 w-16">Rank</th>
-                <th className="pb-3 px-4">User</th>
-                <th className="pb-3 px-4 text-right">XP Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { name: 'Alex M.', xp: 14500, top: true },
-                { name: 'Priya K.', xp: 13200, top: true },
-                { name: 'David W.', xp: 12100, top: true },
-                { name: 'You', xp: 8400, top: false, highlight: true }
-              ].map((row, i) => (
-                <tr key={i} className={`border-b last:border-0 border-gray-700 transition ${row.highlight ? 'bg-blue-900/40' : 'hover:bg-gray-750'}`}>
-                  <td className="py-4 px-4 font-bold text-lg">
-                    {row.top ? <span className="text-yellow-400">#{i+1}</span> : `#${i+4}`}
-                  </td>
-                  <td className="py-4 px-4 font-medium flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-xs">{row.name.charAt(0)}</div>
-                    {row.name}
-                  </td>
-                  <td className="py-4 px-4 text-right font-mono text-blue-400">{row.xp} XP</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;
