@@ -6,7 +6,7 @@
 
 ## What Is Learnify AI?
 
-A student uploads a PDF, PPT, TXT file, or pastes a YouTube URL. The system ingests, chunks, and embeds the content into a FAISS vector index. The student then asks questions in natural language; the system retrieves the most relevant chunks and passes them to an LLM to generate a context-aware, level-appropriate answer with citations. Beyond Q&A, the platform generates adaptive quizzes, builds a visual knowledge graph of concepts, tracks XP and streaks, monitors emotional state via webcam, and offers mini educational games — all built around the student's own uploaded material.
+A student uploads a PDF, PPT, or TXT file. The system ingests, chunks, and embeds the content into a FAISS vector index. The student then asks questions in natural language; the system retrieves the most relevant chunks and passes them to an LLM to generate a context-aware, level-appropriate answer with citations. Beyond Q&A, the platform generates adaptive quizzes, builds a visual knowledge graph of concepts, tracks XP and streaks, monitors emotional state via webcam, and offers mini educational games — all built around the student's own uploaded material.
 
 Most AI tutors are generic. They answer from their training data, not from your textbook. Learnify AI grounds every response in your actual study material. The system adapts difficulty based on quiz performance, adjusts explanations based on your proficiency level (beginner/intermediate/advanced), and even detects when you look confused or tired and changes its approach.
 
@@ -45,18 +45,17 @@ This platform is for university students, self-learners, exam preppers, and educ
 
 ## System Architecture
 
-Learnify AI leverages a decoupled, event-driven architecture split into two primary pipelines. The **Ingestion Pipeline** orchestrates content flow from upload to storage: it parses documents (PDF/PPT/TXT) or YouTube URLs, chunks the text, embeds the segments locally using `sentence-transformers`, and stores the vectors in a flat FAISS index mapped to a MongoDB metadata collection. The **Query Pipeline** handles student interactions: it embeds the incoming question, retrieves the nearest chunks from FAISS, hydrates the full text from MongoDB, constructs a level-adaptive prompt, and calls the active LLM provider. See `docs/architecture.md` for the full system diagram and detailed component descriptions.
+Learnify AI leverages a decoupled, event-driven architecture split into two primary pipelines. The **Ingestion Pipeline** orchestrates content flow from upload to storage: it parses documents (PDF/PPT/TXT), chunks the text, embeds the segments locally using `sentence-transformers`, and stores the vectors in a flat FAISS index mapped to a MongoDB metadata collection. The **Query Pipeline** handles student interactions: it embeds the incoming question, retrieves the nearest chunks from FAISS, hydrates the full text from MongoDB, constructs a level-adaptive prompt, and calls the active LLM provider. See `docs/architecture.md` for the full system diagram and detailed component descriptions.
 
 ## Problems Solved & Technical Decisions
 
-1. **YouTube transcript blocking on cloud IPs** — implemented 8-strategy fallback chain (youtube-transcript-api with cookies, with proxy, plain; yt-dlp with cookies, proxy, plain; combinations)
-2. **LLM provider hot-swapping without restart** — runtime_config dict acts as mutable singleton; set_provider() updates it at runtime; all LLM calls go through get_llm() which reads from it
-3. **Privacy mode enforcement** — when enabled, get_llm() blocks all non-Ollama calls and raises RuntimeError rather than silently falling back to cloud
-4. **Adaptive difficulty without user tagging** — quiz scores per topic stored as 0–100 running average; get_difficulty_level() maps score ranges to 1–5 difficulty; questions are fetched filtered by difficulty then generated if insufficient
-5. **Knowledge graph scalability** — top-40 concept pruning prevents graph from becoming unnavigable; co-occurrence within chunks creates edges naturally without LLM calls
-6. **Stale FAISS index on restart** — FAISS index written to disk after every ingest; JSON sidecar maps integer positions to chunk_id strings; index is loaded fresh on each search call
-7. **WebSocket emotion data with high-FPS preview** — analysis runs in a separate async task every 1.5 seconds while the main loop draws the webcam preview at full frame rate; latest analysis result is shared via a dict
-8. **Multi-language LLM responses** — language instruction injected into prompt template as a variable; LLM instructed to respond entirely in the target language; no translation API needed
+1. **LLM provider hot-swapping without restart** — runtime_config dict acts as mutable singleton; set_provider() updates it at runtime; all LLM calls go through get_llm() which reads from it
+2. **Privacy mode enforcement** — when enabled, get_llm() blocks all non-Ollama calls and raises RuntimeError rather than silently falling back to cloud
+3. **Adaptive difficulty without user tagging** — quiz scores per topic stored as 0–100 running average; get_difficulty_level() maps score ranges to 1–5 difficulty; questions are fetched filtered by difficulty then generated if insufficient
+4. **Knowledge graph scalability** — top-40 concept pruning prevents graph from becoming unnavigable; co-occurrence within chunks creates edges naturally without LLM calls
+5. **Stale FAISS index on restart** — FAISS index written to disk after every ingest; JSON sidecar maps integer positions to chunk_id strings; index is loaded fresh on each search call
+6. **WebSocket emotion data with high-FPS preview** — analysis runs in a separate async task every 1.5 seconds while the main loop draws the webcam preview at full frame rate; latest analysis result is shared via a dict
+7. **Multi-language LLM responses** — language instruction injected into prompt template as a variable; LLM instructed to respond entirely in the target language; no translation API needed
 
 ## Getting Started
 
@@ -136,7 +135,7 @@ npm run dev
 
 | Prefix | Purpose | Key Endpoints |
 |---|---|---|
-| `/api/ingest` | Document & YouTube ingestion | `POST /upload`, `POST /youtube` |
+| `/api/ingest` | Document ingestion | `POST /upload` |
 | `/api/query` | RAG Q&A, learning path, knowledge graph | `POST /ask`, `GET /learning-path/{id}`, `GET /knowledge-graph/{id}` |
 | `/api/quiz` | Quiz generation, submission, flashcards | `POST /generate`, `POST /submit`, `GET /flashcards/{id}` |
 | `/api/gamification` | XP, badges, streaks, leaderboard | `GET /profile/{id}`, `POST /award/{id}`, `GET /leaderboard` |
@@ -154,7 +153,6 @@ npm run dev
 - **Knowledge graph quality depends on NLTK noun phrase extraction which is heuristic; complex academic terminology may not extract correctly**
 - **Emotion detection accuracy degrades in poor lighting or with glasses**
 - **FAISS flat-L2 index (IndexFlatL2) performs exact search which scales to ~100k chunks before needing to switch to IndexIVFFlat**
-- **Cookie-based YouTube ingestion requires manual cookie export every few weeks as sessions expire**
 
 ## License
 
