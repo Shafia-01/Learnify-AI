@@ -10,65 +10,65 @@ A core philosophy of Learnify AI is its local-first approach for privacy-sensiti
 
 ```mermaid
 flowchart TD
-    subgraph CLIENT["🖥️ Client (React 19 + Vite)"]
-        UI["User Interface"]
-        WC["Webcam Feed"]
-        MIC["Microphone Input"]
+    subgraph CLIENT [Client Layer]
+        UI[User Interface]
+        WC[Webcam Feed]
+        MIC[Microphone Input]
     end
 
-    subgraph INGEST["📥 Ingestion Pipeline"]
-        UP["File Upload<br>PDF / PPT / TXT"]
-        PARSE["Parser Layer<br>pdf_parser / ppt_parser<br>txt_parser"]
-        CHUNK["Chunker<br>RecursiveCharacterTextSplitter<br>500 chars / 50 overlap"]
-        EMBED["Embedder<br>all-MiniLM-L6-v2<br>384 dimensions"]
-        FAISS[("FAISS Index<br>IndexFlatL2")]
-        MONGO[("MongoDB<br>chunks collection")]
+    subgraph INGEST [Ingestion Pipeline]
+        UP[File Upload (PDF/PPT/TXT)]
+        PARSE[Parser Layer (pdf/ppt/txt)]
+        CHUNK[Chunker (500 chars)]
+        EMBED[Embedder (MinLM-L6)]
+        FAISS[(FAISS Index L2)]
+        MONGO[(MongoDB Chunks)]
     end
 
-    subgraph QUERY["🔍 Query Pipeline"]
-        Q["User Question"]
-        QE["Query Embedder"]
-        SEARCH["FAISS Search<br>Top-K Nearest Neighbours"]
-        HYDRATE["MongoDB Hydration<br>Fetch full chunk text"]
-        LLM_CHAIN["LLM Chain<br>Prompt + Context + Question"]
+    subgraph QUERY [Query Pipeline]
+        Q[User Question]
+        QE[Query Embedder]
+        SEARCH[FAISS Search Top-K]
+        HYDRATE[MongoDB Hydration]
+        LLM_CHAIN[LLM Chain Prompt]
     end
 
-    subgraph LLM["🤖 LLM Provider Layer"]
-        GEMINI["Google Gemini<br>google-generativeai"]
-        GROQ["Groq LLaMA<br>langchain-groq"]
-        OLLAMA["Ollama Local<br>langchain-ollama"]
-        PRIVACY{"Privacy Mode?"}
+    subgraph LLM [LLM Provider Layer]
+        GEMINI[Google Gemini]
+        GROQ[Groq LLaMA]
+        OLLAMA[Ollama Local]
+        PRIVACY{Privacy Mode?}
     end
 
-    subgraph RESPONSE["📤 Response Layer"]
-        ANS["Answer + Citations"]
-        LEVEL["Level-Adaptive Prompt<br>Beginner / Intermediate / Advanced"]
-        LANG["Language Instruction<br>English / Hindi / French ..."]
+    subgraph RESPONSE [Response Layer]
+        ANS[Answer + Citations]
+        LEVEL[Level-Adaptive Prompt]
+        LANG[Language Instruction]
     end
 
-    subgraph FEATURES["🎮 Platform Features"]
-        QUIZ["Adaptive Quiz Engine<br>Difficulty 1-5<br>MCQ / Fill / Short Answer"]
-        KG["Knowledge Graph<br>NLTK NP Extraction<br>NetworkX + D3.js"]
-        GAME["Mini Games<br>Snake / Memory / Scramble<br>Flashcard / Falling / TicTacToe"]
-        GOALS["Learning Goals<br>Deadline Tracking<br>AI Study Plans"]
-        GAMIFY["Gamification<br>XP / Badges / Streaks<br>Leaderboard"]
+    subgraph FEATURES [Platform Features]
+        QUIZ[Adaptive Quiz Engine]
+        KG[Knowledge Graph]
+        GAME[Mini Games]
+        GOALS[Learning Goals]
+        GAMIFY[Gamification]
     end
 
-    subgraph VOICE["🎙️ Voice Layer"]
-        STT["Whisper STT<br>Local Inference"]
-        TTS["gTTS TTS<br>40+ Languages"]
+    subgraph VOICE [Voice Layer]
+        STT[Whisper STT Local]
+        TTS[gTTS 40+ Languages]
     end
 
-    subgraph EMOTION["👁️ Emotion Engine"]
-        WS["WebSocket<br>/ws/emotion/session_id"]
-        DEEPFACE["DeepFace Analysis<br>Emotion Detection"]
-        INTERV["Adaptive Intervention<br>Simplify / Break / Analogy"]
+    subgraph EMOTION [Emotion Engine]
+        WS[WebSocket Stream]
+        DEEPFACE[DeepFace Analysis]
+        INTERV[Adaptive Intervention]
     end
 
-    subgraph AUTH["🔐 Auth Layer"]
-        JWT["JWT Tokens<br>python-jose"]
-        BCRYPT["bcrypt Password Hashing"]
-        REVOKE[("Revoked Tokens<br>MongoDB TTL Index")]
+    subgraph AUTH [Auth Layer]
+        JWT[JWT Tokens]
+        BCRYPT[bcrypt Password]
+        REVOKE[(Revoked Tokens)]
     end
 
     UI -->|Upload| UP
@@ -100,10 +100,10 @@ flowchart TD
     UI -->|Text| TTS
     TTS -->|MP3 Stream| UI
 
-    WC -->|Base64 Frame every 2s| WS
+    WC -->|Base64 Frame| WS
     WS --> DEEPFACE
     DEEPFACE -->|Emotion State| INTERV
-    INTERV -->|Intervention Message| UI
+    INTERV -->|Intervention| UI
 
     UI --> QUIZ
     UI --> KG
