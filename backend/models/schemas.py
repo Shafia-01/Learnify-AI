@@ -23,7 +23,6 @@ class SourceType(str, Enum):
     PDF = "pdf"
     PPT = "ppt"
     TXT = "txt"
-    YOUTUBE = "youtube"
 
 
 class UserLevel(str, Enum):

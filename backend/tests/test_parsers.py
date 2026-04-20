@@ -1,7 +1,7 @@
 """
 Learnify AI — Parser Unit Tests.
 
-Tests each parser (pdf, ppt, txt, youtube) against sample fixture files.
+Tests each parser (pdf, ppt, txt) against sample fixture files.
 All tests validate that:
   - The parser returns a non-empty list of dicts.
   - Each dict contains the required keys.
@@ -225,85 +225,7 @@ class TestTxtParser:
             )
 
 
-# ── YouTube Parser Tests ──────────────────────────────────────────────────
 
-
-class TestYoutubeParser:
-    """Unit tests for parsers.youtube_parser functions."""
-
-    def test_extract_video_id_standard_url(self) -> None:
-        """_extract_video_id must parse a standard watch URL."""
-        from parsers.youtube_parser import _extract_video_id
-
-        video_id = _extract_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-        assert video_id == "dQw4w9WgXcQ"
-
-    def test_extract_video_id_short_url(self) -> None:
-        """_extract_video_id must parse a youtu.be short URL."""
-        from parsers.youtube_parser import _extract_video_id
-
-        video_id = _extract_video_id("https://youtu.be/dQw4w9WgXcQ")
-        assert video_id == "dQw4w9WgXcQ"
-
-    def test_extract_video_id_embed_url(self) -> None:
-        """_extract_video_id must parse an embed URL."""
-        from parsers.youtube_parser import _extract_video_id
-
-        video_id = _extract_video_id("https://www.youtube.com/embed/dQw4w9WgXcQ")
-        assert video_id == "dQw4w9WgXcQ"
-
-    def test_extract_video_id_invalid_raises(self) -> None:
-        """_extract_video_id must raise HTTPException for invalid URLs."""
-        from fastapi import HTTPException
-
-        from parsers.youtube_parser import _extract_video_id
-
-        with pytest.raises(HTTPException) as exc_info:
-            _extract_video_id("https://example.com/not-youtube")
-        assert exc_info.value.status_code == 400
-
-    def test_parse_youtube_no_captions_raises(self) -> None:
-        """parse_youtube must raise HTTPException(404) for a non-existent ID."""
-        from unittest.mock import patch
-
-        from fastapi import HTTPException
-        from youtube_transcript_api import TranscriptsDisabled
-
-        from parsers.youtube_parser import parse_youtube
-
-        with patch(
-            "parsers.youtube_parser.YouTubeTranscriptApi.get_transcript",
-            side_effect=TranscriptsDisabled("fakeid"),
-        ):
-            with pytest.raises(HTTPException) as exc_info:
-                parse_youtube("https://www.youtube.com/watch?v=fakeid123XY")
-            assert exc_info.value.status_code == 404
-            assert "No captions available" in exc_info.value.detail
-
-    def test_parse_youtube_chunk_structure(self) -> None:
-        """parse_youtube must return correctly structured dicts from mocked transcript."""
-        from unittest.mock import patch
-
-        from parsers.youtube_parser import parse_youtube
-
-        fake_segments = [
-            {"text": f"word{i}", "start": float(i * 2), "duration": 2.0}
-            for i in range(10)
-        ]
-
-        with patch(
-            "parsers.youtube_parser.YouTubeTranscriptApi.get_transcript",
-            return_value=fake_segments,
-        ):
-            result = parse_youtube("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
-        assert isinstance(result, list), "parse_youtube should return a list"
-        assert len(result) > 0, "parse_youtube returned an empty list"
-        for item in result:
-            assert "text" in item, f"Missing 'text' key in: {item}"
-            assert "timestamp_start" in item, f"Missing 'timestamp_start' key in: {item}"
-            assert "source_file" in item, f"Missing 'source_file' key in: {item}"
-            assert isinstance(item["text"], str) and item["text"].strip()
 
 
 # ── Chunker Integration Tests ─────────────────────────────────────────────

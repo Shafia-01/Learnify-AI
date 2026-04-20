@@ -4,7 +4,6 @@ Learnify AI — Ingestion Router.
 Exposes two POST endpoints that drive the full content-ingestion pipeline:
 
   POST /ingest/upload  — accepts a multipart file (PDF, PPT, TXT)
-  POST /ingest/youtube — accepts a JSON body with a YouTube URL
 
 Both endpoints:
   1. Route to the correct parser.
@@ -36,7 +35,6 @@ from embedder import embed_chunks
 from parsers.pdf_parser import parse_pdf
 from parsers.ppt_parser import parse_ppt
 from parsers.txt_parser import parse_txt
-from parsers.youtube_parser import parse_youtube
 from vector_store import build_or_update_index
 
 logger = logging.getLogger(__name__)
@@ -56,10 +54,6 @@ _EXTENSION_TO_SOURCE_TYPE: Dict[str, str] = {
 # ── Pydantic models ───────────────────────────────────────────────────────
 
 
-class YouTubeIngestRequest(BaseModel):
-    """Request body for the YouTube ingestion endpoint."""
-
-    url: str
 
 
 class IngestResponse(BaseModel):
@@ -83,7 +77,7 @@ async def _run_pipeline(
 
     Args:
         raw_items:   Output list of dicts from any parser.
-        source_type: One of ``"pdf"``, ``"ppt"``, ``"txt"``, ``"youtube"``.
+        source_type: One of ``"pdf"``, ``"ppt"``, ``"txt"``.
         db:          MongoDB database handle (injected by FastAPI dependency).
 
     Returns:
@@ -197,43 +191,6 @@ async def upload_file(
 
     return {"message": "processed", "chunks_created": chunks_created}
 
-
-@router.post("/youtube", response_model=IngestResponse, status_code=200)
-async def ingest_youtube(
-    body: YouTubeIngestRequest,
-    db: AsyncIOMotorDatabase = Depends(get_db),
-    user_id: str = Header(default="anonymous", alias="user_id"),
-) -> Dict[str, Any]:
-    """
-    Ingest a YouTube video transcript into the learning system.
-
-    Fetches the auto-generated or manual transcript, groups it into
-    ~500-word chunks, embeds them, and stores them.
-
-    Args:
-        body: JSON body containing the YouTube video ``url``.
-        db:   Injected MongoDB database dependency.
-
-    Returns:
-        JSON with ``message`` and ``chunks_created`` fields.
-
-    Raises:
-        HTTPException 404: If no captions are available for the video.
-        HTTPException 400: If the URL cannot be parsed to a video ID.
-    """
-    try:
-        raw_items = parse_youtube(body.url)
-        chunks_created = await _run_pipeline(raw_items, "youtube", db, user_id=user_id)
-    except HTTPException:
-        raise
-    except Exception as exc:
-        logger.exception("Unhandled error during YouTube ingestion: %s", exc)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal error while processing the YouTube URL: {exc}",
-        ) from exc
-
-    return {"message": "processed", "chunks_created": chunks_created}
 
 
 @router.get("/status")
