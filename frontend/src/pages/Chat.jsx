@@ -1,188 +1,285 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
-import { speakText } from '../api/voice';
+import { speakText, transcribeAudio } from '../api/voice';
 import KnowledgeGraph from '../components/KnowledgeGraph';
-import VoiceButton from '../components/VoiceButton';
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [level, setLevel] = useState(localStorage.getItem('level') || 'Beginner');
-  const [activeTab, setActiveTab] = useState('Learning Path');
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  
-  // Tab states
-  const [learningPath, setLearningPath] = useState([]);
-  const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
-  
-  useEffect(() => {
-    localStorage.setItem('level', level);
-  }, [level]);
+    const userId = localStorage.getItem('user_id') || 'default';
+    const provider = localStorage.getItem('provider') || 'Groq';
+    const model = localStorage.getItem('model') || 'llama-3.1-8b';
 
-  useEffect(() => {
-    // Load mock or real data
-    setLearningPath(['Intro to subject', 'Core concepts', 'Advanced details']);
-    setGraphData({
-      nodes: [{id: '1', label: 'ML'}, {id: '2', label: 'Neural Nets'}],
-      edges: [{source: '1', target: '2'}]
-    });
-  }, []);
+    const [messages, setMessages] = useState([
+        { role: 'ai', content: "Hello! I'm your AI tutor. What would you like to learn today? I can help you with the uploaded materials or general topics.", citations: [] }
+    ]);
+    const [input, setInput] = useState('');
+    const [level, setLevel] = useState(localStorage.getItem('level') || 'Beginner');
+    const [activeTab, setActiveTab] = useState('Learning Path');
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    
+    // Data states
+    const [learningPath, setLearningPath] = useState([
+        { id: 1, name: 'Understanding React 19 Concurrent Features', status: 'Done', progress: 100 },
+        { id: 2, name: 'Deep Dive into Tailwind v4 JIT Engine', status: 'Active', progress: 60 },
+        { id: 3, name: 'State Management with Server Components', status: 'Upcoming', progress: 0 },
+    ]);
+    const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
+    
+    const messagesEndRef = useRef(null);
+    const mediaRecorder = useRef(null);
+    const audioChunks = useRef([]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const userMsg = input;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
-    try {
-      const response = await askQuestion(userMsg, level.toLowerCase());
-      const aiResponse = response.answer || "No answer returned.";
-      // Normalise citations: backend returns source_file / page_or_timestamp
-      const citations = (response.citations || []).map(c => ({
-        source: c.source_file || c.source || '',
-        page: c.page_or_timestamp || c.page || '',
-        text: c.text || '',
-      }));
-      
-      setMessages(prev => [...prev, { role: 'ai', content: aiResponse, citations }]);
-    } catch (e) {
-      setMessages(prev => [...prev, { role: 'ai', content: 'Connection to AI failed.', citations: [] }]);
-    }
-  };
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
-  const handleNodeClick = async (label) => {
-    setMessages(prev => [...prev, { role: 'user', content: `Tell me about ${label}` }]);
-    try {
-      const res = await askQuestion(label);
-      setMessages(prev => [...prev, { role: 'ai', content: res.answer || `Info about ${label}`, citations: res.citations || [] }]);
-    } catch (e) {
-      setMessages(prev => [...prev, { role: 'ai', content: 'Error loading info.' }]);
-    }
-  };
+    useEffect(() => {
+        const fetchTabData = async () => {
+            try {
+                const [pathData, graphData] = await Promise.all([
+                    getLearningPath(userId),
+                    getKnowledgeGraph(userId)
+                ]);
+                if (pathData) setLearningPath(pathData);
+                if (graphData) setGraphData(graphData);
+            } catch (err) {
+                console.error("Failed to fetch chat tab data", err);
+            }
+        };
+        fetchTabData();
+    }, [userId]);
 
-  const handleSpeak = (text) => {
-    if (!text || isSpeaking) return;
-    setIsSpeaking(true);
-    try {
-      const audioUrl = speakText(text);
-      const audio = new Audio(audioUrl);
-      audio.onended = () => setIsSpeaking(false);
-      audio.play();
-    } catch (e) {
-      console.error("Speech failed", e);
-      setIsSpeaking(false);
-    }
-  };
+    const handleSend = async (overrideInput) => {
+        const query = overrideInput || input;
+        if (!query.trim()) return;
+        
+        const userMsg = { role: 'user', content: query };
+        setMessages(prev => [...prev, userMsg]);
+        setInput('');
 
-  return (
-    <div className="h-screen flex bg-gray-900 text-white overflow-hidden">
-      {/* Left panel: Chat */}
-      <div className="w-1/2 flex flex-col border-r border-gray-700">
-        <div className="p-4 bg-gray-800 flex justify-between items-center border-b border-gray-700">
-          <h2 className="font-bold text-xl">Chat</h2>
-          <div className="flex gap-3 items-center">
-            <span className="px-3 py-1 bg-green-900 text-green-400 font-bold rounded-full text-xs border border-green-700">
-              {localStorage.getItem('provider') || 'Provider'}
-            </span>
-            <select 
-              value={level} 
-              onChange={(e) => setLevel(e.target.value)}
-              className="bg-gray-700 p-2 rounded outline-none border border-gray-600"
-            >
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
-            </select>
-          </div>
-        </div>
+        try {
+            const res = await askQuestion(query, level.toLowerCase());
+            const citations = (res.citations || []).map(c => ({
+                source: c.source_file || 'Source',
+                page: c.page_or_timestamp || '1'
+            }));
+            const aiMsg = { role: 'ai', content: res.answer || "I'm sorry, I couldn't process that.", citations };
+            setMessages(prev => [...prev, aiMsg]);
+        } catch (err) {
+            setMessages(prev => [...prev, { role: 'ai', content: "Error: Could not reach the AI tutor.", citations: [] }]);
+        }
+    };
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] p-4 rounded-xl ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-800'} relative group`}>
-                <p>{msg.content}</p>
-                {msg.role === 'ai' && (
-                  <button 
-                    onClick={() => handleSpeak(msg.content)}
-                    className="absolute -right-10 top-2 p-2 bg-gray-700 hover:bg-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Speak"
-                  >
-                    {isSpeaking ? '⏳' : '🔊'}
-                  </button>
-                )}
-                {msg.citations && msg.citations.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {msg.citations.map((cit, i) => (
-                      <span key={i} className="text-xs bg-gray-700 px-2 py-1 rounded cursor-help" title={cit.text}>
-                        [{cit.source} p.{cit.page}]
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder.current = new MediaRecorder(stream);
+            audioChunks.current = [];
+            mediaRecorder.current.ondataavailable = (e) => audioChunks.current.push(e.data);
+            mediaRecorder.current.onstop = async () => {
+                const blob = new Blob(audioChunks.current);
+                const res = await transcribeAudio(blob);
+                if (res?.text) setInput(res.text);
+                stream.getTracks().forEach(t => t.stop());
+            };
+            mediaRecorder.current.start();
+            setIsRecording(true);
+        } catch (err) { console.error(err); }
+    };
 
-        <div className="p-4 bg-gray-800 border-t border-gray-700 flex gap-2">
-          <input 
-            type="text" 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask a question..."
-            className="flex-1 p-3 bg-gray-700 rounded-lg outline-none focus:border-blue-500 border border-transparent"
-          />
-          <VoiceButton onTranscription={(txt) => setInput(txt)} />
-          <button onClick={handleSend} className="bg-blue-600 px-6 rounded-lg font-bold hover:bg-blue-700 transition">
-            Send
-          </button>
-        </div>
-      </div>
+    const stopRecording = () => {
+        if (mediaRecorder.current && isRecording) {
+            mediaRecorder.current.stop();
+            setIsRecording(false);
+        }
+    };
 
-      {/* Right panel */}
-      <div className="w-1/2 flex flex-col bg-gray-800">
-        <div className="flex border-b border-gray-700">
-          {['Learning Path', 'Knowledge Graph', 'Progress'].map(tab => (
-            <button 
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 p-4 text-center font-semibold transition-colors ${activeTab === tab ? 'bg-gray-700 text-blue-400 border-b-2 border-blue-400' : 'hover:bg-gray-700 text-gray-400'}`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+    const handleSpeak = (text) => {
+        const url = speakText(text);
+        const audio = new Audio(url);
+        setIsSpeaking(true);
+        audio.onended = () => setIsSpeaking(false);
+        audio.play().catch(() => setIsSpeaking(false));
+    };
 
-        <div className="flex-1 p-6 overflow-y-auto">
-          {activeTab === 'Learning Path' && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold mb-4">Your Path</h3>
-              {learningPath.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 bg-gray-700 p-4 rounded-lg">
-                  <input type="checkbox" className="w-5 h-5 accent-blue-500" />
-                  <span className="text-lg">{item}</span>
+    return (
+        <div className="flex h-[calc(100vh-var(--topbar-height)-48px)] gap-4 animate-page-enter">
+            {/* Left Panel: Chat */}
+            <div className="w-1/2 flex flex-col bg-white/40 rounded-[16px] border border-white/20 backdrop-blur-sm overflow-hidden shadow-sm">
+                {/* Header */}
+                <div className="px-4 py-3 border-b border-[#8B5CF6]/10 flex justify-between items-center bg-white/50">
+                    <div className="bg-[#EDE9FE] px-3 py-1 rounded-full text-[11px] font-bold text-[#5B21B6] uppercase tracking-wider">
+                        Chat Mode
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border border-[#8B5CF6]/10 shadow-sm">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase">Level</span>
+                            <select 
+                                value={level}
+                                onChange={(e) => setLevel(e.target.value)}
+                                className="text-[12px] font-semibold bg-transparent outline-none text-[#5B21B6]"
+                            >
+                                <option>Beginner</option>
+                                <option>Intermediate</option>
+                                <option>Advanced</option>
+                            </select>
+                        </div>
+                        <div className="bg-[#1e3a2f]/10 border border-[#2d5c45]/20 px-2.5 py-1 rounded-md">
+                            <span className="text-[11px] font-bold text-[#065F46] uppercase">{provider}</span>
+                        </div>
+                    </div>
                 </div>
-              ))}
-            </div>
-          )}
 
-          {activeTab === 'Knowledge Graph' && (
-            <div className="h-full w-full bg-gray-900 rounded-xl border border-gray-700 overflow-hidden relative">
-              <KnowledgeGraph data={graphData} onNodeClick={handleNodeClick} />
-            </div>
-          )}
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-purple-200">
+                    {messages.map((msg, i) => (
+                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className="max-w-[85%] space-y-1">
+                                <div className={`px-4 py-2.5 shadow-sm text-[13.5px] leading-relaxed transition-all ${
+                                    msg.role === 'user' 
+                                        ? 'bg-[#8B5CF6] text-white rounded-[16px] rounded-br-[4px]' 
+                                        : 'bg-white text-gray-800 rounded-[16px] rounded-bl-[4px] border border-[#8B5CF6]/20'
+                                }`}>
+                                    {msg.content}
+                                    {msg.role === 'ai' && (
+                                        <button 
+                                            onClick={() => handleSpeak(msg.content)}
+                                            className="ml-2 inline-flex items-center justify-center text-purple-400 hover:text-purple-600 transition-colors"
+                                        >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                                        </button>
+                                    )}
+                                </div>
+                                {msg.role === 'ai' && msg.citations?.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 px-1">
+                                        {msg.citations.map((c, ci) => (
+                                            <div key={ci} className="bg-[#EDE9FE] text-[#5B21B6] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#8B5CF6]/10 flex items-center gap-1">
+                                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.994 7.994 0 002 12a7.994 7.994 0 007-7.196V4.804zM11 4.804v.396A7.994 7.994 0 0018 12a7.994 7.994 0 00-7-7.196z" /></svg>
+                                                {c.source} · p.{c.page}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                </div>
 
-          {activeTab === 'Progress' && (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-               <div className="text-6xl mb-4">📊</div>
-               <p className="text-xl">Analytics placeholder</p>
+                {/* Input Bar */}
+                <div className="p-4 bg-white/50 border-t border-[#8B5CF6]/10">
+                    <div className="bg-white border border-[#8B5CF6]/30 rounded-[12px] p-1.5 flex items-center gap-2 shadow-sm focus-within:ring-2 ring-purple-500/10 transition-all">
+                        <button 
+                            onMouseDown={startRecording}
+                            onMouseUp={stopRecording}
+                            className={`p-2 rounded-lg transition-colors ${isRecording ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:bg-gray-100 hover:text-[#8B5CF6]'}`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                        </button>
+                        <input 
+                            type="text" 
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                            placeholder="Type a message..."
+                            className="flex-1 bg-transparent border-none outline-none text-[13.5px] px-2 text-gray-700 placeholder:text-gray-400"
+                        />
+                        <button 
+                            onClick={() => handleSend()}
+                            className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white p-2 rounded-[8px] shadow-lg shadow-purple-500/20 transition-all active:scale-95"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
-          )}
+
+            {/* Right Panel: Tabs */}
+            <div className="w-1/2 flex flex-col bg-white/40 rounded-[16px] border border-white/20 backdrop-blur-sm overflow-hidden shadow-sm">
+                {/* Tabs Header */}
+                <div className="flex bg-white/30 border-b border-[#8B5CF6]/10 p-1.5 gap-1.5">
+                    {['Learning Path', 'Knowledge Graph', 'Progress'].map(tab => (
+                        <button 
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex-1 py-2 text-[12px] font-bold transition-all rounded-[10px] ${
+                                activeTab === tab 
+                                    ? 'bg-[#8B5CF6] text-white shadow-md' 
+                                    : 'bg-white/50 text-gray-500 hover:bg-white hover:text-gray-800'
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Tab Content */}
+                <div className="flex-1 overflow-y-auto p-4">
+                    {activeTab === 'Learning Path' && (
+                        <div className="space-y-3">
+                            {learningPath.map((item, i) => (
+                                <div 
+                                    key={i} 
+                                    className={`card p-3 flex items-center gap-3 transition-all ${
+                                        item.status === 'Active' ? 'bg-[#EDE9FE] border-[#8B5CF6] border-[1.5px]' : 'bg-white border-transparent'
+                                    }`}
+                                >
+                                    <input 
+                                        type="checkbox" 
+                                        checked={item.status === 'Done'}
+                                        readOnly
+                                        className="w-4 h-4 rounded border-gray-300 text-[#8B5CF6] focus:ring-purple-500 accent-[#8B5CF6]" 
+                                    />
+                                    <div className="flex-1">
+                                        <div className="text-[13px] font-bold text-gray-800">{item.name}</div>
+                                    </div>
+                                    <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${
+                                        item.status === 'Done' ? 'bg-green-100 text-green-600' :
+                                        item.status === 'Active' ? 'bg-blue-100 text-blue-600' :
+                                        'bg-gray-100 text-gray-400'
+                                    }`}>
+                                        {item.status}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {activeTab === 'Knowledge Graph' && (
+                        <div className="h-full bg-white/50 rounded-xl border border-[#8B5CF6]/10 relative overflow-hidden backdrop-blur-md">
+                            <KnowledgeGraph data={graphData} onNodeClick={(label) => handleSend(`Tell me about ${label}`)} />
+                        </div>
+                    )}
+
+                    {activeTab === 'Progress' && (
+                         <div className="flex flex-col items-center justify-center h-full opacity-40 grayscale group hover:grayscale-0 transition-all duration-500">
+                             <div className="w-16 h-16 bg-[#EDE9FE] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg className="w-8 h-8 text-[#8B5CF6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                             </div>
+                             <p className="text-[14px] font-bold tracking-tight text-[#5B21B6]">Analytics coming soon</p>
+                         </div>
+                    )}
+                </div>
+
+                {/* Voice Mode Status Bar */}
+                <div className="h-12 bg-[#EDE9FE]/80 border-t border-[#8B5CF6]/10 px-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex gap-1 items-end h-3">
+                            <div className="w-1 bg-[#8B5CF6] rounded-full animate-[bounce_1s_infinite_0s]" style={{height: '60%'}}></div>
+                            <div className="w-1 bg-[#8B5CF6] rounded-full animate-[bounce_1s_infinite_0.2s]" style={{height: '100%'}}></div>
+                            <div className="w-1 bg-[#8B5CF6] rounded-full animate-[bounce_1s_infinite_0.4s]" style={{height: '40%'}}></div>
+                            <div className="w-1 bg-[#8B5CF6] rounded-full animate-[bounce_1s_infinite_0.1s]" style={{height: '80%'}}></div>
+                        </div>
+                        <span className="text-[11px] font-bold text-[#5B21B6] uppercase tracking-wider">Voice Mode</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Chat;
