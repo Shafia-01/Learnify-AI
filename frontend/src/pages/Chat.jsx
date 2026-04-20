@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
 import { speakText, transcribeAudio } from '../api/voice';
 import KnowledgeGraph from '../components/KnowledgeGraph';
 
 const Chat = () => {
+    const location = useLocation();
     const userId = localStorage.getItem('user_id') || 'default';
     const provider = localStorage.getItem('provider') || 'Groq';
     const model = localStorage.getItem('model') || 'llama-3.1-8b';
@@ -13,6 +15,12 @@ const Chat = () => {
     ]);
     const [input, setInput] = useState('');
     const [level, setLevel] = useState(localStorage.getItem('level') || 'Beginner');
+
+    useEffect(() => {
+        if (location.state?.initialQuery) {
+            handleSend(location.state.initialQuery);
+        }
+    }, [location.state]);
     const [activeTab, setActiveTab] = useState('Learning Path');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
