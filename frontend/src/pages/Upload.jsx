@@ -3,156 +3,225 @@ import { useNavigate } from 'react-router-dom';
 import { uploadFile, uploadYoutube } from '../api/ingest';
 
 const Upload = () => {
-  const [files, setFiles] = useState([]);
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+    const navigate = useNavigate();
+    const [files, setFiles] = useState([]);
+    const [youtubeUrl, setYoutubeUrl] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [overallProgress, setOverallProgress] = useState(0);
+    const fileInputRef = useRef(null);
 
-  const addFiles = (rawFiles) => {
-    const accepted = Array.from(rawFiles).filter(f => 
-      f.name.endsWith('.pdf') || f.name.endsWith('.ppt') || f.name.endsWith('.txt') || f.name.endsWith('.pptx')
-    );
-    setFiles(prev => [...prev, ...accepted.map(file => ({ type: 'file', data: file, status: 'pending' }))]);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    addFiles(e.dataTransfer.files);
-  };
-
-  const handleDragOver = (e) => e.preventDefault();
-
-  const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      addFiles(e.target.files);
-      e.target.value = '';
-    }
-  };
-
-  const handleAddYoutube = () => {
-    if (youtubeUrl && (youtubeUrl.includes('youtube.com') || youtubeUrl.includes('youtu.be'))) {
-      setFiles(prev => [...prev, { type: 'youtube', data: youtubeUrl, status: 'pending' }]);
-      setYoutubeUrl('');
-    }
-  };
-
-  const processAll = async () => {
-    setIsProcessing(true);
-    let completed = 0;
-    
-    for (let i = 0; i < files.length; i++) {
-      const item = files[i];
-      if (item.status === 'done') {
-        completed++;
-        continue;
-      }
-
-      setFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'processing' } : f));
-      
-      try {
-        if (item.type === 'file') {
-          await uploadFile(item.data);
-        } else {
-          await uploadYoutube(item.data);
-        }
-        setFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'done' } : f));
-      } catch (e) {
-        setFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'error' } : f));
-      }
-      
-      completed++;
-      setProgress(Math.round((completed / files.length) * 100));
-    }
-    
-    setIsProcessing(false);
-    navigate('/chat');
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-3xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold text-blue-400">Upload Knowledge Source</h1>
+    const addFiles = (newFiles) => {
+        const accepted = Array.from(newFiles).filter(f => 
+            ['application/pdf', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'text/plain'].includes(f.type) ||
+            f.name.match(/\.(pdf|ppt|pptx|txt)$/i)
+        );
         
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.ppt,.pptx,.txt"
-          multiple
-          onChange={handleFileSelect}
-          style={{ display: 'none' }}
-        />
+        const mapped = accepted.map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'file',
+            name: file.name,
+            data: file,
+            status: 'PENDING',
+            progress: 0
+        }));
+        
+        setFiles(prev => [...prev, ...mapped]);
+    };
 
-        <div 
-          onDrop={handleDrop} 
-          onDragOver={handleDragOver}
-          onClick={() => fileInputRef.current && fileInputRef.current.click()}
-          className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-blue-500 transition-colors bg-gray-800 cursor-pointer"
-        >
-          <div className="text-5xl mb-4">📁</div>
-          <p className="text-xl mb-2">Drag and drop files here</p>
-          <p className="text-gray-400 mb-4">Supports PDF, PPT, TXT</p>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); fileInputRef.current && fileInputRef.current.click(); }}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
-          >
-            Browse Files
-          </button>
-        </div>
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        addFiles(e.dataTransfer.files);
+    };
 
-        <div className="flex gap-4">
-          <input 
-            type="text" 
-            value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="Paste YouTube URL"
-            className="flex-1 p-3 bg-gray-800 rounded border border-gray-700 outline-none focus:border-blue-500"
-          />
-          <button 
-            onClick={handleAddYoutube}
-            className="px-6 bg-gray-700 hover:bg-gray-600 rounded font-semibold transition-colors"
-          >
-            Add URL
-          </button>
-        </div>
+    const handleAddYoutube = () => {
+        if (!youtubeUrl.trim()) return;
+        const newItem = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'youtube',
+            name: youtubeUrl,
+            data: youtubeUrl,
+            status: 'PENDING',
+            progress: 0
+        };
+        setFiles(prev => [...prev, newItem]);
+        setYoutubeUrl('');
+    };
 
-        {files.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h2 className="text-xl mb-4 font-semibold">Queue</h2>
-            <ul className="space-y-3 mb-6">
-              {files.map((f, idx) => (
-                <li key={idx} className="flex items-center justify-between p-3 bg-gray-700 rounded">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{f.type === 'file' ? '📄' : '🎥'}</span>
-                    <span>{f.type === 'file' ? f.data.name : f.data}</span>
-                  </div>
-                  <span className={`text-sm ${f.status === 'done' ? 'text-green-400' : f.status === 'processing' ? 'text-blue-400 animate-pulse' : f.status === 'error' ? 'text-red-400' : 'text-gray-400'}`}>
-                    {f.status.toUpperCase()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            
-            {isProcessing && (
-              <div className="w-full bg-gray-700 rounded-full h-2.5 mb-6">
-                <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-              </div>
-            )}
+    const processAll = async () => {
+        if (files.length === 0) return;
+        setIsProcessing(true);
+        let completedCount = 0;
 
-            <button 
-              onClick={processAll}
-              disabled={isProcessing}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded font-bold transition-colors disabled:opacity-50"
+        for (let i = 0; i < files.length; i++) {
+            const item = files[i];
+            if (item.status === 'DONE') {
+                completedCount++;
+                continue;
+            }
+
+            // Set to processing
+            setFiles(prev => prev.map(f => f.id === item.id ? { ...f, status: 'PROCESSING', progress: 30 } : f));
+
+            try {
+                if (item.type === 'file') {
+                    await uploadFile(item.data);
+                } else {
+                    await uploadYoutube(item.data);
+                }
+                
+                setFiles(prev => prev.map(f => f.id === item.id ? { ...f, status: 'DONE', progress: 100 } : f));
+            } catch (err) {
+                console.error("Ingestion failed for", item.name, err);
+                setFiles(prev => prev.map(f => f.id === item.id ? { ...f, status: 'ERROR', progress: 100 } : f));
+            }
+
+            completedCount++;
+            setOverallProgress(Math.round((completedCount / files.length) * 100));
+        }
+
+        setIsProcessing(false);
+        // After small delay, redirect to chat if at least one was successful
+        setTimeout(() => {
+            if (files.some(f => f.status === 'DONE')) {
+                navigate('/chat');
+            }
+        }, 1500);
+    };
+
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case 'DONE': return 'bg-[#D1FAE5] text-[#065F46]';
+            case 'PROCESSING': return 'bg-[#DBEAFE] text-[#1E40AF] animate-pulse';
+            case 'ERROR': return 'bg-[#FEE2E2] text-[#991B1B]';
+            default: return 'bg-[#F1F5F9] text-[#6b7280]';
+        }
+    };
+
+    return (
+        <div className="max-w-3xl mx-auto space-y-6 animate-page-enter">
+            {/* Drop Zone */}
+            <div 
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`group border-[1.5px] border-dashed rounded-[12px] p-10 text-center transition-all cursor-pointer ${
+                    isDragging 
+                        ? 'border-[#F97316] bg-[#FFEDD5] scale-[1.02]' 
+                        : 'border-[#FDBA74] bg-[#FFF7ED] hover:border-[#F97316]/50'
+                }`}
             >
-              {isProcessing ? 'Processing...' : 'Process All'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    multiple 
+                    className="hidden" 
+                    onChange={(e) => addFiles(e.target.files)} 
+                />
+                <div className="flex flex-col items-center space-y-4">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-[#F97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-[16px] font-bold text-gray-800">Drag and drop files here</h2>
+                        <p className="text-[12px] text-gray-400 font-medium tracking-tight uppercase">PDF, PPT, PPTX, TXT supported</p>
+                    </div>
+                    <button className="bg-[#F97316] hover:bg-[#EA580C] text-white px-6 py-2 rounded-full text-[13px] font-bold shadow-lg shadow-orange-500/20 transition-all">
+                        Browse Files
+                    </button>
+                </div>
+            </div>
+
+            {/* YouTube Row */}
+            <div className="flex gap-2">
+                <div className="flex-1 bg-white border border-[#F97316]/30 rounded-[10px] p-1.5 flex items-center gap-3 focus-within:ring-2 ring-orange-500/10 transition-all">
+                    <div className="pl-2">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        value={youtubeUrl}
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                        placeholder="Paste YouTube video URL..."
+                        className="flex-1 bg-transparent border-none outline-none text-[13.5px] text-gray-700 font-medium"
+                    />
+                </div>
+                <button 
+                    onClick={handleAddYoutube}
+                    className="bg-[#F97316] hover:bg-[#EA580C] text-white px-6 rounded-[10px] text-[13px] font-bold shadow-sm transition-all"
+                >
+                    Add
+                </button>
+            </div>
+
+            {/* Queue Panel */}
+            {files.length > 0 && (
+                <div className="card p-6 bg-white border-[0.5px] border-[#F97316]/20 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-[14px] font-bold text-[#EA580C] uppercase tracking-wider">Queue ({files.length} items)</h3>
+                        {isProcessing && <div className="text-[12px] font-bold text-orange-500 font-mono">{overallProgress}%</div>}
+                    </div>
+
+                    <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-orange-100">
+                        {files.map((item) => (
+                            <div key={item.id} className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                                            {item.type === 'file' ? (
+                                                <svg className="w-4.5 h-4.5 text-[#F97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                            ) : (
+                                                <svg className="w-4.5 h-4.5 text-[#F97316]" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
+                                            )}
+                                        </div>
+                                        <span className="text-[13px] font-bold text-gray-700 truncate max-w-[240px]">{item.name}</span>
+                                    </div>
+                                    <div className={`px-2 py-0.5 rounded-[4px] text-[10px] font-black tracking-tighter ${getStatusStyle(item.status)}`}>
+                                        {item.status}
+                                    </div>
+                                </div>
+                                {(item.status === 'PROCESSING' || item.status === 'DONE') && (
+                                    <div className="h-[2px] w-full bg-gray-50 rounded-full overflow-hidden">
+                                        <div 
+                                            className={`h-full transition-all duration-300 ${item.status === 'DONE' ? 'bg-green-500' : 'bg-[#F97316]'}`}
+                                            style={{ width: `${item.progress}%` }}
+                                        ></div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="space-y-4 pt-2">
+                        {isProcessing && (
+                            <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-[#F97316] to-[#FB923C] transition-all duration-500"
+                                    style={{ width: `${overallProgress}%` }}
+                                ></div>
+                            </div>
+                        )}
+                        <button 
+                            onClick={processAll}
+                            disabled={isProcessing || files.length === 0}
+                            className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white py-3 rounded-[10px] font-bold shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <span>Processing Materials...</span>
+                                </>
+                            ) : (
+                                'Process All'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default Upload;
