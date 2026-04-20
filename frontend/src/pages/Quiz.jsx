@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
-import { submitAnswer as apiSubmitAnswer } from '../api/quiz';
+import { generateQuiz, submitAnswer as apiSubmitAnswer } from '../api/quiz';
 
 const Quiz = () => {
     const navigate = useNavigate();
@@ -17,28 +17,28 @@ const Quiz = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                // Using client.post as per spec for /api/quiz/generate
-                const res = await client.post('/api/quiz/generate', {
-                    topic: 'General',
-                    level: localStorage.getItem('level') || 'Beginner'
-                });
-                if (res.data && res.data.questions) {
-                    setQuestions(res.data.questions);
+                const userId = localStorage.getItem('user_id') || 'default';
+                const topic = localStorage.getItem('quiz_topic') || 'overall';
+                // generateQuiz posts to /api/quiz/generate with correct schema
+                const data = await generateQuiz(userId, topic, 5);
+                // Backend returns a List[QuizQuestion] directly (not wrapped)
+                if (Array.isArray(data) && data.length > 0) {
+                    setQuestions(data);
                 } else {
-                    // Fallback to mock for testing if API fails
+                    // Fallback to mock for testing if API returns empty
                     setQuestions([
-                        { id: '1', type: 'mcq', question: 'Which React hook is used for side effects?', options: ['useState', 'useContext', 'useEffect', 'useMemo'], difficulty: 'Medium' },
-                        { id: '2', type: 'mcq', question: 'What is the default background color of this page?', options: ['Red', 'Lime Green', 'Blue', 'Purple'], difficulty: 'Easy' },
-                        { id: '3', type: 'short', question: 'What does CSS stand for?', difficulty: 'Hard' }
+                        { question_id: '1', question_type: 'mcq', question_text: 'Which React hook is used for side effects?', options: ['useState', 'useContext', 'useEffect', 'useMemo'], correct_answer: 'useEffect', difficulty: 3 },
+                        { question_id: '2', question_type: 'mcq', question_text: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Counter Style Sheets', 'Creative Style Syntax', 'Color Styling System'], correct_answer: 'Cascading Style Sheets', difficulty: 2 },
+                        { question_id: '3', question_type: 'short', question_text: 'Explain what a REST API is.', options: null, correct_answer: 'A REST API is an architectural style for networked applications.', difficulty: 3 }
                     ]);
                 }
             } catch (err) {
                 console.error("Quiz generation failed", err);
                 // Fallback for demo
                 setQuestions([
-                    { id: '1', type: 'mcq', question: 'Which React hook is used for side effects?', options: ['useState', 'useContext', 'useEffect', 'useMemo'], difficulty: 'Medium' },
-                    { id: '2', type: 'mcq', question: 'What is the default background color of this page?', options: ['Red', 'Lime Green', 'Blue', 'Purple'], difficulty: 'Easy' },
-                    { id: '3', type: 'short', question: 'What does CSS stand for?', difficulty: 'Hard' }
+                    { question_id: '1', question_type: 'mcq', question_text: 'Which React hook is used for side effects?', options: ['useState', 'useContext', 'useEffect', 'useMemo'], correct_answer: 'useEffect', difficulty: 3 },
+                    { question_id: '2', question_type: 'mcq', question_text: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Counter Style Sheets', 'Creative Style Syntax', 'Color Styling System'], correct_answer: 'Cascading Style Sheets', difficulty: 2 },
+                    { question_id: '3', question_type: 'short', question_text: 'Explain what a REST API is.', options: null, correct_answer: 'A REST API is an architectural style for networked applications.', difficulty: 3 }
                 ]);
             } finally {
                 setLoading(false);
@@ -52,7 +52,11 @@ const Quiz = () => {
         const currentQ = questions[currentIndex];
         
         try {
-            const res = await apiSubmitAnswer(currentQ.id, selectedAnswer);
+        const res = await apiSubmitAnswer(
+                currentQ.question_id,
+                selectedAnswer,
+                localStorage.getItem('quiz_topic') || 'overall',
+            );
             if (res) {
                 setFeedback({
                     correct: res.is_correct,
@@ -132,6 +136,9 @@ const Quiz = () => {
 
     const currentQ = questions[currentIndex];
     const progress = ((currentIndex + 1) / questions.length) * 100;
+    const difficultyLabel = currentQ.difficulty
+        ? (currentQ.difficulty <= 2 ? 'Easy' : currentQ.difficulty <= 3 ? 'Medium' : 'Hard')
+        : 'Medium';
 
     return (
         <div className="max-w-[680px] mx-auto space-y-6 pb-24 relative animate-page-enter">
@@ -153,7 +160,7 @@ const Quiz = () => {
             {/* Metadata Row */}
             <div className="flex gap-2">
                 <div className="bg-[#ECFCCB] px-3 py-1 rounded-full text-[11px] font-bold text-[#3a5c10] border border-[#bef264]">
-                    Difficulty: {currentQ.difficulty || 'Medium'}
+                    Difficulty: {difficultyLabel}
                 </div>
                 <div className="bg-[#FEF3C7] px-3 py-1 rounded-full text-[11px] font-bold text-[#854D0E] border border-[#fde68a]">
                     150 XP reward
@@ -163,14 +170,14 @@ const Quiz = () => {
             {/* Question Card */}
             <div className="card p-6 bg-white border-[0.5px] border-[#84CC16]/25">
                 <h2 className="text-[15px] font-semibold text-gray-800 leading-relaxed">
-                    {currentQ.question}
+                    {currentQ.question_text}
                 </h2>
             </div>
 
             {/* Answer Options */}
             <div className="space-y-2.5">
-                {currentQ.type === 'mcq' ? (
-                    currentQ.options.map((option, i) => {
+                {currentQ.question_type === 'mcq' ? (
+                    currentQ.options && currentQ.options.map((option, i) => {
                         const isSelected = selectedAnswer === option;
                         return (
                             <button

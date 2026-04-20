@@ -25,7 +25,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
@@ -76,6 +76,7 @@ async def _run_pipeline(
     raw_items: list[dict[str, Any]],
     source_type: str,
     db: AsyncIOMotorDatabase,
+    user_id: str = "anonymous",
 ) -> int:
     """
     Execute the shared chunking → embedding → storage pipeline.
@@ -103,11 +104,13 @@ async def _run_pipeline(
     # ── 2. Embed ──────────────────────────────────────────────────────────
     embeddings_list, embeddings_array = embed_chunks(chunks)
 
-    # ── 3. Attach embedding_id (positional index within this batch) ───────
+    # ── 3. Attach embedding_id and user_id ────────────────────────────────
     # We use chunk_id as the embedding_id since the FAISS sidecar maps
     # positions → chunk_ids.  The chunk_id is stable across restarts.
+    # user_id is stored so content_generator.py can filter per-user chunks.
     for chunk in chunks:
         chunk["embedding_id"] = chunk["chunk_id"]
+        chunk["user_id"] = user_id
 
     # ── 4. Persist to MongoDB ─────────────────────────────────────────────
     await db["chunks"].insert_many(chunks)
@@ -127,6 +130,7 @@ async def _run_pipeline(
 async def upload_file(
     file: UploadFile = File(...),
     db: AsyncIOMotorDatabase = Depends(get_db),
+    user_id: str = Header(default="anonymous", alias="user_id"),
 ) -> Dict[str, Any]:
     """
     Ingest a document file (PDF, PPT, PPTX, or TXT) into the learning system.
@@ -175,7 +179,7 @@ async def upload_file(
         for item in raw_items:
             item["source_file"] = file.filename or item.get("source_file", "")
 
-        chunks_created = await _run_pipeline(raw_items, source_type, db)
+        chunks_created = await _run_pipeline(raw_items, source_type, db, user_id=user_id)
 
     except HTTPException:
         raise
@@ -198,6 +202,7 @@ async def upload_file(
 async def ingest_youtube(
     body: YouTubeIngestRequest,
     db: AsyncIOMotorDatabase = Depends(get_db),
+    user_id: str = Header(default="anonymous", alias="user_id"),
 ) -> Dict[str, Any]:
     """
     Ingest a YouTube video transcript into the learning system.
@@ -218,7 +223,7 @@ async def ingest_youtube(
     """
     try:
         raw_items = parse_youtube(body.url)
-        chunks_created = await _run_pipeline(raw_items, "youtube", db)
+        chunks_created = await _run_pipeline(raw_items, "youtube", db, user_id=user_id)
     except HTTPException:
         raise
     except Exception as exc:

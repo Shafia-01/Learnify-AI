@@ -47,3 +47,7 @@ models_cache/
 # Logs
 *.log
 logs/
+
+# Browser cookie exports (contain real session data — never commit)
+*.com_cookies.txt
+youtube.com_cookies.txt

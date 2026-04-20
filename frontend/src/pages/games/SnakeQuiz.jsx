@@ -19,6 +19,9 @@ const SnakeQuiz = () => {
     const [isGameOver, setIsGameOver] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Ref to track current score without stale closure issues inside setInterval
+    const scoreRef = useRef(0);
+
     const fetchQuestions = useCallback(async () => {
         try {
             const res = await client.get(`/api/games/quiz-content/${userId}`);
@@ -27,16 +30,17 @@ const SnakeQuiz = () => {
         finally { setIsLoading(false); }
     }, [userId]);
 
-    const submitScore = async () => {
+    const submitScore = useCallback(async () => {
         try {
             await client.post('/api/games/score', {
                 user_id: userId,
                 game_name: 'snake',
-                score: score,
+                // Use ref value to get the latest score, not the stale closure value
+                score: scoreRef.current,
                 duration_seconds: 60
             });
         } catch (err) { console.error("Score submission failed", err); }
-    };
+    }, [userId]);
 
     useEffect(() => {
         fetchQuestions();
@@ -88,14 +92,22 @@ const SnakeQuiz = () => {
 
     const handleAnswer = (option) => {
         if (option === currentQuestion.correct_answer) {
-            setScore(prev => prev + 500);
-            setSnake(prev => [...prev, {}]); // Just add a segment
+            setScore(prev => {
+                const next = prev + 500;
+                scoreRef.current = next;
+                return next;
+            });
+            setSnake(prev => [...prev, {}]);
             setFood({
                 x: Math.floor(Math.random() * GRID_SIZE),
                 y: Math.floor(Math.random() * GRID_SIZE)
             });
         } else {
-            setScore(prev => Math.max(0, prev - 200));
+            setScore(prev => {
+                const next = Math.max(0, prev - 200);
+                scoreRef.current = next;
+                return next;
+            });
         }
         setCurrentQuestion(null);
         setIsPaused(false);

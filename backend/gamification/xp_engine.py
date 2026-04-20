@@ -30,7 +30,7 @@ async def award_xp(db: AsyncIOMotorDatabase, user_id: str, event_type: str) -> d
     if not user_doc:
         # Create a default profile if user doesn't exist
         user_profile = UserProfile(user_id=user_id, name=f"Learner_{user_id[:4]}")
-        user_doc = user_profile.dict()
+        user_doc = user_profile.model_dump()
         await db["users"].insert_one(user_doc)
     else:
         # Use Pydantic to validate and handle the document

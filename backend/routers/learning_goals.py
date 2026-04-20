@@ -174,7 +174,7 @@ async def create_goal(payload: CreateGoalRequest, db: AsyncIOMotorDatabase = Dep
         progress_percent=0.0
     )
     
-    goal_doc = goal.dict()
+    goal_doc = goal.model_dump()
     await db["learning_goals"].insert_one(goal_doc)
     return goal
 
