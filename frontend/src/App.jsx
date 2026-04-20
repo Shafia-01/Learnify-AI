@@ -14,6 +14,8 @@ import client from './api/client';
 import Layout from './components/Layout';
 import { ToastProvider } from './context/ToastContext';
 
+import MLMonitor from './pages/MLMonitor';
+
 function App() {
   useEffect(() => {
     // On app load, restore the last used provider from localStorage
@@ -40,6 +42,7 @@ function App() {
           <Route path="/games/:gameId" element={<GamePlaceholder />} />
           <Route path="/knowledge-graph" element={<KnowledgePage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/ml-monitor" element={<MLMonitor />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

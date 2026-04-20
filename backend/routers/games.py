@@ -12,12 +12,20 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from database import get_db
 from games.word_extractor import get_scramble_words
+from games.content_generator import (
+    generate_game_questions,
+    generate_memory_pairs,
+    generate_flashcards
+)
 from models.schemas import (
     GameLeaderboardEntry,
     GameName,
     GameScoreResponse,
     SubmitScoreRequest,
     WordScrambleWord,
+    MemoryPair,
+    FlashcardCard,
+    QuizQuestion
 )
 
 router = APIRouter(prefix="/games", tags=["Games"])
@@ -185,6 +193,21 @@ async def get_leaderboard(game_name: GameName, db: AsyncIOMotorDatabase = Depend
         
     return results
 
+
+@router.get("/quiz-content/{user_id}", response_model=List[QuizQuestion])
+async def get_quiz_game_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """Provides questions for Snake and Falling Quiz."""
+    return await generate_game_questions(db, user_id, count=10)
+
+@router.get("/memory-match/{user_id}", response_model=List[MemoryPair])
+async def get_memory_match_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """Provides term-match pairs for Memory Match."""
+    return await generate_memory_pairs(db, user_id, count=8)
+
+@router.get("/flashcards/{user_id}", response_model=List[FlashcardCard])
+async def get_flashcard_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """Provides flashcards for the Flip game."""
+    return await generate_flashcards(db, user_id, count=10)
 
 @router.get("/status")
 async def status_check():

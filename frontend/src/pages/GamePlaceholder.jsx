@@ -1,9 +1,29 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import WordScramble from './games/WordScramble';
+import FlashcardFlip from './games/FlashcardFlip';
+import MemoryMatch from './games/MemoryMatch';
+import SnakeQuiz from './games/SnakeQuiz';
+import FallingQuiz from './games/FallingQuiz';
+import TicTacToe from './games/TicTacToe';
 
 const GamePlaceholder = () => {
     const { gameId } = useParams();
     const navigate = useNavigate();
+
+    // Map gameIds to their respective components
+    const GameComponent = {
+        'scramble': <WordScramble />,
+        'flashcard': <FlashcardFlip />,
+        'memory': <MemoryMatch />,
+        'snake': <SnakeQuiz />,
+        'falling': <FallingQuiz />,
+        'tictactoe': <TicTacToe />,
+    }[gameId];
+
+    if (GameComponent) {
+        return <div className="max-w-6xl mx-auto py-8">{GameComponent}</div>;
+    }
 
     return (
         <div className="max-w-4xl mx-auto h-[70vh] flex flex-col items-center justify-center space-y-6 text-center animate-page-enter">

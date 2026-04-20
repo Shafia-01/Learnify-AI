@@ -1,20 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../api/auth';
 
 const Onboarding = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [level, setLevel] = useState('Intermediate');
     const [language, setLanguage] = useState('English');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleComplete = () => {
-        const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('user_id', userId);
-        localStorage.setItem('name', name);
-        localStorage.setItem('level', level);
-        localStorage.setItem('language', language);
-        navigate('/upload');
+    const handleComplete = async () => {
+        setIsLoading(true);
+        try {
+            await register({
+                name,
+                email,
+                password,
+                level,
+                language
+            });
+            navigate('/upload');
+        } catch (err) {
+            console.error("Onboarding failed", err);
+            // Fallback for demo if backend is not running
+            const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('user_id', userId);
+            localStorage.setItem('name', name);
+            navigate('/upload');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const steps = [
@@ -45,25 +63,40 @@ const Onboarding = () => {
                 {/* Content Card */}
                 <div className="bg-white/40 backdrop-blur-xl rounded-[24px] p-8 shadow-xl shadow-pink-500/5 border border-white/60">
                     {step === 1 && (
-                        <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+                        <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
                             <div className="space-y-1">
-                                <h1 className="text-[20px] font-black text-[#9D174D]">What's your name?</h1>
-                                <p className="text-[13px] text-pink-400 font-medium whitespace-nowrap">We'll use this to personalize your journey</p>
+                                <h1 className="text-[20px] font-black text-[#9D174D]">Create your account</h1>
+                                <p className="text-[12px] text-pink-400 font-medium">Join the community of explorers</p>
                             </div>
-                            <input 
-                                type="text" 
-                                value={name}
-                                autoFocus
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter your name"
-                                className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[15px] font-bold text-gray-800 outline-none focus:ring-4 ring-pink-500/10 focus:border-[#EC4899] transition-all"
-                            />
+                            <div className="space-y-3">
+                                <input 
+                                    type="text" 
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Full Name"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                />
+                                <input 
+                                    type="email" 
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Email Address"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                />
+                                <input 
+                                    type="password" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Create Password (min 8 chars)"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                />
+                            </div>
                             <button 
                                 onClick={() => setStep(2)}
-                                disabled={!name.trim()}
+                                disabled={!name.trim() || !email.includes('@') || password.length < 8}
                                 className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
                             >
-                                Next
+                                Continue — Personalized Selection
                             </button>
                         </div>
                     )}
@@ -135,9 +168,10 @@ const Onboarding = () => {
                                 </button>
                                 <button 
                                     onClick={handleComplete}
-                                    className="flex-1 bg-[#10B981] hover:bg-[#059669] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
+                                    disabled={isLoading}
+                                    className="flex-1 bg-[#10B981] hover:bg-[#059669] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] disabled:opacity-70"
                                 >
-                                    Get Started
+                                    {isLoading ? 'Creating Account...' : 'Get Started'}
                                 </button>
                             </div>
                         </div>
