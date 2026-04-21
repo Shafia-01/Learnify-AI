@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # ── JWT Authentication ───────────────────────────────────────────
-    JWT_SECRET_KEY: str = "your-super-secret-key-change-this"
+    JWT_SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_DAYS: int = 7
 
