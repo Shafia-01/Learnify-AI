@@ -8,7 +8,7 @@ os.environ directly.
 """
 
 from pathlib import Path
-from typing from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 # The backend directory (where this config.py lives) — .env is here

@@ -4,7 +4,8 @@ from typing import List, Dict
 
 from langchain_core.prompts import PromptTemplate
 from rag.llm_provider import get_llm
-from pydantic logger = logging.getLogger(__name__)
+
+logger = logging.getLogger(__name__)
 
 async def generate_flashcards(weak_chunk_texts: List[str]) -> List[Dict[str, str]]:
     """
