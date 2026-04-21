@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Modifiable at runtime to allow provider hot-swapping
 runtime_config = {
     "provider": "groq",  # default to groq during development
-    "gemini_model": "gemini-3.1-flash-lite",
+    "gemini_model": "gemini-2.0-flash-lite",
     "groq_model": "llama-3.1-8b-instant",
     "ollama_model": "llama3",
     "privacy_mode": settings.PRIVACY_MODE

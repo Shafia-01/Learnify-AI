@@ -8,8 +8,12 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
   const [isConnected, setIsConnected] = useState(false);
   const ws = useRef(null);
   const intervalRef = useRef(null);
+  const reconnectTimer = useRef(null);
+  const mountedRef = useRef(true);
 
   const connectWS = useCallback(() => {
+    if (!mountedRef.current) return;
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host;
     const wsUrl = `${protocol}//${host}/ws/emotion/${sessionId}`;
@@ -17,30 +21,42 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
-      setIsConnected(true);
+      if (mountedRef.current) setIsConnected(true);
     };
 
     ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setEmotionData(data);
+      if (!mountedRef.current) return;
+      try {
+        const data = JSON.parse(event.data);
+        setEmotionData(data);
+      } catch (_) {}
     };
 
     ws.current.onclose = () => {
+      if (!mountedRef.current) return;
       setIsConnected(false);
-      // Reconnect after 5 seconds
-      setTimeout(connectWS, 5000);
+      // Reconnect after 5 seconds, only if still mounted
+      reconnectTimer.current = setTimeout(connectWS, 5000);
     };
 
     ws.current.onerror = (err) => {
       console.error('WebSocket Error:', err);
+      // Close explicitly so onclose fires and triggers reconnect
+      ws.current?.close();
     };
   }, [sessionId]);
 
   useEffect(() => {
+    mountedRef.current = true;
     connectWS();
     return () => {
-      if (ws.current) ws.current.close();
+      mountedRef.current = false;
+      clearTimeout(reconnectTimer.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (ws.current) {
+        ws.current.onclose = null; // prevent reconnect on deliberate close
+        ws.current.close();
+      }
     };
   }, [connectWS]);
 
