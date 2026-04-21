@@ -8,32 +8,37 @@ for user authentication and authorization.
 from datetime import datetime, timedelta
 from typing import Optional
 
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from config import settings
 from database import get_db
 from models.schemas import AuthUserResponse
 
 # ── Password Hashing ─────────────────────────────────────────────────────
-# Using bcrypt for secure one-way password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Using bcrypt directly (passlib dropped — incompatible with bcrypt >= 4.x)
 
 
 def hash_password(password: str) -> str:
     """
     Hash a plain-text password using bcrypt.
+    Passwords are UTF-8 encoded and salted automatically.
     """
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")
+    hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify a plain-text password against a hashed version.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed_password.encode("utf-8"),
+    )
 
 
 # ── JWT Handling ─────────────────────────────────────────────────────────

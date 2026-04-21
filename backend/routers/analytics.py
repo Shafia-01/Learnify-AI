@@ -3,7 +3,6 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timedelta
 from database import get_db
 from models.schemas import SessionEvent
-from typing import logging
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
