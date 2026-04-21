@@ -1,4 +1,3 @@
-from typing import Dict, Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from models.schemas import UserProfile
 from gamification.badge_system import check_and_award_badges
