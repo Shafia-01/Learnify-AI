@@ -11,8 +11,13 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+from dotenv import load_dotenv
+
 # The backend directory (where this config.py lives) — .env is here
 _BACKEND_DIR = Path(__file__).resolve().parent
+# Load environment variables from .env explicitly and override system env
+load_dotenv(_BACKEND_DIR / ".env", override=True)
+
 # The project root (one level up) — faiss_index lives here
 _PROJECT_ROOT = _BACKEND_DIR.parent
 
@@ -21,7 +26,7 @@ class Settings(BaseSettings):
     """Application-wide settings sourced from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=str(_BACKEND_DIR / ".env"),  # .env is in backend/, not project root
+        env_file=str(_BACKEND_DIR / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
