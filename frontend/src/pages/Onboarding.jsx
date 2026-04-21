@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api/auth';
+import { register, login } from '../api/auth';
+import { useToast } from '../context/ToastContext';
 
 const Onboarding = () => {
     const navigate = useNavigate();
@@ -11,6 +12,23 @@ const Onboarding = () => {
     const [level, setLevel] = useState('Intermediate');
     const [language, setLanguage] = useState('English');
     const [isLoading, setIsLoading] = useState(false);
+    const [isLogin, setIsLogin] = useState(false);
+    const { addToast } = useToast();
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+        try {
+            await login(email, password);
+            addToast("Welcome back!", "success");
+            navigate('/dashboard');
+        } catch (err) {
+            console.error("Login failed", err);
+            const errorMessage = err.response?.data?.detail || "Login failed. Please check your credentials.";
+            addToast(errorMessage, "error");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleComplete = async () => {
         setIsLoading(true);
@@ -22,14 +40,20 @@ const Onboarding = () => {
                 level,
                 language
             });
+            addToast("Welcome to Learnify AI!", "success");
             navigate('/upload');
         } catch (err) {
             console.error("Onboarding failed", err);
-            // Fallback for demo if backend is not running
-            const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem('user_id', userId);
-            localStorage.setItem('name', name);
-            navigate('/upload');
+            const detail = err.response?.data?.detail;
+            const errorMessage = detail || "Registration failed. Please check your details.";
+            
+            if (detail === "Email is already registered") {
+                addToast("This email is already registered. Try logging in instead!", "warning");
+                setIsLogin(true);
+                setStep(1);
+            } else {
+                addToast(errorMessage, "error");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -65,17 +89,23 @@ const Onboarding = () => {
                     {step === 1 && (
                         <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
                             <div className="space-y-1">
-                                <h1 className="text-[20px] font-black text-[#9D174D]">Create your account</h1>
-                                <p className="text-[12px] text-pink-400 font-medium">Join the community of explorers</p>
+                                <h1 className="text-[20px] font-black text-[#9D174D]">
+                                    {isLogin ? 'Sign in to account' : 'Create your account'}
+                                </h1>
+                                <p className="text-[12px] text-pink-400 font-medium">
+                                    {isLogin ? 'Welcome back, explorer!' : 'Join the community of explorers'}
+                                </p>
                             </div>
                             <div className="space-y-3">
-                                <input 
-                                    type="text" 
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Full Name"
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
-                                />
+                                {!isLogin && (
+                                    <input 
+                                        type="text" 
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Full Name"
+                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                    />
+                                )}
                                 <input 
                                     type="email" 
                                     value={email}
@@ -87,17 +117,51 @@ const Onboarding = () => {
                                     type="password" 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Create Password (min 8 chars)"
+                                    placeholder={isLogin ? "Password" : "Create Password (min 8 chars)"}
                                     className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
                                 />
                             </div>
-                            <button 
-                                onClick={() => setStep(2)}
-                                disabled={!name.trim() || !email.includes('@') || password.length < 8}
-                                className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
-                            >
-                                Continue — Personalized Selection
-                            </button>
+
+                            {isLogin ? (
+                                <button 
+                                    onClick={handleLogin}
+                                    disabled={!email.includes('@') || !password || isLoading}
+                                    className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
+                                >
+                                    {isLoading ? 'Signing in...' : 'Sign In'}
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => setStep(2)}
+                                    disabled={
+                                        !name.trim() || 
+                                        !email.includes('@') || 
+                                        password.length < 8 ||
+                                        !/[A-Z]/.test(password) ||
+                                        !/[0-9]/.test(password)
+                                    }
+                                    className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
+                                >
+                                    Continue — Personalized Selection
+                                </button>
+                            )}
+
+                            {!isLogin && (
+                                <div className="mt-2 space-y-1">
+                                    <p className={`text-[10px] ${password.length >= 8 ? 'text-green-500' : 'text-pink-300'}`}>• At least 8 characters</p>
+                                    <p className={`text-[10px] ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one uppercase letter</p>
+                                    <p className={`text-[10px] ${/[0-9]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one digit</p>
+                                </div>
+                            )}
+
+                            <div className="text-center pt-2">
+                                <button 
+                                    onClick={() => setIsLogin(!isLogin)}
+                                    className="text-[12px] text-pink-500 font-bold hover:underline"
+                                >
+                                    {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                                </button>
+                            </div>
                         </div>
                     )}
 

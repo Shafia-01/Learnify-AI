@@ -2,8 +2,9 @@ import client from './client';
 
 export const register = async (userData) => {
     try {
+        const sanitizedName = userData.name.toLowerCase().replace(/[^a-z0-9_]/g, '');
         const response = await client.post('/api/auth/register', {
-            username: userData.name.toLowerCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000),
+            username: sanitizedName + Math.floor(Math.random() * 1000),
             email: userData.email,
             password: userData.password,
             name: userData.name,
