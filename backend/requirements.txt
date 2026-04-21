@@ -54,4 +54,5 @@ pytest-asyncio
 
 # Authentication
 passlib[bcrypt]
+bcrypt
 python-jose[cryptography]
