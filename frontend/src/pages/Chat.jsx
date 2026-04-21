@@ -48,8 +48,18 @@ const Chat = () => {
                     getLearningPath(userId),
                     getKnowledgeGraph(userId)
                 ]);
-                if (pathData) setLearningPath(pathData);
-                if (graphData) setGraphData(graphData);
+                
+                // pathData is {"learning_path": [...]}
+                if (pathData && Array.isArray(pathData.learning_path)) {
+                    setLearningPath(pathData.learning_path);
+                } else if (Array.isArray(pathData)) {
+                    setLearningPath(pathData);
+                }
+
+                // graphData should be {nodes: [], edges: []}
+                if (graphData && graphData.nodes && graphData.edges) {
+                    setGraphData(graphData);
+                }
             } catch (err) {
                 console.error("Failed to fetch chat tab data", err);
             }

@@ -20,13 +20,17 @@ const KnowledgeGraph = ({ data, onNodeClick }) => {
 
     // calculate connection counts for node sizing
     const connectionCounts = {};
-    data.edges.forEach(e => {
-      connectionCounts[e.source.id || e.source] = (connectionCounts[e.source.id || e.source] || 0) + 1;
-      connectionCounts[e.target.id || e.target] = (connectionCounts[e.target.id || e.target] || 0) + 1;
-    });
+    if (data.edges && Array.isArray(data.edges)) {
+      data.edges.forEach(e => {
+        const sourceId = (e.source && e.source.id) ? e.source.id : e.source;
+        const targetId = (e.target && e.target.id) ? e.target.id : e.target;
+        if (sourceId) connectionCounts[sourceId] = (connectionCounts[sourceId] || 0) + 1;
+        if (targetId) connectionCounts[targetId] = (connectionCounts[targetId] || 0) + 1;
+      });
+    }
 
-    const nodesData = data.nodes.map(d => ({...d, radius: Math.min(30, 10 + (connectionCounts[d.id] || 0) * 5)}));
-    const edgesData = data.edges.map(d => ({...d}));
+    const nodesData = (data.nodes || []).map(d => ({...d, radius: Math.min(30, 10 + (connectionCounts[d.id] || 0) * 5)}));
+    const edgesData = (data.edges || []).map(d => ({...d}));
 
     const simulation = d3.forceSimulation(nodesData)
       .force("link", d3.forceLink(edgesData).id(d => d.id).distance(100))
