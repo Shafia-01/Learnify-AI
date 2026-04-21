@@ -13,8 +13,7 @@ from typing import Any, Dict, List
 from langchain_core.output_parsers import StrOutputParser
 from rag.llm_provider import get_llm
 
-from config import settings
-from models.schemas import ContentChunk
+from config from models.schemas import ContentChunk
 from rag.prompts import (
     ADVANCED_PROMPT,
     BEGINNER_PROMPT,

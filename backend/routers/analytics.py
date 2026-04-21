@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timedelta
 from database import get_db
 from models.schemas import SessionEvent
-from typing import List, Dict, Any
-import logging
+from typing import logging
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 

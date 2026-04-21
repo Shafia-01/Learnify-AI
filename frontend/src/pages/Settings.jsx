@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import client from '../api/client';
+import { useState, useEffect } from 'react';
 import { getSettingsStatus, getAvailableProviders, switchProvider, togglePrivacyMode as apiTogglePrivacy } from '../api/settings';
 
 const Settings = () => {

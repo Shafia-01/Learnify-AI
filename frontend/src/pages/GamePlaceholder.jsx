@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import WordScramble from './games/WordScramble';
 import FlashcardFlip from './games/FlashcardFlip';

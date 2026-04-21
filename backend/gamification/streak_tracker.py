@@ -1,7 +1,6 @@
-from datetime import datetime, date, timedelta
+from time import time, timedelta
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from typing import Optional
-import logging
+from typing import logging
 
 async def update_streak(db: AsyncIOMotorDatabase, user_id: str) -> int:
     """

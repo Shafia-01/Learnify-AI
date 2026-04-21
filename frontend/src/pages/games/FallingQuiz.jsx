@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import client from '../../api/client';
 
 const FallingQuiz = () => {
     const navigate = useNavigate();

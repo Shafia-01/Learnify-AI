@@ -1,4 +1,3 @@
-import random
 import logging
 from typing import List
 from motor.motor_asyncio import AsyncIOMotorDatabase

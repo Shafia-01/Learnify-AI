@@ -10,7 +10,6 @@ Requires: pdfplumber (already in requirements), reportlab (for PDF generation),
 and python-pptx (already in requirements).
 """
 
-import os
 from pathlib import Path
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from models.schemas import UserProfile
 from motor.motor_asyncio import AsyncIOMotorDatabase
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { transcribeAudio } from '../api/voice';
 
 const VoiceButton = ({ onTranscription }) => {
