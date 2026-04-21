@@ -44,6 +44,10 @@ def set_provider(provider: str, model: str = None) -> Dict[str, str]:
     runtime_config["provider"] = provider
 
     if model:
+        # Fallback for defunct model names
+        if model == "gemini-3.1-flash-lite":
+            model = "gemini-2.0-flash-lite"
+            
         if provider == "gemini":
             runtime_config["gemini_model"] = model
         elif provider == "groq":

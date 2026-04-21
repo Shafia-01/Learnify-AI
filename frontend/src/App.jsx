@@ -18,6 +18,12 @@ import MLMonitor from './pages/MLMonitor';
 
 function App() {
   useEffect(() => {
+    // Migration: Remove defunct model names from localStorage
+    if (localStorage.getItem('model') === 'gemini-3.1-flash-lite') {
+      localStorage.removeItem('model');
+      localStorage.removeItem('provider');
+    }
+
     // On app load, restore the last used provider from localStorage
     const savedProvider = localStorage.getItem('provider');
     const savedModel = localStorage.getItem('model');
