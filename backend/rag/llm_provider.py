@@ -9,7 +9,6 @@ seamlessly swap models without restarting the server.
 import logging
 from typing import Any, Dict
 
-
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
