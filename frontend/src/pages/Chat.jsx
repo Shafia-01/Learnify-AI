@@ -138,6 +138,15 @@ const Chat = () => {
         audio.play().catch(() => setIsSpeaking(false));
     };
 
+    const toggleTask = (index) => {
+        setLearningPath(prev => prev.map((item, i) => {
+            if (i === index) {
+                return { ...item, status: item.status === 'Done' ? 'Pending' : 'Done' };
+            }
+            return item;
+        }));
+    };
+
     return (
         <div className="flex h-[calc(100vh-var(--topbar-height)-48px)] gap-4 animate-page-enter">
             {/* Left Panel: Chat */}
@@ -263,8 +272,8 @@ const Chat = () => {
                                     <input 
                                         type="checkbox" 
                                         checked={item.status === 'Done'}
-                                        readOnly
-                                        className="w-4 h-4 rounded border-gray-300 text-[#8B5CF6] focus:ring-purple-500 accent-[#8B5CF6]" 
+                                        onChange={() => toggleTask(i)}
+                                        className="w-4 h-4 rounded border-gray-300 text-[#8B5CF6] focus:ring-purple-500 accent-[#8B5CF6] cursor-pointer" 
                                     />
                                     <div className="flex-1">
                                         <div className="text-[13px] font-bold text-gray-800">{item.name}</div>
