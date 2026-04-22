@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
 import { speakText, transcribeAudio } from '../api/voice';
+import { getSessionStats } from '../api/analytics';
 import KnowledgeGraph from '../components/KnowledgeGraph';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 
 const Chat = () => {
     const location = useLocation();
@@ -28,6 +30,7 @@ const Chat = () => {
     // Data states
     const [learningPath, setLearningPath] = useState([]);
     const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
+    const [stats, setStats] = useState(null);
     
     const messagesEndRef = useRef(null);
     const mediaRecorder = useRef(null);
@@ -44,11 +47,14 @@ const Chat = () => {
     useEffect(() => {
         const fetchTabData = async () => {
             try {
-                const [pathData, graphData] = await Promise.all([
+                const [pathData, graphData, statsData] = await Promise.all([
                     getLearningPath(userId),
-                    getKnowledgeGraph(userId)
+                    getKnowledgeGraph(userId),
+                    getSessionStats(userId)
                 ]);
                 
+                setStats(statsData);
+
                 // pathData is {"learning_path": [...]}
                 if (pathData && Array.isArray(pathData.learning_path)) {
                     const formattedPath = pathData.learning_path.map((item, idx) => {
@@ -297,12 +303,50 @@ const Chat = () => {
                     )}
 
                     {activeTab === 'Progress' && (
-                         <div className="flex flex-col items-center justify-center h-full opacity-40 grayscale group hover:grayscale-0 transition-all duration-500">
-                             <div className="w-16 h-16 bg-[#EDE9FE] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <svg className="w-8 h-8 text-[#8B5CF6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                             </div>
-                             <p className="text-[14px] font-bold tracking-tight text-[#5B21B6]">Analytics coming soon</p>
-                         </div>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-3 gap-3">
+                                {[
+                                    { label: 'Time', val: `${stats?.total_time_spent_minutes || 0}m`, color: 'text-blue-600' },
+                                    { label: 'Score', val: `${stats?.avg_quiz_score || 0}%`, color: 'text-green-600' },
+                                    { label: 'Topics', val: stats?.topics_covered || 0, color: 'text-purple-600' }
+                                ].map((s, i) => (
+                                    <div key={i} className="bg-white p-3 rounded-xl border border-[#8B5CF6]/10 shadow-sm text-center">
+                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">{s.label}</div>
+                                        <div className={`text-[15px] font-black ${s.color}`}>{s.val}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="bg-white/50 p-4 rounded-xl border border-[#8B5CF6]/10">
+                                <h4 className="text-[12px] font-bold text-gray-700 mb-4">Study Velocity (7d)</h4>
+                                <div className="h-[150px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={stats?.study_time_velocity || []}>
+                                            <XAxis dataKey="date" hide />
+                                            <YAxis hide />
+                                            <Tooltip 
+                                                labelStyle={{ fontSize: '10px' }}
+                                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            />
+                                            <Area type="monotone" dataKey="minutes" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.2} strokeWidth={2} />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {stats?.weak_topics?.length > 0 && (
+                                <div className="p-3 bg-red-50 rounded-xl border border-red-100">
+                                    <div className="text-[11px] font-bold text-red-500 uppercase tracking-tighter mb-2">Focus Needed</div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {stats.weak_topics.slice(0, 3).map((t, i) => (
+                                            <span key={i} className="px-2 py-0.5 bg-white text-red-600 text-[10px] font-bold rounded-md border border-red-100">
+                                                {t}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 

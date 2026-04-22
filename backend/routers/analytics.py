@@ -81,5 +81,57 @@ async def get_stats(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
         "topics_covered": len(quiz_scores),
         "avg_quiz_score": round(avg_score, 2),
         "weak_topics": weak_topics,
-        "sessions_last_7_days": sessions_last_7_days
+        "sessions_last_7_days": sessions_last_7_days,
+        "study_time_velocity": await _get_study_time_velocity(user_id, db),
+        "knowledge_retention": await _get_knowledge_retention(user_id, db)
     }
+
+async def _get_study_time_velocity(user_id: str, db: AsyncIOMotorDatabase):
+    """Calculates minutes studied per day for the last 7 days."""
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    pipeline = [
+        {"$match": {"user_id": user_id, "timestamp": {"$gte": seven_days_ago}}},
+        {"$group": {
+            "_id": {
+                "day": {"$dateToString": {"format": "%Y-%m-%d", "date": "$timestamp"}},
+                "session": "$session_id"
+            },
+            "start": {"$min": "$timestamp"},
+            "end": {"$max": "$timestamp"}
+        }},
+        {"$group": {
+            "_id": "$_id.day",
+            "minutes": {"$sum": {"$divide": [{"$subtract": ["$end", "$start"]}, 60000]}}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    results = await db["sessions"].aggregate(pipeline).to_list(None)
+    
+    # Fill in missing days
+    data = []
+    for i in range(7):
+        day = (datetime.utcnow() - timedelta(days=6-i)).strftime("%Y-%m-%d")
+        found = next((r for r in results if r["_id"] == day), None)
+        data.append({"date": day, "minutes": round(found["minutes"], 1) if found else 0})
+    return data
+
+async def _get_knowledge_retention(user_id: str, db: AsyncIOMotorDatabase):
+    """Calculates average quiz accuracy per day for the last 7 days."""
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    pipeline = [
+        {"$match": {"user_id": user_id, "timestamp": {"$gte": seven_days_ago}}},
+        {"$group": {
+            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$timestamp"}},
+            "accuracy": {"$avg": {"$cond": ["$is_correct", 100, 0]}}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    results = await db["quiz_attempts"].aggregate(pipeline).to_list(None)
+    
+    # Fill in missing days
+    data = []
+    for i in range(7):
+        day = (datetime.utcnow() - timedelta(days=6-i)).strftime("%Y-%m-%d")
+        found = next((r for r in results if r["_id"] == day), None)
+        data.append({"date": day, "score": round(found["accuracy"], 1) if found else 0})
+    return data
