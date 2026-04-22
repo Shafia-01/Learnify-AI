@@ -7,7 +7,7 @@ import client from './client';
  */
 export const transcribeAudio = async (audioBlob) => {
   const formData = new FormData();
-  formData.append('audio', audioBlob, 'audio.webm');
+  formData.append('file', audioBlob, 'audio.webm');
   
   const response = await client.post('/api/voice/transcribe', formData, {
     headers: {
