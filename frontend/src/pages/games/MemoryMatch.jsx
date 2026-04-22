@@ -67,6 +67,14 @@ const MemoryMatch = () => {
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#10B981] font-bold animate-pulse">Shuffling Cards...</div>;
+    
+    if (cards.length === 0) return (
+        <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
+            <h2 className="text-2xl font-black text-gray-800">Empty Deck</h2>
+            <p className="text-gray-500 text-sm">We couldn't extract enough pairs for a game. Upload more detailed material!</p>
+            <button onClick={() => navigate('/upload')} className="w-full bg-[#10B981] text-white py-3 rounded-xl font-bold font-black">Go to Upload</button>
+        </div>
+    );
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-page-enter">

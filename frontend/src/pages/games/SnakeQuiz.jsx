@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import client from '../../api/client';
 
 const GRID_SIZE = 20;
 
@@ -90,7 +91,8 @@ const SnakeQuiz = () => {
     }, [snake, direction, food, isPaused, isGameOver, questions, isLoading]);
 
     const handleAnswer = (option) => {
-        if (option === currentQuestion.correct_answer) {
+        const isCorrect = option?.toString().trim().toLowerCase() === currentQuestion.correct_answer?.toString().trim().toLowerCase();
+        if (isCorrect) {
             setScore(prev => {
                 const next = prev + 500;
                 scoreRef.current = next;
@@ -130,6 +132,16 @@ const SnakeQuiz = () => {
         ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, Math.PI * 2);
         ctx.fill();
     }, [snake, food]);
+
+    if (isLoading) return <div className="text-center p-20 font-black animate-pulse text-yellow-500 uppercase">Waking the snake...</div>;
+
+    if (questions.length === 0) return (
+        <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
+            <h2 className="text-2xl font-black text-gray-800">Snake is Hungry</h2>
+            <p className="text-gray-500 text-sm">But there are no questions! Upload some material to feed the snake.</p>
+            <button onClick={() => navigate('/upload')} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
+        </div>
+    );
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">

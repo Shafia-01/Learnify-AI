@@ -169,27 +169,50 @@ async def get_word_scramble(user_id: str, db: AsyncIOMotorDatabase = Depends(get
 @router.get("/leaderboard/{game_name}", response_model=List[GameLeaderboardEntry])
 async def get_leaderboard(game_name: GameName, db: AsyncIOMotorDatabase = Depends(get_db)):
     """
-    Returns the top 10 scores for a given game.
+    Returns the top 10 scores for a given game, searching across both registration and legacy collections.
     """
     game_key = game_name.value
     
-    # Query users with high scores > 0, sorted descending
-    cursor = db["registered_users"].find(
+    # We'll pull from both collections and merge for the most inclusive leaderboard
+    reg_cursor = db["registered_users"].find(
         {f"game_scores.{game_key}": {"$gt": 0}}
     ).sort(f"game_scores.{game_key}", -1).limit(10)
     
+    legacy_cursor = db["users"].find(
+        {f"game_scores.{game_key}": {"$gt": 0}}
+    ).sort(f"game_scores.{game_key}", -1).limit(10)
+    
+    combined = []
+    async for entry in reg_cursor:
+        combined.append({
+            "user_id": entry["user_id"],
+            "username": entry.get("username", entry.get("name", "Learner")),
+            "name": entry["name"],
+            "score": entry["game_scores"][game_key],
+            "avatar_emoji": entry.get("avatar_emoji", "🎓")
+        })
+        
+    async for entry in legacy_cursor:
+        # Avoid duplicates if user is in both
+        if not any(x["user_id"] == entry["user_id"] for x in combined):
+            combined.append({
+                "user_id": entry["user_id"],
+                "username": entry.get("name", "Learner"),
+                "name": entry["name"],
+                "score": entry["game_scores"][game_key],
+                "avatar_emoji": "🎓"
+            })
+            
+    # Sort the merged list and take top 10
+    combined.sort(key=lambda x: x["score"], reverse=True)
+    top_10 = combined[:10]
+    
     results = []
-    rank = 1
-    async for entry in cursor:
+    for i, entry in enumerate(top_10):
         results.append(GameLeaderboardEntry(
-            rank=rank,
-            user_id=entry["user_id"],
-            username=entry["username"],
-            name=entry["name"],
-            score=entry["game_scores"][game_key],
-            avatar_emoji=entry.get("avatar_emoji", "🎓")
+            rank=i + 1,
+            **entry
         ))
-        rank += 1
         
     return results
 
