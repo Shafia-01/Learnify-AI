@@ -51,9 +51,27 @@ const Chat = () => {
                 
                 // pathData is {"learning_path": [...]}
                 if (pathData && Array.isArray(pathData.learning_path)) {
-                    setLearningPath(pathData.learning_path);
+                    const formattedPath = pathData.learning_path.map((item, idx) => {
+                        if (typeof item === 'string') {
+                            return { 
+                                name: item, 
+                                status: idx === 0 ? 'Active' : 'Pending' 
+                            };
+                        }
+                        return item;
+                    });
+                    setLearningPath(formattedPath);
                 } else if (Array.isArray(pathData)) {
-                    setLearningPath(pathData);
+                    const formattedPath = pathData.map((item, idx) => {
+                        if (typeof item === 'string') {
+                            return { 
+                                name: item, 
+                                status: idx === 0 ? 'Active' : 'Pending' 
+                            };
+                        }
+                        return item;
+                    });
+                    setLearningPath(formattedPath);
                 }
 
                 // graphData should be {nodes: [], edges: []}

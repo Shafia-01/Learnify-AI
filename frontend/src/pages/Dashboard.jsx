@@ -24,7 +24,24 @@ const Dashboard = () => {
                 
                 if (profileData) setProfile(profileData);
                 if (leaderboardData) setLeaderboard(leaderboardData);
-                if (pathData) setLearningPath(pathData);
+                if (pathData) {
+                    const rawPath = pathData.learning_path || (Array.isArray(pathData) ? pathData : []);
+                    const formattedPath = rawPath.map((item, idx) => {
+                        if (typeof item === 'string') {
+                            const colors = ['#8B5CF6', '#10B981', '#F59E0B', '#3B82F6', '#EF4444'];
+                            const emojis = ['📚', '💡', '🚀', '🧠', '🛠️'];
+                            return {
+                                name: item,
+                                color: colors[idx % colors.length],
+                                emoji: emojis[idx % emojis.length],
+                                progress: idx === 0 ? 30 : 0,
+                                chunks: Math.floor(Math.random() * 5) + 2
+                            };
+                        }
+                        return item;
+                    });
+                    setLearningPath(formattedPath);
+                }
 
                 // Fetch extra stats manually if not in wrappers
                 const statsResponse = await client.get(`/api/analytics/stats/${userId}`);
