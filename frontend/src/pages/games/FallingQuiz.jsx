@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import client from '../../api/client';
 
 const FallingQuiz = () => {
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ const FallingQuiz = () => {
                         x: Math.random() * 80 + 10, 
                         y: 0, 
                         text: option,
-                        isCorrect: option === currentQuestion.correct_answer
+                        isCorrect: option?.toString().trim().toLowerCase() === currentQuestion.correct_answer?.toString().trim().toLowerCase()
                     });
                 }
 
@@ -89,6 +90,14 @@ const FallingQuiz = () => {
     };
 
     if (isLoading) return <div className="text-center p-20 font-black animate-pulse text-[#EC4899]">PREPARING DROP ZONE...</div>;
+
+    if (questions.length === 0) return (
+        <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
+            <h2 className="text-2xl font-black text-gray-800">Sky is Clear</h2>
+            <p className="text-gray-500 text-sm">But where are the questions? Upload your material to see them fall!</p>
+            <button onClick={() => navigate('/upload')} className="w-full bg-[#EC4899] text-white py-3 rounded-xl font-bold font-black">Go to Upload</button>
+        </div>
+    );
 
     return (
         <div className="max-w-3xl mx-auto space-y-6">

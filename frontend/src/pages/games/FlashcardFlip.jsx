@@ -25,12 +25,12 @@ const FlashcardFlip = () => {
         fetchCards();
     }, [userId]);
 
-    const handleNext = () => {
+    const handleNext = async () => {
         setIsFlipped(false);
         if (currentIndex < cards.length - 1) {
             setCurrentIndex(prev => prev + 1);
         } else {
-            submitScore();
+            await submitScore();
             navigate('/games');
         }
     };

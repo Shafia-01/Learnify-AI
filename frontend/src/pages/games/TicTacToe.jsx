@@ -44,7 +44,8 @@ const TicTacToe = () => {
     };
 
     const handleAnswer = (option) => {
-        if (option === currentQuestion.correct_answer) {
+        const isCorrect = option?.toString().trim().toLowerCase() === currentQuestion.correct_answer?.toString().trim().toLowerCase();
+        if (isCorrect) {
             const newBoard = [...board];
             newBoard[pendingMove] = 'X';
             setBoard(newBoard);
@@ -90,6 +91,14 @@ const TicTacToe = () => {
     };
 
     if (isLoading) return <div className="text-center p-20 font-black animate-pulse text-blue-500">SETTING UP BOARD...</div>;
+    
+    if (questions.length === 0) return (
+        <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
+            <h2 className="text-2xl font-black text-gray-800">No content available</h2>
+            <p className="text-gray-500">Please upload some documents in the Upload section to generate questions for this game.</p>
+            <button onClick={() => navigate('/upload')} className="w-full bg-blue-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
+        </div>
+    );
 
     return (
         <div className="max-w-xl mx-auto space-y-8 animate-page-enter">
