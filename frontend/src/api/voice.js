@@ -18,13 +18,39 @@ export const transcribeAudio = async (audioBlob) => {
 };
 
 /**
- * Convert text to speech. Returns audio URL for direct use in <audio> tags.
+ * Convert text to speech using a GET request.
+ * For short text, returns a direct URL for <audio> tags.
+ * For long text, fetches the audio as a blob and creates an object URL.
  * @param {string} text 
  * @param {string} [language='en']
- * @returns {string}
+ * @returns {string} URL to the audio
  */
 export const speakText = (text, language = 'en') => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
   const params = new URLSearchParams({ text, language });
   return `${baseUrl}/api/voice/speak?${params.toString()}`;
+};
+
+/**
+ * Fetch TTS audio as a blob URL — works for long text that might exceed
+ * URL length limits when using the GET endpoint directly.
+ * Uses a GET request with query parameters which the backend supports.
+ * @param {string} text 
+ * @param {string} [language='en']
+ * @returns {Promise<string>} Object URL for the audio blob
+ */
+export const speakTextFetch = async (text, language = 'en') => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+  const params = new URLSearchParams({ text, language });
+  
+  const response = await fetch(`${baseUrl}/api/voice/speak?${params.toString()}`, {
+    method: 'GET',
+  });
+  
+  if (!response.ok) {
+    throw new Error(`TTS request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
 };

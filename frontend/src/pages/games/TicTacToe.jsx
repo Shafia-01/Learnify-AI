@@ -13,6 +13,8 @@ const TicTacToe = () => {
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [winner, setWinner] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isEnded, setIsEnded] = useState(false);
+    const [scoreResponse, setScoreResponse] = useState(null);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -35,7 +37,7 @@ const TicTacToe = () => {
     };
 
     const handleSquareClick = (idx) => {
-        if (board[idx] || winner || pendingMove) return;
+        if (board[idx] || winner || pendingMove || isEnded) return;
         
         // Show question barrier
         setPendingMove(idx);
@@ -66,13 +68,22 @@ const TicTacToe = () => {
 
     const submitScore = async (finalScore) => {
         try {
-            await client.post('/api/games/score', {
+            const res = await client.post('/api/games/score', {
                 user_id: userId,
                 game_name: 'tictactoe',
                 score: finalScore,
                 duration_seconds: 120
             });
+            setScoreResponse(res.data);
         } catch (err) { console.error("Failed to submit TicTacToe score", err); }
+    };
+
+    const handleEndGame = () => {
+        setIsEnded(true);
+        // Calculate score based on board state: X-marks * 100
+        const xCount = board.filter(s => s === 'X').length;
+        const finalScore = xCount * 100;
+        submitScore(finalScore);
     };
 
     const aiMove = (currentBoard) => {
@@ -95,16 +106,26 @@ const TicTacToe = () => {
     if (questions.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
             <h2 className="text-2xl font-black text-gray-800">No content available</h2>
-            <p className="text-gray-500">Please upload some documents in the Upload section to generate questions for this game.</p>
+            <p className="text-gray-600">Please upload some documents in the Upload section to generate questions for this game.</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-blue-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
         </div>
     );
 
+    const gameFinished = winner || isEnded;
+
     return (
         <div className="max-w-xl mx-auto space-y-8 animate-page-enter">
-            <header className="text-center">
+            <header className="text-center space-y-2">
                 <h1 className="text-3xl font-black text-gray-800 uppercase tracking-tighter">TIC-TAC-TOE</h1>
-                <p className="text-blue-500 font-bold text-xs uppercase tracking-widest mt-1">Answer to verify your move</p>
+                <p className="text-blue-600 font-bold text-xs uppercase tracking-widest mt-1">Answer to verify your move</p>
+                {!gameFinished && (
+                    <button
+                        onClick={handleEndGame}
+                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-bold text-sm shadow-lg shadow-red-500/20 transition-all active:scale-95 uppercase tracking-wide"
+                    >
+                        🏁 End Game
+                    </button>
+                )}
             </header>
 
             <div className="grid grid-cols-3 gap-3">
@@ -125,13 +146,13 @@ const TicTacToe = () => {
 
             {currentQuestion && (
                 <div className="card p-6 border-2 border-blue-500 bg-blue-50 space-y-4 animate-[slideUp_0.3s]">
-                    <h3 className="text-lg font-bold text-gray-800">{currentQuestion.question_text}</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{currentQuestion.question_text}</h3>
                     <div className="grid grid-cols-1 gap-2">
                         {currentQuestion.options.map((opt, i) => (
                             <button 
                                 key={i}
                                 onClick={() => handleAnswer(opt)}
-                                className="w-full text-left p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-500 font-bold transition-all"
+                                className="w-full text-left p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-500 font-bold transition-all text-gray-800"
                             >
                                 {opt}
                             </button>
@@ -140,10 +161,33 @@ const TicTacToe = () => {
                 </div>
             )}
 
-            {winner && (
-                <div className={`p-6 rounded-3xl text-center text-white font-black text-2xl shadow-xl ${winner === 'X' ? 'bg-green-500' : winner === 'O' ? 'bg-red-500' : 'bg-gray-500'}`}>
-                    {winner === 'Draw' ? 'IT\'S A DRAW!' : `WINNER: ${winner === 'X' ? 'YOU' : 'AI BOT'}`}
-                    <button onClick={() => window.location.reload()} className="block mx-auto mt-4 text-[10px] bg-white/20 px-4 py-2 rounded-full uppercase">Play Again</button>
+            {gameFinished && (
+                <div className={`p-8 rounded-3xl text-center text-white font-black space-y-4 shadow-xl ${
+                    winner === 'X' ? 'bg-green-500' : 
+                    winner === 'O' ? 'bg-red-500' : 
+                    isEnded ? 'bg-blue-600' :
+                    'bg-gray-500'
+                }`}>
+                    <div className="text-2xl">
+                        {winner === 'Draw' ? "IT'S A DRAW!" : 
+                         winner === 'X' ? 'WINNER: YOU 🏆' :
+                         winner === 'O' ? 'WINNER: AI BOT' :
+                         'GAME ENDED'}
+                    </div>
+                    {scoreResponse && (
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold opacity-90">{scoreResponse.message}</p>
+                            <div className="flex gap-4 justify-center text-xs font-bold uppercase tracking-wider">
+                                <span className="bg-white/10 px-3 py-1 rounded-full">Score: {scoreResponse.submitted_score}</span>
+                                <span className="bg-white/10 px-3 py-1 rounded-full">High: {scoreResponse.new_high_score}</span>
+                                <span className="bg-white/10 px-3 py-1 rounded-full">+{scoreResponse.xp_awarded} XP</span>
+                            </div>
+                        </div>
+                    )}
+                    <div className="flex gap-3 justify-center mt-2">
+                        <button onClick={() => window.location.reload()} className="bg-white/20 px-6 py-2 rounded-full uppercase text-sm font-bold">Play Again</button>
+                        <button onClick={() => navigate('/games')} className="bg-white/10 border border-white/20 px-6 py-2 rounded-full text-sm font-bold">Back to Games</button>
+                    </div>
                 </div>
             )}
         </div>

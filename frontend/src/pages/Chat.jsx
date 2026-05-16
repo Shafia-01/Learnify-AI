@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
-import { speakText, transcribeAudio } from '../api/voice';
+import { speakTextFetch, transcribeAudio } from '../api/voice';
 import { getSessionStats } from '../api/analytics';
 import KnowledgeGraph from '../components/KnowledgeGraph';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
@@ -136,12 +136,30 @@ const Chat = () => {
         }
     };
 
-    const handleSpeak = (text) => {
-        const url = speakText(text);
-        const audio = new Audio(url);
+    const handleSpeak = async (text) => {
         setIsSpeaking(true);
-        audio.onended = () => setIsSpeaking(false);
-        audio.play().catch(() => setIsSpeaking(false));
+        try {
+            const language = localStorage.getItem('language') || 'en';
+            // Map display language names to ISO codes
+            const langMap = { 'English': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de', 'Hindi': 'hi', 'Urdu': 'ur' };
+            const langCode = langMap[language] || language.toLowerCase().slice(0, 2);
+            
+            const audioUrl = await speakTextFetch(text, langCode);
+            const audio = new Audio(audioUrl);
+            audio.onended = () => {
+                setIsSpeaking(false);
+                URL.revokeObjectURL(audioUrl);
+            };
+            audio.onerror = () => {
+                setIsSpeaking(false);
+                URL.revokeObjectURL(audioUrl);
+                console.error('Audio playback failed');
+            };
+            await audio.play();
+        } catch (err) {
+            setIsSpeaking(false);
+            console.error('Voice synthesis failed:', err);
+        }
     };
 
     const toggleTask = (index) => {

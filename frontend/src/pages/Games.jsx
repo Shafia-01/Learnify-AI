@@ -22,7 +22,9 @@ const Games = () => {
         const fetchScores = async () => {
             try {
                 const res = await client.get(`/api/games/scores/${userId}`);
-                if (res.data) setHighScores(res.data);
+                // Backend returns { user_id, scores: { snake: 0, ... }, total_games_played }
+                if (res.data?.scores) setHighScores(res.data.scores);
+                else if (res.data) setHighScores(res.data);
             } catch (err) { console.error("Failed to fetch high scores", err); }
         };
         fetchScores();
@@ -51,7 +53,7 @@ const Games = () => {
     return (
         <div className="max-w-6xl mx-auto space-y-8 animate-page-enter">
             <header>
-                <h1 className="text-[18px] font-bold text-[#713F12]">Choose a Mini-Game</h1>
+                <h1 className="text-[18px] font-bold text-gray-900">Choose a Mini-Game</h1>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -79,8 +81,8 @@ const Games = () => {
                             {game.icon}
                         </div>
 
-                        <h3 className="text-[13px] font-bold mb-1">{game.name}</h3>
-                        <p className={`text-[11px] mb-3 ${game.featured ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <h3 className="text-[13px] font-bold mb-1 text-gray-900">{game.name}</h3>
+                        <p className={`text-[11px] mb-3 ${game.featured ? 'text-gray-300' : 'text-gray-600'}`}>
                             {game.tagline}
                         </p>
 
@@ -106,7 +108,7 @@ const Games = () => {
                                 className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-all whitespace-nowrap ${
                                     selectedGame === game.id 
                                         ? 'bg-[#EAB308] text-white shadow-sm' 
-                                        : 'text-gray-400 hover:text-gray-600'
+                                        : 'text-gray-600 hover:text-gray-800'
                                 }`}
                             >
                                 {game.name.split(' ')[0]}

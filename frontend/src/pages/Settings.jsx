@@ -104,7 +104,7 @@ const Settings = () => {
 
             <header className="pb-2">
                 <h1 className="text-[20px] font-black text-gray-800 tracking-tight">Settings</h1>
-                <p className="text-[13px] text-gray-500 font-medium">Configure your AI experience and preferences</p>
+                <p className="text-[13px] text-gray-600 font-medium">Configure your AI experience and preferences</p>
             </header>
 
             {/* General Section */}
@@ -114,7 +114,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between py-2">
                     <div className="space-y-0.5">
                         <div className="text-[14px] font-bold text-gray-800">Privacy Mode</div>
-                        <div className="text-[11px] text-gray-400 font-medium leading-normal max-w-[280px]">
+                        <div className="text-[11px] text-gray-500 font-medium leading-normal max-w-[280px]">
                             When enabled, session data won't be sent to our analytics server.
                         </div>
                     </div>
@@ -128,7 +128,7 @@ const Settings = () => {
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-tight">Preferred Language</label>
+                        <label className="text-[11px] font-bold text-gray-600 uppercase tracking-tight">Preferred Language</label>
                         <select 
                             value={language}
                             onChange={(e) => handleGeneralChange('language', e.target.value)}
