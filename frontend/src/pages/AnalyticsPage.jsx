@@ -51,9 +51,9 @@ const AnalyticsPage = () => {
             <header className="flex justify-between items-end">
                 <div>
                     <h1 className="text-[24px] font-black text-gray-800 tracking-tight">Performance Analytics</h1>
-                    <p className="text-[14px] text-gray-500 font-medium">Tracking your growth and learning efficiency</p>
+                    <p className="text-[14px] text-gray-600 font-medium">Tracking your growth and learning efficiency</p>
                 </div>
-                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-[12px] font-bold text-gray-400 uppercase">
+                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-[12px] font-bold text-gray-600 uppercase">
                     Last 7 Days
                 </div>
             </header>
@@ -80,7 +80,7 @@ const AnalyticsPage = () => {
                 <div className="card p-6 bg-white flex flex-col space-y-6">
                     <div>
                         <h3 className="text-[16px] font-bold text-gray-800">Learning Velocity</h3>
-                        <p className="text-[12px] text-gray-400">Minutes studied per day</p>
+                        <p className="text-[12px] text-gray-500">Minutes studied per day</p>
                     </div>
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -114,7 +114,7 @@ const AnalyticsPage = () => {
                 <div className="card p-6 bg-white flex flex-col space-y-6">
                     <div>
                         <h3 className="text-[16px] font-bold text-gray-800">Knowledge Retention</h3>
-                        <p className="text-[12px] text-gray-400">Quiz performance accuracy (%)</p>
+                        <p className="text-[12px] text-gray-500">Quiz performance accuracy (%)</p>
                     </div>
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">

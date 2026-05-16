@@ -10,6 +10,8 @@ const FlashcardFlip = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isEnded, setIsEnded] = useState(false);
+    const [scoreResponse, setScoreResponse] = useState(null);
 
     useEffect(() => {
         const fetchCards = async () => {
@@ -30,24 +32,60 @@ const FlashcardFlip = () => {
         if (currentIndex < cards.length - 1) {
             setCurrentIndex(prev => prev + 1);
         } else {
-            await submitScore();
-            navigate('/games');
+            await submitScore(cards.length * 10);
+            setIsEnded(true);
         }
     };
 
-    const submitScore = async () => {
+    const submitScore = async (finalScore) => {
         try {
-            await client.post('/api/games/score', {
+            const res = await client.post('/api/games/score', {
                 user_id: userId,
                 game_name: 'flashcard',
-                score: cards.length * 10,
+                score: finalScore,
                 duration_seconds: 120
             });
+            setScoreResponse(res.data);
         } catch (err) { console.error("Failed to submit FlashcardFlip score", err); }
     };
 
+    const handleEndGame = async () => {
+        // Score based on how many cards were reviewed
+        const reviewedScore = (currentIndex + 1) * 10;
+        await submitScore(reviewedScore);
+        setIsEnded(true);
+    };
+
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#8B5CF6] font-bold animate-pulse">Preparing Cards...</div>;
-    if (cards.length === 0) return <div className="text-center p-10 font-bold">No cards available. Upload material first!</div>;
+    if (cards.length === 0) return <div className="text-center p-10 font-bold text-gray-800">No cards available. Upload material first!</div>;
+
+    if (isEnded) {
+        const finalScore = scoreResponse?.submitted_score || (currentIndex + 1) * 10;
+        return (
+            <div className="max-w-2xl mx-auto space-y-8 animate-page-enter">
+                <div className="card p-10 text-center space-y-6 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white">
+                    <h2 className="text-3xl font-black">Session Complete! 🎉</h2>
+                    <div className="text-5xl font-black">{finalScore} pts</div>
+                    <p className="text-purple-200 font-bold">
+                        You reviewed {currentIndex + 1} of {cards.length} cards
+                    </p>
+                    {scoreResponse && (
+                        <div className="space-y-2">
+                            <p className="text-sm font-bold text-purple-100">{scoreResponse.message}</p>
+                            <div className="flex gap-4 justify-center text-xs font-bold uppercase tracking-wider">
+                                <span className="bg-white/10 px-3 py-1 rounded-full">High Score: {scoreResponse.new_high_score}</span>
+                                <span className="bg-white/10 px-3 py-1 rounded-full">+{scoreResponse.xp_awarded} XP</span>
+                            </div>
+                        </div>
+                    )}
+                    <div className="flex gap-3 justify-center mt-2">
+                        <button onClick={() => window.location.reload()} className="bg-white text-[#7C3AED] px-6 py-3 rounded-xl font-bold">Play Again</button>
+                        <button onClick={() => navigate('/games')} className="bg-white/10 border border-white/20 px-6 py-3 rounded-xl font-bold">Back to Games</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const current = cards[currentIndex];
 
@@ -58,8 +96,16 @@ const FlashcardFlip = () => {
                     <button onClick={() => navigate('/games')} className="p-2 hover:bg-gray-100 rounded-lg">🔙</button>
                     <h1 className="text-2xl font-black text-gray-800">Flashcard Flip</h1>
                 </div>
-                <div className="text-sm font-bold text-[#8B5CF6] uppercase tracking-wider">
-                    Card {currentIndex + 1} / {cards.length}
+                <div className="flex items-center gap-3">
+                    <div className="text-sm font-bold text-[#8B5CF6] uppercase tracking-wider">
+                        Card {currentIndex + 1} / {cards.length}
+                    </div>
+                    <button
+                        onClick={handleEndGame}
+                        className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-red-500/20 transition-all active:scale-95 uppercase tracking-wide"
+                    >
+                        🏁 End Game
+                    </button>
                 </div>
             </header>
 
@@ -69,17 +115,17 @@ const FlashcardFlip = () => {
             >
                 {/* Front Side */}
                 <div className="absolute inset-0 bg-white border-2 border-[#8B5CF6]/20 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-xl [backface-visibility:hidden]">
-                    <div className="text-[10px] font-black text-[#8B5CF6] uppercase tracking-[4px] mb-4 opacity-50">Concept</div>
-                    <h2 className="text-2xl font-black text-gray-800 leading-tight">{current.front}</h2>
-                    {current.hint && <p className="mt-6 text-sm text-gray-400 italic">Hint: {current.hint}</p>}
-                    <div className="mt-10 text-[10px] text-gray-300 font-bold uppercase">Click to flip</div>
+                    <div className="text-[10px] font-black text-[#8B5CF6] uppercase tracking-[4px] mb-4 opacity-70">Concept</div>
+                    <h2 className="text-2xl font-black text-gray-900 leading-tight">{current.front}</h2>
+                    {current.hint && <p className="mt-6 text-sm text-gray-600 italic">Hint: {current.hint}</p>}
+                    <div className="mt-10 text-[10px] text-gray-500 font-bold uppercase">Click to flip</div>
                 </div>
 
                 {/* Back Side */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-xl [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                    <div className="text-[10px] font-black text-white/50 uppercase tracking-[4px] mb-4">Explanation</div>
+                    <div className="text-[10px] font-black text-white/70 uppercase tracking-[4px] mb-4">Explanation</div>
                     <p className="text-xl font-bold text-white leading-relaxed">{current.back}</p>
-                    <div className="mt-10 text-[10px] text-white/40 font-bold uppercase">Click to flip back</div>
+                    <div className="mt-10 text-[10px] text-white/60 font-bold uppercase">Click to flip back</div>
                 </div>
             </div>
 

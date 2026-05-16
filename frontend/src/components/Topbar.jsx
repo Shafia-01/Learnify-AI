@@ -25,7 +25,7 @@ const Topbar = () => {
         </div>
         <div className="flex flex-col">
             <span className="text-white font-black text-[18px] tracking-tight leading-none">{currentTitle}</span>
-            <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Workspace</span>
+            <span className="text-[10px] text-white/70 font-bold uppercase tracking-widest mt-1">Workspace</span>
         </div>
       </div>
 

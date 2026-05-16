@@ -5,7 +5,7 @@ const MLMonitor = () => {
         <div className="max-w-6xl mx-auto space-y-8 py-4">
             <header className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">Advanced ML Monitoring</h1>
-                <p className="text-gray-500">Real-time analysis of your learning state using computer vision.</p>
+                <p className="text-gray-700">Real-time analysis of your learning state using computer vision.</p>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -55,25 +55,25 @@ const MLMonitor = () => {
                 </div>
             </div>
 
-            {/* Analysis Stats (Placeholder for future telemetry) */}
-            <div className="card p-6 bg-[#1a1a1a] text-white">
-                <h2 className="text-lg font-bold mb-4">ML Telemetry (Session Stats)</h2>
+            {/* Analysis Stats */}
+            <div className="card p-6 bg-white border border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900 mb-4">ML Telemetry (Session Stats)</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div className="text-center">
-                        <div className="text-3xl font-mono font-bold text-purple-400">92%</div>
-                        <div className="text-xs text-gray-400 uppercase tracking-widest mt-1">Focus Score</div>
+                    <div className="text-center p-4 bg-purple-50 rounded-xl">
+                        <div className="text-3xl font-mono font-bold text-purple-600">92%</div>
+                        <div className="text-xs text-purple-800 uppercase tracking-widest mt-1 font-bold">Focus Score</div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-mono font-bold text-emerald-400">42m</div>
-                        <div className="text-xs text-gray-400 uppercase tracking-widest mt-1">Deep Learning</div>
+                    <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                        <div className="text-3xl font-mono font-bold text-emerald-600">42m</div>
+                        <div className="text-xs text-emerald-800 uppercase tracking-widest mt-1 font-bold">Deep Learning</div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-mono font-bold text-amber-400">2</div>
-                        <div className="text-xs text-gray-400 uppercase tracking-widest mt-1">Interventions</div>
+                    <div className="text-center p-4 bg-amber-50 rounded-xl">
+                        <div className="text-3xl font-mono font-bold text-amber-600">2</div>
+                        <div className="text-xs text-amber-800 uppercase tracking-widest mt-1 font-bold">Interventions</div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-mono font-bold text-blue-400">0</div>
-                        <div className="text-xs text-gray-400 uppercase tracking-widest mt-1">Fatigue Alerts</div>
+                    <div className="text-center p-4 bg-blue-50 rounded-xl">
+                        <div className="text-3xl font-mono font-bold text-blue-600">0</div>
+                        <div className="text-xs text-blue-800 uppercase tracking-widest mt-1 font-bold">Fatigue Alerts</div>
                     </div>
                 </div>
             </div>

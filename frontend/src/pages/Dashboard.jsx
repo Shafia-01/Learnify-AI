@@ -133,7 +133,7 @@ const Dashboard = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-[13px] font-semibold text-gray-900 truncate">{item.name}</div>
-                                        <div className="text-[11px] text-gray-500">{item.chunks} chunks mapped</div>
+                                        <div className="text-[11px] text-gray-600">{item.chunks} chunks mapped</div>
                                     </div>
                                 </div>
                                 <div className="h-[3px] w-full bg-gray-100 rounded-full overflow-hidden">
@@ -147,7 +147,7 @@ const Dashboard = () => {
                     </div>
                     
                     <div className="mt-8 pt-6 border-t border-gray-100">
-                        <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-wider mb-3">Weekly Streak</h3>
+                        <h3 className="text-[12px] font-bold text-gray-600 uppercase tracking-wider mb-3">Weekly Streak</h3>
                         <div className="flex justify-between items-center px-1">
                             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
                                 const isDone = i < profile.streak % 7;

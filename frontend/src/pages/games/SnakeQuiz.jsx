@@ -18,6 +18,7 @@ const SnakeQuiz = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [isGameOver, setIsGameOver] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [scoreResponse, setScoreResponse] = useState(null);
 
     // Ref to track current score without stale closure issues inside setInterval
     const scoreRef = useRef(0);
@@ -32,13 +33,14 @@ const SnakeQuiz = () => {
 
     const submitScore = useCallback(async () => {
         try {
-            await client.post('/api/games/score', {
+            const res = await client.post('/api/games/score', {
                 user_id: userId,
                 game_name: 'snake',
                 // Use ref value to get the latest score, not the stale closure value
                 score: scoreRef.current,
                 duration_seconds: 60
             });
+            setScoreResponse(res.data);
         } catch (err) { console.error("Score submission failed", err); }
     }, [userId]);
 
@@ -114,6 +116,11 @@ const SnakeQuiz = () => {
         setIsPaused(false);
     };
 
+    const handleEndGame = () => {
+        setIsGameOver(true);
+        submitScore();
+    };
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -138,7 +145,7 @@ const SnakeQuiz = () => {
     if (questions.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
             <h2 className="text-2xl font-black text-gray-800">Snake is Hungry</h2>
-            <p className="text-gray-500 text-sm">But there are no questions! Upload some material to feed the snake.</p>
+            <p className="text-gray-600 text-sm">But there are no questions! Upload some material to feed the snake.</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
         </div>
     );
@@ -147,7 +154,17 @@ const SnakeQuiz = () => {
         <div className="max-w-2xl mx-auto space-y-6">
             <header className="flex justify-between items-center text-gray-800">
                 <h1 className="text-xl font-black">SNAKE QUIZ</h1>
-                <div className="font-mono font-bold bg-yellow-100 px-4 py-1 rounded-full text-yellow-700">Score: {score}</div>
+                <div className="flex items-center gap-3">
+                    <div className="font-mono font-bold bg-yellow-100 px-4 py-1 rounded-full text-yellow-700">Score: {score}</div>
+                    {!isGameOver && (
+                        <button
+                            onClick={handleEndGame}
+                            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-bold text-sm shadow-lg shadow-red-500/20 transition-all active:scale-95 uppercase tracking-wide"
+                        >
+                            🏁 End Game
+                        </button>
+                    )}
+                </div>
             </header>
 
             <div className="relative bg-gray-900 rounded-2xl overflow-hidden border-8 border-gray-800 shadow-2xl aspect-square">
@@ -157,15 +174,15 @@ const SnakeQuiz = () => {
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-8 animate-page-enter">
                         <div className="bg-white rounded-3xl p-6 w-full space-y-6 shadow-2xl ring-4 ring-yellow-400">
                             <div className="text-center">
-                                <span className="bg-yellow-100 text-yellow-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Knowledge Check</span>
-                                <h3 className="text-lg font-bold text-gray-800 mt-2">{currentQuestion.question_text}</h3>
+                                <span className="bg-yellow-100 text-yellow-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Knowledge Check</span>
+                                <h3 className="text-lg font-bold text-gray-900 mt-2">{currentQuestion.question_text}</h3>
                             </div>
                             <div className="grid grid-cols-1 gap-3">
                                 {currentQuestion.options.map((opt, i) => (
                                     <button 
                                         key={i}
                                         onClick={() => handleAnswer(opt)}
-                                        className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-yellow-400 hover:bg-yellow-50 transition-all font-bold text-sm"
+                                        className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-yellow-400 hover:bg-yellow-50 transition-all font-bold text-sm text-gray-800"
                                     >
                                         {opt}
                                     </button>
@@ -178,14 +195,25 @@ const SnakeQuiz = () => {
                 {isGameOver && (
                     <div className="absolute inset-0 bg-red-600/90 flex flex-col items-center justify-center text-white space-y-4">
                         <h2 className="text-4xl font-black">GAME OVER</h2>
-                        <div className="text-xl">Final Score: {score}</div>
-                        <button onClick={() => window.location.reload()} className="bg-white text-red-600 px-8 py-3 rounded-xl font-bold uppercase">Restart</button>
-                        <button onClick={() => navigate('/games')} className="text-white/80 font-bold underline">Back to Selection</button>
+                        <div className="text-3xl font-black">{scoreRef.current} pts</div>
+                        {scoreResponse && (
+                            <div className="space-y-2 text-center">
+                                <p className="text-sm font-bold text-red-100">{scoreResponse.message}</p>
+                                <div className="flex gap-4 justify-center text-xs font-bold uppercase tracking-wider">
+                                    <span className="bg-white/10 px-3 py-1 rounded-full">High Score: {scoreResponse.new_high_score}</span>
+                                    <span className="bg-white/10 px-3 py-1 rounded-full">+{scoreResponse.xp_awarded} XP</span>
+                                </div>
+                            </div>
+                        )}
+                        <div className="flex gap-3 mt-2">
+                            <button onClick={() => window.location.reload()} className="bg-white text-red-600 px-8 py-3 rounded-xl font-bold uppercase">Restart</button>
+                            <button onClick={() => navigate('/games')} className="bg-white/10 border border-white/20 px-8 py-3 rounded-xl font-bold">Back to Games</button>
+                        </div>
                     </div>
                 )}
             </div>
             
-            <p className="text-center text-xs text-gray-400 font-bold uppercase tracking-widest">Use Arrow Keys to Move • Eat Red Food to Answer Questions</p>
+            <p className="text-center text-xs text-gray-600 font-bold uppercase tracking-widest">Use Arrow Keys to Move • Eat Red Food to Answer Questions</p>
         </div>
     );
 };
