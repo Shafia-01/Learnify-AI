@@ -40,17 +40,13 @@ export const speakText = (text, language = 'en') => {
  * @returns {Promise<string>} Object URL for the audio blob
  */
 export const speakTextFetch = async (text, language = 'en') => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-  const params = new URLSearchParams({ text, language });
-  
-  const response = await fetch(`${baseUrl}/api/voice/speak?${params.toString()}`, {
-    method: 'GET',
-  });
-  
-  if (!response.ok) {
-    throw new Error(`TTS request failed: ${response.status} ${response.statusText}`);
+  try {
+    const response = await client.post('/api/voice/speak', { text, language }, {
+      responseType: 'blob'
+    });
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('TTS request failed:', error);
+    throw error;
   }
-  
-  const blob = await response.blob();
-  return URL.createObjectURL(blob);
 };

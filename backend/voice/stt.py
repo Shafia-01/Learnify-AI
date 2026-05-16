@@ -60,6 +60,8 @@ def transcribe_audio(audio_bytes: bytes) -> str:
         return result.get("text", "").strip()
     except Exception as e:
         logger.error(f"Transcription error: {e}")
+        if "0 elements" in str(e) or "empty" in str(e).lower() or "too small" in str(e).lower():
+            return ""
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
     finally:
         # Clean up temp file if it exists

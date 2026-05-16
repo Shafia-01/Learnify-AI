@@ -20,6 +20,11 @@ const VoiceButton = ({ onTranscription }) => {
 
       mediaRecorder.current.onstop = async () => {
         const audioBlob = new Blob(audioChunks.current);
+        // Stop all tracks to release mic
+        stream.getTracks().forEach(track => track.stop());
+
+        if (audioBlob.size < 500) return;
+
         try {
           const res = await transcribeAudio(audioBlob);
           if (res && res.text) {
@@ -48,15 +53,19 @@ const VoiceButton = ({ onTranscription }) => {
     }
   };
 
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
     <button
-      onMouseDown={startRecording}
-      onMouseUp={stopRecording}
-      onMouseLeave={stopRecording}
-      onTouchStart={startRecording}
-      onTouchEnd={stopRecording}
+      onClick={toggleRecording}
       className={`p-3 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 animate-pulse scale-110 shadow-[0_0_15px_rgba(239,68,68,0.7)]' : 'bg-gray-700 hover:bg-gray-600 border border-gray-600' }`}
-      title="Hold to speak"
+      title={isRecording ? "Click to stop recording" : "Click to speak"}
     >
       <span className="text-xl">🎙️</span>
     </button>

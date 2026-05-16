@@ -120,9 +120,19 @@ const Chat = () => {
             mediaRecorder.current.ondataavailable = (e) => audioChunks.current.push(e.data);
             mediaRecorder.current.onstop = async () => {
                 const blob = new Blob(audioChunks.current);
-                const res = await transcribeAudio(blob);
-                if (res?.text) setInput(res.text);
                 stream.getTracks().forEach(t => t.stop());
+                
+                // Don't send empty or extremely short audio
+                if (blob.size < 500) return;
+
+                try {
+                    const res = await transcribeAudio(blob);
+                    if (res?.text) {
+                        setInput(res.text);
+                    }
+                } catch (err) {
+                    console.error("Transcription error", err);
+                }
             };
             mediaRecorder.current.start();
             setIsRecording(true);
@@ -133,6 +143,14 @@ const Chat = () => {
         if (mediaRecorder.current && isRecording) {
             mediaRecorder.current.stop();
             setIsRecording(false);
+        }
+    };
+
+    const toggleRecording = () => {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
         }
     };
 
@@ -239,9 +257,9 @@ const Chat = () => {
                 <div className="p-4 bg-white/50 border-t border-[#8B5CF6]/10">
                     <div className="bg-white border border-[#8B5CF6]/30 rounded-[12px] p-1.5 flex items-center gap-2 shadow-sm focus-within:ring-2 ring-purple-500/10 transition-all">
                         <button 
-                            onMouseDown={startRecording}
-                            onMouseUp={stopRecording}
-                            className={`p-2 rounded-lg transition-colors ${isRecording ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:bg-gray-100 hover:text-[#8B5CF6]'}`}
+                            onClick={toggleRecording}
+                            className={`p-2 rounded-lg transition-colors ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:bg-gray-100 hover:text-[#8B5CF6]'}`}
+                            title={isRecording ? "Click or press Enter to stop recording" : "Click to start recording"}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                         </button>
@@ -249,8 +267,16 @@ const Chat = () => {
                             type="text" 
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="Type a message..."
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    if (isRecording) {
+                                        stopRecording();
+                                    } else {
+                                        handleSend();
+                                    }
+                                }
+                            }}
+                            placeholder={isRecording ? "Recording... Press Enter to stop" : "Type a message..."}
                             className="flex-1 bg-transparent border-none outline-none text-[13.5px] px-2 text-gray-700 placeholder:text-gray-400"
                         />
                         <button 
