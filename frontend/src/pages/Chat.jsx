@@ -200,7 +200,7 @@ const Chat = () => {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border border-[#8B5CF6]/10 shadow-sm">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Level</span>
+                            <span className="text-[10px] font-bold text-gray-900 uppercase">Level</span>
                             <select 
                                 value={level}
                                 onChange={(e) => setLevel(e.target.value)}
@@ -225,7 +225,7 @@ const Chat = () => {
                                 <div className={`px-4 py-2.5 shadow-sm text-[13.5px] leading-relaxed transition-all ${
                                     msg.role === 'user' 
                                         ? 'bg-[#8B5CF6] text-white rounded-[16px] rounded-br-[4px]' 
-                                        : 'bg-white text-gray-800 rounded-[16px] rounded-bl-[4px] border border-[#8B5CF6]/20'
+                                        : 'bg-white text-gray-900 rounded-[16px] rounded-bl-[4px] border border-[#8B5CF6]/20'
                                 }`}>
                                     {msg.content}
                                     {msg.role === 'ai' && (
@@ -258,7 +258,7 @@ const Chat = () => {
                     <div className="bg-white border border-[#8B5CF6]/30 rounded-[12px] p-1.5 flex items-center gap-2 shadow-sm focus-within:ring-2 ring-purple-500/10 transition-all">
                         <button 
                             onClick={toggleRecording}
-                            className={`p-2 rounded-lg transition-colors ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:bg-gray-100 hover:text-[#8B5CF6]'}`}
+                            className={`p-2 rounded-lg transition-colors ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-900 hover:bg-gray-100 hover:text-[#8B5CF6]'}`}
                             title={isRecording ? "Click or press Enter to stop recording" : "Click to start recording"}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
@@ -277,7 +277,7 @@ const Chat = () => {
                                 }
                             }}
                             placeholder={isRecording ? "Recording... Press Enter to stop" : "Type a message..."}
-                            className="flex-1 bg-transparent border-none outline-none text-[13.5px] px-2 text-gray-700 placeholder:text-gray-400"
+                            className="flex-1 bg-transparent border-none outline-none text-[13.5px] px-2 text-gray-900 placeholder:text-gray-900"
                         />
                         <button 
                             onClick={() => handleSend()}
@@ -300,7 +300,7 @@ const Chat = () => {
                             className={`flex-1 py-2 text-[12px] font-bold transition-all rounded-[10px] ${
                                 activeTab === tab 
                                     ? 'bg-[#8B5CF6] text-white shadow-md' 
-                                    : 'bg-white/50 text-gray-500 hover:bg-white hover:text-gray-800'
+                                    : 'bg-white/50 text-gray-900 hover:bg-white hover:text-gray-900'
                             }`}
                         >
                             {tab}
@@ -326,12 +326,12 @@ const Chat = () => {
                                         className="w-4 h-4 rounded border-gray-300 text-[#8B5CF6] focus:ring-purple-500 accent-[#8B5CF6] cursor-pointer" 
                                     />
                                     <div className="flex-1">
-                                        <div className="text-[13px] font-bold text-gray-800">{item.name}</div>
+                                        <div className="text-[13px] font-bold text-gray-900">{item.name}</div>
                                     </div>
                                     <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${
                                         item.status === 'Done' ? 'bg-green-100 text-green-600' :
                                         item.status === 'Active' ? 'bg-blue-100 text-blue-600' :
-                                        'bg-gray-100 text-gray-400'
+                                        'bg-gray-100 text-gray-900'
                                     }`}>
                                         {item.status}
                                     </div>
@@ -355,14 +355,14 @@ const Chat = () => {
                                     { label: 'Topics', val: stats?.topics_covered || 0, color: 'text-purple-600' }
                                 ].map((s, i) => (
                                     <div key={i} className="bg-white p-3 rounded-xl border border-[#8B5CF6]/10 shadow-sm text-center">
-                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">{s.label}</div>
+                                        <div className="text-[10px] font-bold text-gray-900 uppercase tracking-tighter mb-1">{s.label}</div>
                                         <div className={`text-[15px] font-black ${s.color}`}>{s.val}</div>
                                     </div>
                                 ))}
                             </div>
 
                             <div className="bg-white/50 p-4 rounded-xl border border-[#8B5CF6]/10">
-                                <h4 className="text-[12px] font-bold text-gray-700 mb-4">Study Velocity (7d)</h4>
+                                <h4 className="text-[12px] font-bold text-gray-900 mb-4">Study Velocity (7d)</h4>
                                 <div className="h-[150px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={stats?.study_time_velocity || []}>

@@ -149,8 +149,8 @@ const FallingQuiz = () => {
 
     if (questions.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
-            <h2 className="text-2xl font-black text-gray-800">Sky is Clear</h2>
-            <p className="text-gray-600 text-sm">But where are the questions? Upload your material to see them fall!</p>
+            <h2 className="text-2xl font-black text-gray-900">Sky is Clear</h2>
+            <p className="text-gray-900 text-sm">But where are the questions? Upload your material to see them fall!</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-[#EC4899] text-white py-3 rounded-xl font-bold font-black">Go to Upload</button>
         </div>
     );
@@ -224,7 +224,7 @@ const FallingQuiz = () => {
                 )}
             </div>
             
-            <p className="text-center text-xs text-gray-600 font-bold uppercase tracking-wider">Catch the CORRECT answer with your basket. Don't catch the wrong ones!</p>
+            <p className="text-center text-xs text-gray-900 font-bold uppercase tracking-wider">Catch the CORRECT answer with your basket. Don't catch the wrong ones!</p>
         </div>
     );
 };

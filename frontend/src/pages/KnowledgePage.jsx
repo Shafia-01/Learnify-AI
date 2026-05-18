@@ -95,7 +95,7 @@ const KnowledgePage = () => {
                         >
                             <div className="w-2 h-2 rounded-full bg-teal-500"></div>
                             <div className="flex-1">
-                                <div className="text-[13px] font-bold text-gray-800">{concept.label || concept.id}</div>
+                                <div className="text-[13px] font-bold text-gray-900">{concept.label || concept.id}</div>
                             </div>
                             <div className="text-[10px] font-black text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">
                                 {concept.connections} links

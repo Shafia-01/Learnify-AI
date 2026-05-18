@@ -103,7 +103,7 @@ const Onboarding = () => {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="Full Name"
-                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
                                     />
                                 )}
                                 <input 
@@ -111,14 +111,14 @@ const Onboarding = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Email Address"
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
                                 />
                                 <input 
                                     type="password" 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder={isLogin ? "Password" : "Create Password (min 8 chars)"}
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
                                 />
                             </div>
 
@@ -213,7 +213,7 @@ const Onboarding = () => {
                                 <select 
                                     value={language}
                                     onChange={(e) => setLanguage(e.target.value)}
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[15px] font-bold text-gray-800 outline-none focus:border-[#EC4899] transition-all"
+                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[15px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
                                 >
                                     <option>English</option>
                                     <option>Spanish</option>

@@ -35,7 +35,7 @@ const Sidebar = () => {
                 className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 group relative ${
                   isActive 
                     ? 'bg-white/10 text-white shadow-[0_4px_15px_-3px_rgba(255,255,255,0.1)] border border-white/5' 
-                    : 'text-gray-500 hover:bg-white/[0.03] hover:text-white'
+                    : 'text-gray-900 hover:bg-white/[0.03] hover:text-white'
                 }`}
               >
                 <Icon name={item.label} color={item.iconColor} isActive={isActive} />

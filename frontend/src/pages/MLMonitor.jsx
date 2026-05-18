@@ -4,8 +4,8 @@ const MLMonitor = () => {
     return (
         <div className="max-w-6xl mx-auto space-y-8 py-4">
             <header className="flex flex-col gap-2">
-                <h1 className="text-2xl font-bold text-gray-800">Advanced ML Monitoring</h1>
-                <p className="text-gray-700">Real-time analysis of your learning state using computer vision.</p>
+                <h1 className="text-2xl font-bold text-gray-900">Advanced ML Monitoring</h1>
+                <p className="text-gray-900">Real-time analysis of your learning state using computer vision.</p>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -17,8 +17,8 @@ const MLMonitor = () => {
                 {/* Information Area */}
                 <div className="lg:col-span-8 space-y-6">
                     <div className="card p-6 bg-white shadow-sm border border-gray-100 h-full">
-                        <h2 className="text-lg font-bold text-gray-800 mb-4">How it works</h2>
-                        <div className="space-y-4 text-gray-600 leading-relaxed">
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">How it works</h2>
+                        <div className="space-y-4 text-gray-900 leading-relaxed">
                             <p>
                                 Learnify AI uses <strong>DeepFace</strong> and <strong>OpenCV</strong> to analyze your facial expressions in real-time. 
                                 This data helps the system understand when you are struggling, tired, or focused.

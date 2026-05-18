@@ -111,15 +111,15 @@ const Quiz = () => {
             </div>
 
             <div className="card p-8 bg-white space-y-4">
-                <h1 className="text-3xl font-black text-gray-800">Quiz Completed!</h1>
+                <h1 className="text-3xl font-black text-gray-900">Quiz Completed!</h1>
                 <div className="flex justify-center gap-8 mt-4">
                     <div>
-                        <div className="text-[11px] font-bold text-gray-400 uppercase">Score</div>
+                        <div className="text-[11px] font-bold text-gray-900 uppercase">Score</div>
                         <div className="text-3xl font-black text-[#84CC16]">{score} / {questions.length}</div>
                     </div>
                     <div className="w-px bg-gray-100"></div>
                     <div>
-                        <div className="text-[11px] font-bold text-gray-400 uppercase">XP Earned</div>
+                        <div className="text-[11px] font-bold text-gray-900 uppercase">XP Earned</div>
                         <div className="text-3xl font-black text-amber-500">+{totalXp}</div>
                     </div>
                 </div>
@@ -168,7 +168,7 @@ const Quiz = () => {
 
             {/* Question Card */}
             <div className="card p-6 bg-white border-[0.5px] border-[#84CC16]/25">
-                <h2 className="text-[15px] font-semibold text-gray-800 leading-relaxed">
+                <h2 className="text-[15px] font-semibold text-gray-900 leading-relaxed">
                     {currentQ.question_text}
                 </h2>
             </div>
@@ -192,7 +192,7 @@ const Quiz = () => {
                                 <div className={`w-3.5 h-3.5 rounded-full border-[1.5px] border-[#84CC16] flex items-center justify-center ${isSelected ? 'bg-white' : ''}`}>
                                     {isSelected && <div className="w-1.5 h-1.5 bg-[#84CC16] rounded-full"></div>}
                                 </div>
-                                <span className={`text-[14px] ${isSelected ? 'text-[#3a5c10] font-semibold' : 'text-gray-700'}`}>
+                                <span className={`text-[14px] ${isSelected ? 'text-[#3a5c10] font-semibold' : 'text-gray-900'}`}>
                                     {option}
                                 </span>
                             </button>
