@@ -24,7 +24,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, Form, HTTPException, UploadFile
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
@@ -70,6 +70,7 @@ async def _run_pipeline(
     source_type: str,
     db: AsyncIOMotorDatabase,
     user_id: str = "anonymous",
+    subject: str = None,
 ) -> int:
     """
     Execute the shared chunking → embedding → storage pipeline.
@@ -104,6 +105,8 @@ async def _run_pipeline(
     for chunk in chunks:
         chunk["embedding_id"] = chunk["chunk_id"]
         chunk["user_id"] = user_id
+        if subject:
+            chunk["subject"] = subject
 
     # ── 4. Persist to MongoDB ─────────────────────────────────────────────
     await db["chunks"].insert_many(chunks)
@@ -122,6 +125,7 @@ async def _run_pipeline(
 @router.post("/upload", response_model=IngestResponse, status_code=200)
 async def upload_file(
     file: UploadFile = File(...),
+    subject: str = Form(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
     user_id: str = Header(default="anonymous", alias="user_id"),
 ) -> Dict[str, Any]:
@@ -172,7 +176,7 @@ async def upload_file(
         for item in raw_items:
             item["source_file"] = file.filename or item.get("source_file", "")
 
-        chunks_created = await _run_pipeline(raw_items, source_type, db, user_id=user_id)
+        chunks_created = await _run_pipeline(raw_items, source_type, db, user_id=user_id, subject=subject)
 
     except HTTPException:
         raise

@@ -8,6 +8,7 @@ const Upload = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [overallProgress, setOverallProgress] = useState(0);
+    const [subject, setSubject] = useState("");
     const fileInputRef = useRef(null);
 
     const addFiles = (newFiles) => {
@@ -53,7 +54,7 @@ const Upload = () => {
 
             try {
                 if (item.type === 'file') {
-                    await uploadFile(item.data);
+                    await uploadFile(item.data, subject);
                 }
                 
                 setFiles(prev => prev.map(f => f.id === item.id ? { ...f, status: 'DONE', progress: 100 } : f));
@@ -86,6 +87,16 @@ const Upload = () => {
 
     return (
         <div className="max-w-3xl mx-auto space-y-6 animate-page-enter">
+            <div className="card p-6 bg-white border-[0.5px] border-[#F97316]/20">
+                <label className="block text-[14px] font-bold text-gray-900 mb-2">Subject (Optional)</label>
+                <input 
+                    type="text" 
+                    placeholder="e.g. Computer Networks, DBMS" 
+                    className="w-full border border-gray-200 rounded-[10px] p-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-[#F97316]/50"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                />
+            </div>
             {/* Drop Zone */}
             <div 
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
