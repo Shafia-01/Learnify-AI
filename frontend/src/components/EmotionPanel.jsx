@@ -104,6 +104,7 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
         <Webcam
           audio={false}
           ref={webcamRef}
+          mirrored={true}
           screenshotFormat="image/jpeg"
           videoConstraints={{
             width: 320,
@@ -116,10 +117,10 @@ const EmotionPanel = ({ sessionId = "session1" }) => {
            <div 
              className="face-box"
              style={{
-               left: `${(emotionData.region.x / 640) * 100}%`,
-               top: `${(emotionData.region.y / 480) * 100}%`,
-               width: `${(emotionData.region.w / 640) * 100}%`,
-               height: `${(emotionData.region.h / 480) * 100}%`,
+               left: `${(1 - (emotionData.region.x + emotionData.region.w) / 320) * 100}%`,
+               top: `${(emotionData.region.y / 240) * 100}%`,
+               width: `${(emotionData.region.w / 320) * 100}%`,
+               height: `${(emotionData.region.h / 240) * 100}%`,
                borderColor: getStatusColor(emotionData.state)
              }}
            />
