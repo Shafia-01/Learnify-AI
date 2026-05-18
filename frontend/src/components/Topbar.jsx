@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { navItems, iconPaths } from '../utils/navigation';
+import Avatar from './Avatar';
 
 const Topbar = () => {
     const location = useLocation();
@@ -54,9 +55,7 @@ const Topbar = () => {
             </span>
         </div>
         
-        <div className="w-11 h-11 flex-shrink-0 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center border-2 border-white/10 shadow-xl hover:rotate-3 transition-all cursor-pointer">
-            <span className="text-[16px] font-black text-white uppercase">{name[0] || 'U'}</span>
-        </div>
+        <Avatar name={name} size="lg" />
       </div>
     </header>
   );
