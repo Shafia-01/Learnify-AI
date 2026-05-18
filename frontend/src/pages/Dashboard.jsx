@@ -165,7 +165,7 @@ const Dashboard = () => {
                                                 isDone 
                                                     ? 'bg-[#7C3AED] text-white shadow-md' 
                                                     : isToday 
-                                                        ? 'border border-[#DDD6FE] text-[#7C3AED]' 
+                                                        ? 'bg-gray-800 text-white shadow-md' 
                                                         : 'bg-gray-100 text-gray-900'
                                             }`}
                                         >
