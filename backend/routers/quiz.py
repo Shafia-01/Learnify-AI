@@ -18,6 +18,8 @@ class GenerateRequest(BaseModel):
     user_id: str
     n: int = 5
     topic: str = "overall"
+    subject: str = None
+    source_file: str = None
 
 class SubmitRequest(BaseModel):
     user_id: str
@@ -27,7 +29,7 @@ class SubmitRequest(BaseModel):
 
 @router.post("/generate", response_model=List[QuizQuestion])
 async def generate_quiz(req: GenerateRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
-    questions = await select_next_questions(db, req.user_id, req.n, req.topic)
+    questions = await select_next_questions(db, req.user_id, req.n, req.topic, req.subject, req.source_file)
     return questions
 
 @router.post("/submit")

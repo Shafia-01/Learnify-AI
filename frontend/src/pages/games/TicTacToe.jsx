@@ -19,7 +19,9 @@ const TicTacToe = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const res = await client.get(`/api/games/quiz-content/${userId}`);
+                const subject = localStorage.getItem('study_subject');
+                const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+                const res = await client.get(`/api/games/quiz-content/${userId}${queryParams}`);
                 setQuestions(res.data);
             } catch (err) { console.error("Failed to fetch quiz content for TicTacToe", err); }
             finally { setIsLoading(false); }

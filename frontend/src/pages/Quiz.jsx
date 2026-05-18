@@ -18,8 +18,9 @@ const Quiz = () => {
             try {
                 const userId = localStorage.getItem('user_id') || 'default';
                 const topic = localStorage.getItem('quiz_topic') || 'overall';
+                const subject = localStorage.getItem('study_subject') || '';
                 // generateQuiz posts to /api/quiz/generate with correct schema
-                const data = await generateQuiz(userId, topic, 5);
+                const data = await generateQuiz(userId, topic, 5, subject);
                 // Backend returns a List[QuizQuestion] directly (not wrapped)
                 if (Array.isArray(data) && data.length > 0) {
                     setQuestions(data);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
+import { getDocuments } from '../api/documents';
 
 const games = [
     { id: 'snake', name: 'Snake Quiz', tagline: 'Answer questions to keep growing!', color: '#EAB308', icon: '🐍' },
@@ -17,6 +18,21 @@ const Games = () => {
     const [selectedGame, setSelectedGame] = useState('snake');
     const [leaderboard, setLeaderboard] = useState([]);
     const [highScores, setHighScores] = useState({});
+    const [library, setLibrary] = useState([]);
+    const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('study_subject') || "");
+
+    useEffect(() => {
+        getDocuments().then(data => setLibrary(data)).catch(console.error);
+    }, []);
+
+    const handleSubjectChange = (e) => {
+        setSelectedSubject(e.target.value);
+        if (e.target.value) {
+            localStorage.setItem('study_subject', e.target.value);
+        } else {
+            localStorage.removeItem('study_subject');
+        }
+    };
 
     useEffect(() => {
         const fetchScores = async () => {
@@ -52,8 +68,21 @@ const Games = () => {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 animate-page-enter">
-            <header>
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h1 className="text-[18px] font-bold text-gray-900">Choose a Mini-Game</h1>
+                <div className="flex items-center gap-3">
+                    <label className="text-[13px] font-bold text-gray-700">Study Subject:</label>
+                    <select 
+                        value={selectedSubject} 
+                        onChange={handleSubjectChange}
+                        className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-[13px] font-semibold text-gray-900 focus:outline-none focus:border-[#EAB308] focus:ring-1 focus:ring-[#EAB308]"
+                    >
+                        <option value="">All Uploads (Mixed)</option>
+                        {library.map(s => (
+                            <option key={s.subject} value={s.subject}>{s.subject}</option>
+                        ))}
+                    </select>
+                </div>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

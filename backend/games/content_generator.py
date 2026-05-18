@@ -8,10 +8,14 @@ import json
 
 logger = logging.getLogger(__name__)
 
-async def get_user_content_sample(db: AsyncIOMotorDatabase, user_id: str, sample_size: int = 10) -> str:
+async def get_user_content_sample(db: AsyncIOMotorDatabase, user_id: str, sample_size: int = 10, subject: str = None, source_file: str = None) -> str:
     """Fetches a random sample of user material to use as context."""
+    match_query = {"user_id": user_id}
+    if subject: match_query["subject"] = subject
+    if source_file: match_query["source_file"] = source_file
+    
     cursor = db["chunks"].aggregate([
-        {"$match": {"user_id": user_id}},
+        {"$match": match_query},
         {"$sample": {"size": sample_size}}
     ])
     texts = []
@@ -19,9 +23,9 @@ async def get_user_content_sample(db: AsyncIOMotorDatabase, user_id: str, sample
         texts.append(chunk.get("text", ""))
     return "\n\n".join(texts)
 
-async def generate_game_questions(db: AsyncIOMotorDatabase, user_id: str, count: int = 5) -> List[QuizQuestion]:
+async def generate_game_questions(db: AsyncIOMotorDatabase, user_id: str, count: int = 5, subject: str = None, source_file: str = None) -> List[QuizQuestion]:
     """Generates MCQ questions for Snake and Falling Quiz."""
-    context = await get_user_content_sample(db, user_id)
+    context = await get_user_content_sample(db, user_id, sample_size=10, subject=subject, source_file=source_file)
     if not context:
         return []
 
@@ -53,9 +57,9 @@ async def generate_game_questions(db: AsyncIOMotorDatabase, user_id: str, count:
         logger.error(f"Error generating game questions: {e}")
         return []
 
-async def generate_memory_pairs(db: AsyncIOMotorDatabase, user_id: str, count: int = 6) -> List[MemoryPair]:
+async def generate_memory_pairs(db: AsyncIOMotorDatabase, user_id: str, count: int = 6, subject: str = None, source_file: str = None) -> List[MemoryPair]:
     """Generates Term-Match pairs for Memory Match."""
-    context = await get_user_content_sample(db, user_id)
+    context = await get_user_content_sample(db, user_id, sample_size=10, subject=subject, source_file=source_file)
     if not context:
         return []
 
@@ -75,9 +79,9 @@ async def generate_memory_pairs(db: AsyncIOMotorDatabase, user_id: str, count: i
         logger.error(f"Error generating memory pairs: {e}")
         return []
 
-async def generate_flashcards(db: AsyncIOMotorDatabase, user_id: str, count: int = 8) -> List[FlashcardCard]:
+async def generate_flashcards(db: AsyncIOMotorDatabase, user_id: str, count: int = 8, subject: str = None, source_file: str = None) -> List[FlashcardCard]:
     """Generates Flashcards for the Flashcard Flip game."""
-    context = await get_user_content_sample(db, user_id)
+    context = await get_user_content_sample(db, user_id, sample_size=10, subject=subject, source_file=source_file)
     if not context:
         return []
 

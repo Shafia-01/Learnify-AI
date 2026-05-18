@@ -16,7 +16,9 @@ const FlashcardFlip = () => {
     useEffect(() => {
         const fetchCards = async () => {
             try {
-                const res = await client.get(`/api/games/flashcards/${userId}`);
+                const subject = localStorage.getItem('study_subject');
+                const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+                const res = await client.get(`/api/games/flashcards/${userId}${queryParams}`);
                 setCards(res.data);
             } catch (err) {
                 console.error("Failed to fetch flashcards", err);

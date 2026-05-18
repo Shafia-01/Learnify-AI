@@ -9,13 +9,16 @@ import client from './client';
  * @param {number} n - number of questions
  * @returns {Promise<Array>}
  */
-export const generateQuiz = async (userId, topic = 'overall', n = 5) => {
+export const generateQuiz = async (userId, topic = 'overall', n = 5, subject = '') => {
   const uid = userId || localStorage.getItem('user_id') || 'default';
-  const response = await client.post('/api/quiz/generate', {
+  const payload = {
     user_id: uid,
     topic,
     n,
-  });
+  };
+  if (subject) payload.subject = subject;
+  
+  const response = await client.post('/api/quiz/generate', payload);
   return response.data;
 };
 
