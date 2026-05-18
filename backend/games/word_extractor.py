@@ -100,7 +100,9 @@ def _extract_words_from_text(text: str) -> List[str]:
 async def get_scramble_words(
     db: AsyncIOMotorDatabase, 
     user_id: str, 
-    count: int = 5
+    count: int = 5,
+    subject: str = None,
+    source_file: str = None
 ) -> List[WordScrambleWord]:
     """
     Fetches words for the game by sampling user material or falling back to defaults.
@@ -116,8 +118,12 @@ async def get_scramble_words(
     pool = []
     
     # 1. Sample up to 20 random chunks from the DB for this user
+    match_query = {"user_id": user_id}
+    if subject: match_query["subject"] = subject
+    if source_file: match_query["source_file"] = source_file
+        
     cursor = db["chunks"].aggregate([
-        {"$match": {"user_id": user_id}},
+        {"$match": match_query},
         {"$sample": {"size": 20}}
     ])
     

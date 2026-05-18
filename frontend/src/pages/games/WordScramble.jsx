@@ -21,7 +21,9 @@ const WordScramble = () => {
     useEffect(() => {
         const fetchWords = async () => {
             try {
-                const res = await client.get(`/api/games/word-scramble/${userId}`);
+                const subject = localStorage.getItem('study_subject');
+                const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+                const res = await client.get(`/api/games/word-scramble/${userId}${queryParams}`);
                 setWords(res.data);
             } catch (err) {
                 console.error("Failed to fetch words", err);

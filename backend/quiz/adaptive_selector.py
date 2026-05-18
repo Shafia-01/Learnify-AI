@@ -4,7 +4,7 @@ from models.schemas import QuizQuestion
 from quiz.difficulty_engine import get_difficulty_level
 from quiz.generator import generate_questions
 
-async def select_next_questions(db: AsyncIOMotorDatabase, user_id: str, n: int = 5, topic: str = "overall") -> List[QuizQuestion]:
+async def select_next_questions(db: AsyncIOMotorDatabase, user_id: str, n: int = 5, topic: str = "overall", subject: str = None, source_file: str = None) -> List[QuizQuestion]:
     """
     Gets current difficulty level for user. Fetches questions from
     MongoDB filtered by difficulty == current_level. If fewer than n
@@ -28,7 +28,11 @@ async def select_next_questions(db: AsyncIOMotorDatabase, user_id: str, n: int =
         shortfall = n - len(questions)
         
         # Get random chunks
-        pipeline = [{"$sample": {"size": max(shortfall, 3)}}] # Fetch a few chunks
+        match_query = {"user_id": user_id}
+        if subject: match_query["subject"] = subject
+        if source_file: match_query["source_file"] = source_file
+        
+        pipeline = [{"$match": match_query}, {"$sample": {"size": max(shortfall, 3)}}]
         chunk_docs = await db["chunks"].aggregate(pipeline).to_list(length=max(shortfall, 3))
         
         chunk_texts = [doc["text"] for doc in chunk_docs]

@@ -21,7 +21,9 @@ const MemoryMatch = () => {
     useEffect(() => {
         const fetchPairs = async () => {
             try {
-                const res = await client.get(`/api/games/memory-match/${userId}`);
+                const subject = localStorage.getItem('study_subject');
+                const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+                const res = await client.get(`/api/games/memory-match/${userId}${queryParams}`);
                 const pairs = res.data;
                 const gameCards = [];
                 pairs.forEach((p, i) => {

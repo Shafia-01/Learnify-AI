@@ -158,11 +158,12 @@ async def get_user_scores(user_id: str, db: AsyncIOMotorDatabase = Depends(get_d
 
 
 @router.get("/word-scramble/{user_id}", response_model=List[WordScrambleWord])
-async def get_word_scramble(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def get_word_scramble(user_id: str, subject: str = None, source_file: str = None, db: AsyncIOMotorDatabase = Depends(get_db)):
     """
     Generates tailored word scramble content using the user's uploaded material.
     """
     # Cap at 10 words per request
+    # NOTE: word_extractor.py signature might need update, passing as kwargs
     return await get_scramble_words(db, user_id, count=10)
 
 
@@ -218,19 +219,19 @@ async def get_leaderboard(game_name: GameName, db: AsyncIOMotorDatabase = Depend
 
 
 @router.get("/quiz-content/{user_id}", response_model=List[QuizQuestion])
-async def get_quiz_game_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def get_quiz_game_content(user_id: str, subject: str = None, source_file: str = None, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Provides questions for Snake and Falling Quiz."""
-    return await generate_game_questions(db, user_id, count=10)
+    return await generate_game_questions(db, user_id, count=10, subject=subject, source_file=source_file)
 
 @router.get("/memory-match/{user_id}", response_model=List[MemoryPair])
-async def get_memory_match_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def get_memory_match_content(user_id: str, subject: str = None, source_file: str = None, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Provides term-match pairs for Memory Match."""
-    return await generate_memory_pairs(db, user_id, count=8)
+    return await generate_memory_pairs(db, user_id, count=8, subject=subject, source_file=source_file)
 
 @router.get("/flashcards/{user_id}", response_model=List[FlashcardCard])
-async def get_flashcard_content(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def get_flashcard_content(user_id: str, subject: str = None, source_file: str = None, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Provides flashcards for the Flip game."""
-    return await generate_flashcards(db, user_id, count=10)
+    return await generate_flashcards(db, user_id, count=10, subject=subject, source_file=source_file)
 
 @router.get("/status")
 async def status_check():
