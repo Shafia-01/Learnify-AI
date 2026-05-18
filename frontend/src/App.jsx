@@ -10,6 +10,7 @@ import Games from './pages/Games';
 import GamePlaceholder from './pages/GamePlaceholder';
 import KnowledgePage from './pages/KnowledgePage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import Library from './pages/Library';
 import client from './api/client';
 import Layout from './components/Layout';
 import { ToastProvider } from './context/ToastContext';
@@ -49,6 +50,7 @@ function App() {
           <Route path="/knowledge-graph" element={<KnowledgePage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/ml-monitor" element={<MLMonitor />} />
+          <Route path="/library" element={<Library />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>
