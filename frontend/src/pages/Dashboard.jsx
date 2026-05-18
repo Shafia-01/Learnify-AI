@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getProfile, getLeaderboard } from '../api/gamification';
 import { getLearningPath } from '../api/query';
 import client from '../api/client';
+import Avatar from '../components/Avatar';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -45,7 +46,12 @@ const Dashboard = () => {
 
                 // Fetch extra stats manually if not in wrappers
                 const statsResponse = await client.get(`/api/analytics/stats/${userId}`);
-                if (statsResponse.data) setStats(statsResponse.data);
+                if (statsResponse.data) {
+                    setStats({
+                        quizAvg: statsResponse.data.avg_quiz_score || 0,
+                        chunksIndexed: statsResponse.data.topics_covered || 0
+                    });
+                }
             } catch (err) {
                 console.error("Failed to fetch dashboard data", err);
             }
@@ -192,9 +198,7 @@ const Dashboard = () => {
                                     }`}>
                                         {i + 1}
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[12px] font-bold border border-white">
-                                        {user.avatar}
-                                    </div>
+                                    <Avatar name={user.name || "Learner"} size="sm" />
                                     <div className="flex-1 text-[13px] font-semibold">{user.isMe ? 'You' : user.name}</div>
                                     <div className="text-[12px] font-bold font-mono">
                                         {user.xp.toLocaleString()} <span className="text-[10px] opacity-50">XP</span>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import { getDocuments } from '../api/documents';
+import Avatar from '../components/Avatar';
 
 const games = [
     { id: 'snake', name: 'Snake Quiz', tagline: 'Answer questions to keep growing!', color: '#EAB308', icon: '🐍' },
@@ -155,9 +156,7 @@ const Games = () => {
                             }`}>
                                 {row.rank}
                             </div>
-                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs border border-white">
-                                {row.avatar}
-                            </div>
+                            <Avatar name={row.isMe ? (localStorage.getItem('name') || "You") : row.name} size="sm" />
                             <div className="flex-1 text-[13px] font-bold text-gray-900">
                                 {row.isMe ? 'You (Keep climbing!)' : row.name}
                             </div>
