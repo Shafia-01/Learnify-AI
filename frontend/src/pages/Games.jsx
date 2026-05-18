@@ -90,11 +90,7 @@ const Games = () => {
                     <div 
                         key={game.id}
                         onClick={() => navigate(`/games/${game.id}`)}
-                        className={`relative group card p-4 flex flex-col items-center text-center cursor-pointer hover:translate-y-[-4px] transition-all duration-300 border-t-[3px] overflow-hidden ${
-                            game.featured 
-                                ? 'bg-[#1a1a1a] text-[#EAB308] border-t-[#EAB308]' 
-                                : 'bg-white border-[0.5px] border-[#EAB308]/30'
-                        }`}
+                        className="relative group p-4 flex flex-col items-center text-center cursor-pointer hover:translate-y-[-4px] transition-all duration-300 border-t-[3px] overflow-hidden rounded-xl bg-gray-900 shadow-md hover:shadow-lg border border-gray-800"
                         style={{ borderTopColor: game.color }}
                     >
                         {game.featured && (
@@ -110,8 +106,8 @@ const Games = () => {
                             {game.icon}
                         </div>
 
-                        <h3 className={`text-[13px] font-bold mb-1 ${game.featured ? 'text-white' : 'text-gray-900'}`}>{game.name}</h3>
-                        <p className={`text-[11px] mb-3 ${game.featured ? 'text-white/80' : 'text-gray-900'}`}>
+                        <h3 className="text-[13px] font-bold mb-1 text-white">{game.name}</h3>
+                        <p className="text-[11px] mb-3 text-white/80">
                             {game.tagline}
                         </p>
 

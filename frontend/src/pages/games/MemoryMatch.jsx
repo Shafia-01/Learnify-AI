@@ -149,7 +149,7 @@ const MemoryMatch = () => {
                             }`}
                         >
                             {isRevealed ? (
-                                <span className={`text-sm font-bold leading-snug text-center ${isMatched ? 'text-white' : 'text-gray-900'}`}>
+                                <span className={`text-sm font-bold leading-snug text-center ${isMatched ? 'text-white' : 'text-black'}`}>
                                     {card.content}
                                 </span>
                             ) : (
