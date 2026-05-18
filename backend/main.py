@@ -36,6 +36,7 @@ from routers.analytics import router as analytics_router
 from routers.auth import router as auth_router
 from routers.games import router as games_router
 from routers.learning_goals import router as learning_goals_router
+from routers.documents import router as documents_router
 
 
 
@@ -92,6 +93,7 @@ app.include_router(settings_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(games_router, prefix="/api")
 app.include_router(learning_goals_router, prefix="/api")
+app.include_router(documents_router, prefix="/api")
 app.include_router(websocket_router)
 
 
