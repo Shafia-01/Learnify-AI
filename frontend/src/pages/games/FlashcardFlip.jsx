@@ -57,7 +57,7 @@ const FlashcardFlip = () => {
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#8B5CF6] font-bold animate-pulse">Preparing Cards...</div>;
-    if (cards.length === 0) return <div className="text-center p-10 font-bold text-gray-800">No cards available. Upload material first!</div>;
+    if (cards.length === 0) return <div className="text-center p-10 font-bold text-gray-900">No cards available. Upload material first!</div>;
 
     if (isEnded) {
         const finalScore = scoreResponse?.submitted_score || (currentIndex + 1) * 10;
@@ -94,7 +94,7 @@ const FlashcardFlip = () => {
             <header className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate('/games')} className="p-2 hover:bg-gray-100 rounded-lg">🔙</button>
-                    <h1 className="text-2xl font-black text-gray-800">Flashcard Flip</h1>
+                    <h1 className="text-2xl font-black text-gray-900">Flashcard Flip</h1>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-sm font-bold text-[#8B5CF6] uppercase tracking-wider">
@@ -117,8 +117,8 @@ const FlashcardFlip = () => {
                 <div className="absolute inset-0 bg-white border-2 border-[#8B5CF6]/20 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-xl [backface-visibility:hidden]">
                     <div className="text-[10px] font-black text-[#8B5CF6] uppercase tracking-[4px] mb-4 opacity-70">Concept</div>
                     <h2 className="text-2xl font-black text-gray-900 leading-tight">{current.front}</h2>
-                    {current.hint && <p className="mt-6 text-sm text-gray-600 italic">Hint: {current.hint}</p>}
-                    <div className="mt-10 text-[10px] text-gray-500 font-bold uppercase">Click to flip</div>
+                    {current.hint && <p className="mt-6 text-sm text-gray-900 italic">Hint: {current.hint}</p>}
+                    <div className="mt-10 text-[10px] text-gray-900 font-bold uppercase">Click to flip</div>
                 </div>
 
                 {/* Back Side */}

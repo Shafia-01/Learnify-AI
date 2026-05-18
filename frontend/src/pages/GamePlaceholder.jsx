@@ -30,10 +30,10 @@ const GamePlaceholder = () => {
                 🎮
             </div>
             <div className="space-y-2">
-                <h1 className="text-3xl font-black text-gray-800 uppercase tracking-tighter">
+                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">
                    {gameId?.replace('-', ' ')}
                 </h1>
-                <p className="text-gray-500 font-medium">Coming soon in the next update!</p>
+                <p className="text-gray-900 font-medium">Coming soon in the next update!</p>
             </div>
             <button 
                 onClick={() => navigate('/games')}

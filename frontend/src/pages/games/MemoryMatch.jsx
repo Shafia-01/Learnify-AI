@@ -97,8 +97,8 @@ const MemoryMatch = () => {
     
     if (cards.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
-            <h2 className="text-2xl font-black text-gray-800">Empty Deck</h2>
-            <p className="text-gray-600 text-sm">We couldn't extract enough pairs for a game. Upload more detailed material!</p>
+            <h2 className="text-2xl font-black text-gray-900">Empty Deck</h2>
+            <p className="text-gray-900 text-sm">We couldn't extract enough pairs for a game. Upload more detailed material!</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-[#10B981] text-white py-3 rounded-xl font-bold font-black">Go to Upload</button>
         </div>
     );
@@ -110,7 +110,7 @@ const MemoryMatch = () => {
             <header className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate('/games')} className="p-2 hover:bg-gray-100 rounded-lg">🔙</button>
-                    <h1 className="text-2xl font-black text-gray-800">Memory Match</h1>
+                    <h1 className="text-2xl font-black text-gray-900">Memory Match</h1>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-xl font-mono font-bold text-[#10B981]">Score: {score}</div>
@@ -167,7 +167,7 @@ const MemoryMatch = () => {
                     <div className="text-4xl font-black text-[#10B981]">{scoreRef.current} pts</div>
                     {scoreResponse && (
                         <div className="space-y-3">
-                            <p className="text-sm font-bold text-gray-800">{scoreResponse.message}</p>
+                            <p className="text-sm font-bold text-gray-900">{scoreResponse.message}</p>
                             <div className="flex gap-4 justify-center text-xs font-bold uppercase tracking-wider">
                                 <span className="bg-[#D1FAE5] text-[#065F46] px-4 py-1.5 rounded-full">High Score: {scoreResponse.new_high_score}</span>
                                 <span className="bg-[#FEF3C7] text-[#92400E] px-4 py-1.5 rounded-full">+{scoreResponse.xp_awarded} XP</span>
@@ -176,7 +176,7 @@ const MemoryMatch = () => {
                     )}
                     <div className="flex gap-3 justify-center mt-4 pt-2">
                         <button onClick={() => window.location.reload()} className="bg-[#10B981] hover:bg-[#059669] text-white px-8 py-3 rounded-xl font-black uppercase text-sm shadow-lg shadow-emerald-500/20 transition-all">Play Again</button>
-                        <button onClick={() => navigate('/games')} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold text-sm transition-all">Back to Games</button>
+                        <button onClick={() => navigate('/games')} className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-3 rounded-xl font-bold text-sm transition-all">Back to Games</button>
                     </div>
                 </div>
             )}

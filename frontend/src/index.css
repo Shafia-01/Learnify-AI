@@ -30,13 +30,11 @@ body {
    Override Tailwind's light gray text utilities so every label, tag,
    description, and placeholder is clearly legible.                    */
 
-/* Light grays → darker equivalents */
-.text-gray-300 { color: #4b5563 !important; }
-.text-gray-400 { color: #374151 !important; }
-.text-gray-500 { color: #1f2937 !important; }
+/* Light grays → pure black equivalents for maximum visibility */
+.text-gray-900 { color: #000000 !important; }
 
-/* Ensure placeholder text is visible */
-::placeholder { color: #6b7280 !important; opacity: 1; }
+/* Ensure placeholder text is completely visible */
+::placeholder { color: #000000 !important; opacity: 1; }
 
 /* White-alpha overlays used in dark panels → brighter */
 .text-white\/40 { color: rgba(255,255,255,0.75) !important; }

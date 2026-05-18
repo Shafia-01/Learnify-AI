@@ -50,10 +50,10 @@ const AnalyticsPage = () => {
         <div className="max-w-6xl mx-auto space-y-8 animate-page-enter pb-12">
             <header className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-[24px] font-black text-gray-800 tracking-tight">Performance Analytics</h1>
-                    <p className="text-[14px] text-gray-600 font-medium">Tracking your growth and learning efficiency</p>
+                    <h1 className="text-[24px] font-black text-gray-900 tracking-tight">Performance Analytics</h1>
+                    <p className="text-[14px] text-gray-900 font-medium">Tracking your growth and learning efficiency</p>
                 </div>
-                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-[12px] font-bold text-gray-600 uppercase">
+                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-[12px] font-bold text-gray-900 uppercase">
                     Last 7 Days
                 </div>
             </header>
@@ -61,10 +61,10 @@ const AnalyticsPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
                     <div key={i} className="card p-5 bg-white border-transparent hover:border-purple-100 transition-all group">
-                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">{s.label}</div>
+                        <div className="text-[11px] font-bold text-gray-900 uppercase tracking-widest mb-1">{s.label}</div>
                         <div className="flex items-baseline gap-2">
-                            <div className="text-2xl font-black text-gray-800" style={{ color: s.color }}>{s.value}</div>
-                            <div className={`text-[10px] font-bold ${s.trend.startsWith('+') ? 'text-green-500' : 'text-gray-400'}`}>
+                            <div className="text-2xl font-black text-gray-900" style={{ color: s.color }}>{s.value}</div>
+                            <div className={`text-[10px] font-bold ${s.trend.startsWith('+') ? 'text-green-500' : 'text-gray-900'}`}>
                                 {s.trend}
                             </div>
                         </div>
@@ -79,8 +79,8 @@ const AnalyticsPage = () => {
                 {/* Learning Velocity Chart */}
                 <div className="card p-6 bg-white flex flex-col space-y-6">
                     <div>
-                        <h3 className="text-[16px] font-bold text-gray-800">Learning Velocity</h3>
-                        <p className="text-[12px] text-gray-500">Minutes studied per day</p>
+                        <h3 className="text-[16px] font-bold text-gray-900">Learning Velocity</h3>
+                        <p className="text-[12px] text-gray-900">Minutes studied per day</p>
                     </div>
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -113,8 +113,8 @@ const AnalyticsPage = () => {
                 {/* Knowledge Retention Chart */}
                 <div className="card p-6 bg-white flex flex-col space-y-6">
                     <div>
-                        <h3 className="text-[16px] font-bold text-gray-800">Knowledge Retention</h3>
-                        <p className="text-[12px] text-gray-500">Quiz performance accuracy (%)</p>
+                        <h3 className="text-[16px] font-bold text-gray-900">Knowledge Retention</h3>
+                        <p className="text-[12px] text-gray-900">Quiz performance accuracy (%)</p>
                     </div>
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -146,7 +146,7 @@ const AnalyticsPage = () => {
             {/* Weak Topics */}
             {data?.weak_topics?.length > 0 && (
                 <div className="card p-6 bg-white border-red-100 bg-red-50/10">
-                    <h3 className="text-[16px] font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <h3 className="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         Focus Areas (Weak Topics)
                     </h3>

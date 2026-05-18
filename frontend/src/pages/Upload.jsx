@@ -110,8 +110,8 @@ const Upload = () => {
                         <svg className="w-6 h-6 text-[#F97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-[16px] font-bold text-gray-800">Drag and drop files here</h2>
-                        <p className="text-[12px] text-gray-400 font-medium tracking-tight uppercase">PDF, PPT, PPTX, TXT supported</p>
+                        <h2 className="text-[16px] font-bold text-gray-900">Drag and drop files here</h2>
+                        <p className="text-[12px] text-gray-900 font-medium tracking-tight uppercase">PDF, PPT, PPTX, TXT supported</p>
                     </div>
                     <button className="bg-[#F97316] hover:bg-[#EA580C] text-white px-6 py-2 rounded-full text-[13px] font-bold shadow-lg shadow-orange-500/20 transition-all">
                         Browse Files
@@ -141,7 +141,7 @@ const Upload = () => {
                                                 <svg className="w-4.5 h-4.5 text-[#F97316]" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
                                             )}
                                         </div>
-                                        <span className="text-[13px] font-bold text-gray-700 truncate max-w-[240px]">{item.name}</span>
+                                        <span className="text-[13px] font-bold text-gray-900 truncate max-w-[240px]">{item.name}</span>
                                     </div>
                                     <div className={`px-2 py-0.5 rounded-[4px] text-[10px] font-black tracking-tighter ${getStatusStyle(item.status)}`}>
                                         {item.status}

@@ -120,7 +120,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Learning Path */}
                 <div className="card p-6 flex flex-col h-full">
-                    <h2 className="text-[15px] font-bold text-gray-800 mb-5">Your Learning Path</h2>
+                    <h2 className="text-[15px] font-bold text-gray-900 mb-5">Your Learning Path</h2>
                     <div className="flex-1 space-y-5">
                         {learningPath.map((item, i) => (
                             <div key={i} className="space-y-2">
@@ -133,7 +133,7 @@ const Dashboard = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-[13px] font-semibold text-gray-900 truncate">{item.name}</div>
-                                        <div className="text-[11px] text-gray-600">{item.chunks} chunks mapped</div>
+                                        <div className="text-[11px] text-gray-900">{item.chunks} chunks mapped</div>
                                     </div>
                                 </div>
                                 <div className="h-[3px] w-full bg-gray-100 rounded-full overflow-hidden">
@@ -147,7 +147,7 @@ const Dashboard = () => {
                     </div>
                     
                     <div className="mt-8 pt-6 border-t border-gray-100">
-                        <h3 className="text-[12px] font-bold text-gray-600 uppercase tracking-wider mb-3">Weekly Streak</h3>
+                        <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wider mb-3">Weekly Streak</h3>
                         <div className="flex justify-between items-center px-1">
                             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
                                 const isDone = i < profile.streak % 7;
@@ -160,7 +160,7 @@ const Dashboard = () => {
                                                     ? 'bg-[#7C3AED] text-white shadow-md' 
                                                     : isToday 
                                                         ? 'border border-[#DDD6FE] text-[#7C3AED]' 
-                                                        : 'bg-gray-100 text-gray-400'
+                                                        : 'bg-gray-100 text-gray-900'
                                             }`}
                                         >
                                             {day}
@@ -176,7 +176,7 @@ const Dashboard = () => {
                 <div className="space-y-4">
                     {/* Leaderboard */}
                     <div className="card p-5 max-h-[280px] flex flex-col">
-                        <h2 className="text-[14px] font-bold text-gray-800 mb-4">Top Scholars</h2>
+                        <h2 className="text-[14px] font-bold text-gray-900 mb-4">Top Scholars</h2>
                         <div className="space-y-2 overflow-y-auto pr-1">
                             {leaderboard.map((user, i) => (
                                 <div 
@@ -207,7 +207,7 @@ const Dashboard = () => {
                     {/* Badges & Progress */}
                     <div className="card p-5 bg-white relative overflow-hidden">
                         <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-[14px] font-bold text-gray-800">Your Badges</h2>
+                            <h2 className="text-[14px] font-bold text-gray-900">Your Badges</h2>
                             <div className="text-[11px] font-bold text-[#7C3AED] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
                                 {profile.badges} Total
                             </div>
@@ -216,11 +216,11 @@ const Dashboard = () => {
                             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center border border-amber-200 shadow-sm" title="Top Performer">🥇</div>
                             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center border border-purple-200 shadow-sm" title="Week Warrior">⚡</div>
                             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center border border-emerald-200 shadow-sm" title="Fast Learner">🚀</div>
-                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-200 text-gray-300 text-xs font-bold">?</div>
+                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-200 text-gray-900 text-xs font-bold">?</div>
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between text-[11px] font-bold">
-                                <span className="text-gray-500 uppercase tracking-wider">Level 5 Progress</span>
+                                <span className="text-gray-900 uppercase tracking-wider">Level 5 Progress</span>
                                 <span className="text-[#7C3AED] font-mono">{profile.xp} / 2,000 XP</span>
                             </div>
                             <div className="h-[6px] w-full bg-gray-100 rounded-full overflow-hidden">

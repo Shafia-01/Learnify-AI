@@ -105,8 +105,8 @@ const TicTacToe = () => {
     
     if (questions.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
-            <h2 className="text-2xl font-black text-gray-800">No content available</h2>
-            <p className="text-gray-600">Please upload some documents in the Upload section to generate questions for this game.</p>
+            <h2 className="text-2xl font-black text-gray-900">No content available</h2>
+            <p className="text-gray-900">Please upload some documents in the Upload section to generate questions for this game.</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-blue-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
         </div>
     );
@@ -116,7 +116,7 @@ const TicTacToe = () => {
     return (
         <div className="max-w-xl mx-auto space-y-8 animate-page-enter">
             <header className="text-center space-y-2">
-                <h1 className="text-3xl font-black text-gray-800 uppercase tracking-tighter">TIC-TAC-TOE</h1>
+                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">TIC-TAC-TOE</h1>
                 <p className="text-blue-600 font-bold text-xs uppercase tracking-widest mt-1">Answer to verify your move</p>
                 {!gameFinished && (
                     <button
@@ -136,7 +136,7 @@ const TicTacToe = () => {
                         className={`aspect-square rounded-3xl text-4xl font-black flex items-center justify-center transition-all shadow-lg border-b-4 ${
                             val === 'X' ? 'bg-blue-500 text-white border-blue-700' : 
                             val === 'O' ? 'bg-red-500 text-white border-red-700' : 
-                            'bg-gray-50 text-gray-400 hover:bg-gray-100 border-gray-200'
+                            'bg-gray-50 text-gray-900 hover:bg-gray-100 border-gray-200'
                         }`}
                     >
                         {val}
@@ -152,7 +152,7 @@ const TicTacToe = () => {
                             <button 
                                 key={i}
                                 onClick={() => handleAnswer(opt)}
-                                className="w-full text-left p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-500 font-bold transition-all text-gray-800"
+                                className="w-full text-left p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-500 font-bold transition-all text-gray-900"
                             >
                                 {opt}
                             </button>

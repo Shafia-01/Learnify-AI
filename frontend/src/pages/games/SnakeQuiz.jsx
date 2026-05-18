@@ -144,15 +144,15 @@ const SnakeQuiz = () => {
 
     if (questions.length === 0) return (
         <div className="card p-10 text-center space-y-4 max-w-md mx-auto">
-            <h2 className="text-2xl font-black text-gray-800">Snake is Hungry</h2>
-            <p className="text-gray-600 text-sm">But there are no questions! Upload some material to feed the snake.</p>
+            <h2 className="text-2xl font-black text-gray-900">Snake is Hungry</h2>
+            <p className="text-gray-900 text-sm">But there are no questions! Upload some material to feed the snake.</p>
             <button onClick={() => navigate('/upload')} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold">Go to Upload</button>
         </div>
     );
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
-            <header className="flex justify-between items-center text-gray-800">
+            <header className="flex justify-between items-center text-gray-900">
                 <h1 className="text-xl font-black">SNAKE QUIZ</h1>
                 <div className="flex items-center gap-3">
                     <div className="font-mono font-bold bg-yellow-100 px-4 py-1 rounded-full text-yellow-700">Score: {score}</div>
@@ -182,7 +182,7 @@ const SnakeQuiz = () => {
                                     <button 
                                         key={i}
                                         onClick={() => handleAnswer(opt)}
-                                        className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-yellow-400 hover:bg-yellow-50 transition-all font-bold text-sm text-gray-800"
+                                        className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-yellow-400 hover:bg-yellow-50 transition-all font-bold text-sm text-gray-900"
                                     >
                                         {opt}
                                     </button>
@@ -213,7 +213,7 @@ const SnakeQuiz = () => {
                 )}
             </div>
             
-            <p className="text-center text-xs text-gray-600 font-bold uppercase tracking-widest">Use Arrow Keys to Move • Eat Red Food to Answer Questions</p>
+            <p className="text-center text-xs text-gray-900 font-bold uppercase tracking-widest">Use Arrow Keys to Move • Eat Red Food to Answer Questions</p>
         </div>
     );
 };

@@ -103,8 +103,8 @@ const Settings = () => {
             )}
 
             <header className="pb-2">
-                <h1 className="text-[20px] font-black text-gray-800 tracking-tight">Settings</h1>
-                <p className="text-[13px] text-gray-600 font-medium">Configure your AI experience and preferences</p>
+                <h1 className="text-[20px] font-black text-gray-900 tracking-tight">Settings</h1>
+                <p className="text-[13px] text-gray-900 font-medium">Configure your AI experience and preferences</p>
             </header>
 
             {/* General Section */}
@@ -113,8 +113,8 @@ const Settings = () => {
                 
                 <div className="flex items-center justify-between py-2">
                     <div className="space-y-0.5">
-                        <div className="text-[14px] font-bold text-gray-800">Privacy Mode</div>
-                        <div className="text-[11px] text-gray-500 font-medium leading-normal max-w-[280px]">
+                        <div className="text-[14px] font-bold text-gray-900">Privacy Mode</div>
+                        <div className="text-[11px] text-gray-900 font-medium leading-normal max-w-[280px]">
                             When enabled, session data won't be sent to our analytics server.
                         </div>
                     </div>
@@ -128,11 +128,11 @@ const Settings = () => {
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-gray-600 uppercase tracking-tight">Preferred Language</label>
+                        <label className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">Preferred Language</label>
                         <select 
                             value={language}
                             onChange={(e) => handleGeneralChange('language', e.target.value)}
-                            className="w-full bg-white border border-[#3B82F6]/25 rounded-[8px] px-3 py-2 text-[13px] font-bold text-gray-700 outline-none focus:ring-2 ring-blue-500/10 focus:border-[#3B82F6] transition-all"
+                            className="w-full bg-white border border-[#3B82F6]/25 rounded-[8px] px-3 py-2 text-[13px] font-bold text-gray-900 outline-none focus:ring-2 ring-blue-500/10 focus:border-[#3B82F6] transition-all"
                         >
                             <option>English</option>
                             <option>Spanish</option>
@@ -143,11 +143,11 @@ const Settings = () => {
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-tight">Learning Level</label>
+                        <label className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">Learning Level</label>
                         <select 
                             value={level}
                             onChange={(e) => handleGeneralChange('level', e.target.value)}
-                            className="w-full bg-white border border-[#3B82F6]/25 rounded-[8px] px-3 py-2 text-[13px] font-bold text-gray-700 outline-none focus:ring-2 ring-blue-500/10 focus:border-[#3B82F6] transition-all"
+                            className="w-full bg-white border border-[#3B82F6]/25 rounded-[8px] px-3 py-2 text-[13px] font-bold text-gray-900 outline-none focus:ring-2 ring-blue-500/10 focus:border-[#3B82F6] transition-all"
                         >
                             <option>Beginner</option>
                             <option>Intermediate</option>
@@ -175,11 +175,11 @@ const Settings = () => {
                                         : 'border-gray-100 hover:border-[#3B82F6]/30 bg-gray-50/50'
                                 }`}
                             >
-                                <div className={`text-[13px] font-bold ${isSelected ? 'text-[#3B82F6]' : 'text-gray-500'}`}>
+                                <div className={`text-[13px] font-bold ${isSelected ? 'text-[#3B82F6]' : 'text-gray-900'}`}>
                                     {pName}
                                 </div>
                                 <div className={`text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full inline-block ${
-                                    isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-400'
+                                    isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-900'
                                 }`}>
                                     {pId === 'ollama' ? 'OFFLINE' : 'CLOUD'}
                                 </div>
@@ -201,11 +201,11 @@ const Settings = () => {
                 )}
 
                 <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-tight">Active Model</label>
+                    <label className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">Active Model</label>
                     <select 
                         value={model}
                         onChange={(e) => setModel(e.target.value)}
-                        className="w-full bg-white border border-[#3B82F6]/25 rounded-[10px] px-4 py-3 text-[14px] font-bold text-gray-800 outline-none focus:border-[#3B82F6] transition-all"
+                        className="w-full bg-white border border-[#3B82F6]/25 rounded-[10px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#3B82F6] transition-all"
                     >
                         <option value="">-- Select a model --</option>
                         {availableModels.map(m => (
@@ -229,7 +229,7 @@ const Settings = () => {
                 
                 <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                        <div className="text-[14px] font-bold text-gray-800">Fresh Start</div>
+                        <div className="text-[14px] font-bold text-gray-900">Fresh Start</div>
                         <div className="text-[11px] text-red-600/70 font-medium leading-normal max-w-[280px]">
                             Clear all local data and re-authenticate to start from scratch.
                         </div>

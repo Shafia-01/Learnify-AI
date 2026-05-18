@@ -77,14 +77,14 @@ const WordScramble = () => {
     };
 
     if (isLoading) return <div className="flex items-center justify-center h-[60vh] text-[#EAB308] font-bold animate-pulse">Loading Words...</div>;
-    if (words.length === 0) return <div className="text-center p-10 font-bold text-gray-800">No words available. Upload some material!</div>;
+    if (words.length === 0) return <div className="text-center p-10 font-bold text-gray-900">No words available. Upload some material!</div>;
 
     if (isGameOver) {
         return (
             <div className="card p-10 text-center space-y-6 max-w-md mx-auto animate-page-enter">
-                <h2 className="text-3xl font-black text-gray-800">Game Over!</h2>
+                <h2 className="text-3xl font-black text-gray-900">Game Over!</h2>
                 <div className="text-5xl font-black text-[#EAB308]">{scoreRef.current}</div>
-                <p className="text-gray-600 font-bold">Your knowledge is growing!</p>
+                <p className="text-gray-900 font-bold">Your knowledge is growing!</p>
                 {scoreResponse && (
                     <div className="space-y-2 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
                         <p className="text-sm font-bold text-yellow-800">{scoreResponse.message}</p>
@@ -96,7 +96,7 @@ const WordScramble = () => {
                 )}
                 <div className="flex gap-3 justify-center">
                     <button onClick={() => window.location.reload()} className="bg-[#EAB308] text-white py-3 px-6 rounded-xl font-bold">Play Again</button>
-                    <button onClick={() => navigate('/games')} className="bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-bold">Back to Games</button>
+                    <button onClick={() => navigate('/games')} className="bg-gray-100 text-gray-900 py-3 px-6 rounded-xl font-bold">Back to Games</button>
                 </div>
             </div>
         );
@@ -109,7 +109,7 @@ const WordScramble = () => {
             <header className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate('/games')} className="p-2 hover:bg-gray-100 rounded-lg">🔙</button>
-                    <h1 className="text-2xl font-black text-gray-800">Word Scramble</h1>
+                    <h1 className="text-2xl font-black text-gray-900">Word Scramble</h1>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-xl font-mono font-bold text-[#EAB308]">Score: {score}</div>
@@ -128,8 +128,8 @@ const WordScramble = () => {
                 </div>
                 
                 <div className="bg-gray-50 p-4 rounded-xl text-center border border-dashed border-gray-200">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Context Clue</span>
-                    <p className="text-[13px] font-medium text-gray-700">{current.hint}</p>
+                    <span className="text-[10px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Context Clue</span>
+                    <p className="text-[13px] font-medium text-gray-900">{current.hint}</p>
                 </div>
 
                 <div className="w-full space-y-4">

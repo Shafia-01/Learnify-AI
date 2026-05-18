@@ -6,8 +6,8 @@ const EmptyState = ({ icon, title, description, actionLabel, onAction }) => {
                 <span className="text-4xl">{icon}</span>
             </div>
             <div className="space-y-2 max-w-[280px]">
-                <h3 className="text-[16px] font-black text-gray-800 tracking-tight">{title}</h3>
-                <p className="text-[13px] text-gray-400 font-medium leading-relaxed">
+                <h3 className="text-[16px] font-black text-gray-900 tracking-tight">{title}</h3>
+                <p className="text-[13px] text-gray-900 font-medium leading-relaxed">
                     {description}
                 </p>
             </div>

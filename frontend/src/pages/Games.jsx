@@ -81,8 +81,8 @@ const Games = () => {
                             {game.icon}
                         </div>
 
-                        <h3 className="text-[13px] font-bold mb-1 text-gray-900">{game.name}</h3>
-                        <p className={`text-[11px] mb-3 ${game.featured ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <h3 className={`text-[13px] font-bold mb-1 ${game.featured ? 'text-white' : 'text-gray-900'}`}>{game.name}</h3>
+                        <p className={`text-[11px] mb-3 ${game.featured ? 'text-white/80' : 'text-gray-900'}`}>
                             {game.tagline}
                         </p>
 
@@ -99,7 +99,7 @@ const Games = () => {
             {/* Leaderboard Section */}
             <div className="card p-6 bg-white space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h2 className="text-[15px] font-bold text-gray-800">Game Leaderboard</h2>
+                    <h2 className="text-[15px] font-bold text-gray-900">Game Leaderboard</h2>
                     <div className="flex bg-gray-50 p-1 rounded-lg gap-1 border border-gray-100 overflow-x-auto no-scrollbar">
                         {games.map((game) => (
                             <button
@@ -108,7 +108,7 @@ const Games = () => {
                                 className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-all whitespace-nowrap ${
                                     selectedGame === game.id 
                                         ? 'bg-[#EAB308] text-white shadow-sm' 
-                                        : 'text-gray-600 hover:text-gray-800'
+                                        : 'text-gray-900 hover:text-gray-900'
                                 }`}
                             >
                                 {game.name.split(' ')[0]}
@@ -126,14 +126,14 @@ const Games = () => {
                             }`}
                         >
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black ${
-                                i === 0 ? 'bg-amber-100 text-amber-600' : 'text-gray-400'
+                                i === 0 ? 'bg-amber-100 text-amber-600' : 'text-gray-900'
                             }`}>
                                 {row.rank}
                             </div>
                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs border border-white">
                                 {row.avatar}
                             </div>
-                            <div className="flex-1 text-[13px] font-bold text-gray-800">
+                            <div className="flex-1 text-[13px] font-bold text-gray-900">
                                 {row.isMe ? 'You (Keep climbing!)' : row.name}
                             </div>
                             <div className="text-[13px] font-black font-mono text-[#EAB308]">
