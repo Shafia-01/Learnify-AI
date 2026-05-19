@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
 import { speakTextFetch, transcribeAudio } from '../api/voice';
 import { getSessionStats } from '../api/analytics';
-import KnowledgeGraph from '../components/KnowledgeGraph';
+import { getDocuments } from '../api/documents';
+import KnowledgeGraphEnhanced from '../components/KnowledgeGraphEnhanced';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 
 const Chat = () => {
@@ -31,6 +32,8 @@ const Chat = () => {
     const [learningPath, setLearningPath] = useState([]);
     const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
     const [stats, setStats] = useState(null);
+    const [library, setLibrary] = useState([]);
+    const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('study_subject') || '');
     
     const messagesEndRef = useRef(null);
     const mediaRecorder = useRef(null);
@@ -45,11 +48,16 @@ const Chat = () => {
     }, [messages]);
 
     useEffect(() => {
+        getDocuments().then(data => setLibrary(data)).catch(console.error);
+    }, []);
+
+    useEffect(() => {
         const fetchTabData = async () => {
             try {
+                const subject = selectedSubject;
                 const [pathData, graphData, statsData] = await Promise.all([
-                    getLearningPath(userId),
-                    getKnowledgeGraph(userId),
+                    getLearningPath(userId, subject),
+                    getKnowledgeGraph(userId, subject),
                     getSessionStats(userId)
                 ]);
                 
@@ -89,7 +97,16 @@ const Chat = () => {
             }
         };
         fetchTabData();
-    }, [userId]);
+    }, [userId, selectedSubject]);
+
+    const handleSubjectChange = (e) => {
+        setSelectedSubject(e.target.value);
+        if (e.target.value) {
+            localStorage.setItem('study_subject', e.target.value);
+        } else {
+            localStorage.removeItem('study_subject');
+        }
+    };
 
     const handleSend = async (overrideInput) => {
         const query = overrideInput || input;
@@ -292,20 +309,34 @@ const Chat = () => {
             {/* Right Panel: Tabs */}
             <div className="w-1/2 flex flex-col bg-white/40 rounded-[16px] border border-white/20 backdrop-blur-sm overflow-hidden shadow-sm">
                 {/* Tabs Header */}
-                <div className="flex bg-white/30 border-b border-[#8B5CF6]/10 p-1.5 gap-1.5">
-                    {['Learning Path', 'Knowledge Graph', 'Progress'].map(tab => (
-                        <button 
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`flex-1 py-2 text-[12px] font-bold transition-all rounded-[10px] ${
-                                activeTab === tab 
-                                    ? 'bg-[#8B5CF6] text-white shadow-md' 
-                                    : 'bg-white/50 text-gray-900 hover:bg-white hover:text-gray-900'
-                            }`}
+                <div className="flex bg-white/30 border-b border-[#8B5CF6]/10 p-1.5 gap-1.5 items-center justify-between">
+                    <div className="flex gap-1.5 flex-1">
+                        {['Learning Path', 'Knowledge Graph', 'Progress'].map(tab => (
+                            <button 
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`flex-1 py-2 text-[12px] font-bold transition-all rounded-[10px] ${
+                                    activeTab === tab 
+                                        ? 'bg-[#8B5CF6] text-white shadow-md' 
+                                        : 'bg-white/50 text-gray-900 hover:bg-white hover:text-gray-900'
+                                }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                    {(activeTab === 'Learning Path' || activeTab === 'Knowledge Graph') && (
+                        <select 
+                            value={selectedSubject} 
+                            onChange={handleSubjectChange}
+                            className="bg-white border border-[#8B5CF6]/20 rounded-[8px] px-2 py-1.5 text-[11px] font-bold text-[#5B21B6] focus:outline-none focus:ring-1 focus:ring-[#8B5CF6] max-w-[120px]"
                         >
-                            {tab}
-                        </button>
-                    ))}
+                            <option value="">All Materials</option>
+                            {library.map(s => (
+                                <option key={s.subject} value={s.subject}>{s.subject}</option>
+                            ))}
+                        </select>
+                    )}
                 </div>
 
                 {/* Tab Content */}
@@ -342,7 +373,7 @@ const Chat = () => {
 
                     {activeTab === 'Knowledge Graph' && (
                         <div className="h-full bg-white/50 rounded-xl border border-[#8B5CF6]/10 relative overflow-hidden backdrop-blur-md">
-                            <KnowledgeGraph data={graphData} onNodeClick={(label) => handleSend(`Tell me about ${label}`)} />
+                            <KnowledgeGraphEnhanced data={graphData} onNodeSelect={(d) => handleSend(`Tell me about ${d.label || d.id}`)} />
                         </div>
                     )}
 

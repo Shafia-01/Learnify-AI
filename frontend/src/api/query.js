@@ -18,20 +18,24 @@ export const askQuestion = async (query, level = 'intermediate', language = 'Eng
 
 /**
  * Get learning path based on topic.
- * @param {string} topic 
+ * @param {string} userId 
+ * @param {string} subject
  * @returns {Promise<Object>}
  */
-export const getLearningPath = async (userId = 'default') => {
-  const response = await client.get(`/api/query/learning-path/${encodeURIComponent(userId)}`);
+export const getLearningPath = async (userId = 'default', subject = '') => {
+  const params = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+  const response = await client.get(`/api/query/learning-path/${encodeURIComponent(userId)}${params}`);
   return response.data;
 };
 
 /**
  * Get knowledge graph data based on query.
- * @param {string} query 
+ * @param {string} userId 
+ * @param {string} subject
  * @returns {Promise<Object>}
  */
-export const getKnowledgeGraph = async (userId = 'default') => {
-  const response = await client.get(`/api/query/knowledge-graph/${encodeURIComponent(userId)}`);
+export const getKnowledgeGraph = async (userId = 'default', subject = '') => {
+  const params = subject ? `?subject=${encodeURIComponent(subject)}` : '';
+  const response = await client.get(`/api/query/knowledge-graph/${encodeURIComponent(userId)}${params}`);
   return response.data;
 };

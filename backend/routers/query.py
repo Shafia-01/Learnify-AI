@@ -42,7 +42,7 @@ async def ask_question(request: QueryRequest) -> Dict[str, Any]:
     Embeds the context, searches FAISS + Mongo, and calls the LLM.
     """
     try:
-        chunks = await retrieve_chunks(request.question, top_k=5)
+        chunks = await retrieve_chunks(request.question, user_id=request.user_id, top_k=5)
     except Exception as exc:
         logger.warning(f"Database/retriever error, falling back to mock chunk: {exc}")
         # Graceful degradation for testing environment lacking MongoDB
@@ -72,16 +72,19 @@ async def ask_question(request: QueryRequest) -> Dict[str, Any]:
 
 @router.get("/learning-path/{user_id}")
 async def get_learning_path(
-    user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)
+    user_id: str, 
+    subject: str = None,
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ) -> Dict[str, List[str]]:
     """
     Synthesize an ordered list of foundational concepts into a learning path.
     Extracts underlying text from chunks via LLM aggregation.
     """
     try:
-        # We query the overarching chunk repository directly 
-        # (Assuming all data belongs to the user for this prototype iteration)
-        cursor = db["chunks"].find().limit(50)
+        query = {"user_id": user_id}
+        if subject:
+            query["subject"] = subject
+        cursor = db["chunks"].find(query).limit(50)
         docs = await cursor.to_list(length=50)
         chunk_texts = [doc["text"] for doc in docs if "text" in doc]
     except Exception as exc:
@@ -103,13 +106,18 @@ async def get_learning_path(
 
 @router.get("/knowledge-graph/{user_id}")
 async def get_knowledge_graph(
-    user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)
+    user_id: str, 
+    subject: str = None,
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ) -> Dict[str, Any]:
     """
     Build a co-occurrence knowledge graph extracting nominal concepts using NLTK.
     """
     try:
-        cursor = db["chunks"].find().limit(100)
+        query = {"user_id": user_id}
+        if subject:
+            query["subject"] = subject
+        cursor = db["chunks"].find(query).limit(100)
         docs = await cursor.to_list(length=100)
         chunk_texts = [doc["text"] for doc in docs if "text" in doc]
     except Exception as exc:

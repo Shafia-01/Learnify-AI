@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getKnowledgeGraph } from '../api/query';
+import { getDocuments } from '../api/documents';
 import KnowledgeGraphEnhanced from '../components/KnowledgeGraphEnhanced';
 
 const KnowledgePage = () => {
@@ -10,11 +11,17 @@ const KnowledgePage = () => {
     const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
     const [selectedNode, setSelectedNode] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [library, setLibrary] = useState([]);
+    const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('study_subject') || '');
+
+    useEffect(() => {
+        getDocuments().then(data => setLibrary(data)).catch(console.error);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getKnowledgeGraph(userId);
+                const data = await getKnowledgeGraph(userId, selectedSubject);
                 if (data) setGraphData(data);
             } catch (err) {
                 console.error("Failed to fetch graph data", err);
@@ -43,7 +50,16 @@ const KnowledgePage = () => {
             }
         };
         fetchData();
-    }, [userId]);
+    }, [userId, selectedSubject]);
+
+    const handleSubjectChange = (e) => {
+        setSelectedSubject(e.target.value);
+        if (e.target.value) {
+            localStorage.setItem('study_subject', e.target.value);
+        } else {
+            localStorage.removeItem('study_subject');
+        }
+    };
 
     const handleAskInChat = () => {
         if (!selectedNode) return;
@@ -78,8 +94,18 @@ const KnowledgePage = () => {
 
             {/* Right Panel: Concept Details */}
             <div className="w-[320px] flex flex-col bg-white/40 rounded-[16px] border border-white/20 backdrop-blur-sm overflow-hidden shadow-sm">
-                <div className="p-4 border-b border-teal-100 bg-white/50">
+                <div className="p-4 border-b border-teal-100 bg-white/50 flex flex-col gap-2">
                     <h2 className="text-[14px] font-bold text-teal-800 uppercase tracking-wider">Top Concepts</h2>
+                    <select 
+                        value={selectedSubject} 
+                        onChange={handleSubjectChange}
+                        className="bg-white border border-teal-200 rounded-[8px] px-2 py-1.5 text-[11px] font-bold text-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                    >
+                        <option value="">All Materials</option>
+                        {library.map(s => (
+                            <option key={s.subject} value={s.subject}>{s.subject}</option>
+                        ))}
+                    </select>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">

@@ -95,7 +95,7 @@ async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(g
 
 @router.get("/summary/{user_id}")
 async def get_summary(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
-    pipeline = [{"$sample": {"size": 3}}]
+    pipeline = [{"$match": {"user_id": user_id}}, {"$sample": {"size": 3}}]
     chunk_docs = await db["chunks"].aggregate(pipeline).to_list(length=3)
     chunk_texts = [doc["text"] for doc in chunk_docs]
     if not chunk_texts:
@@ -113,7 +113,7 @@ async def get_flashcards(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db
     if not weak_topics:
         weak_topics = ["overall"]
         
-    pipeline = [{"$sample": {"size": 3}}]
+    pipeline = [{"$match": {"user_id": user_id}}, {"$sample": {"size": 3}}]
     chunk_docs = await db["chunks"].aggregate(pipeline).to_list(length=3)
     chunk_texts = [doc["text"] for doc in chunk_docs]
     if not chunk_texts:

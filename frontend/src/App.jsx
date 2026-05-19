@@ -14,6 +14,7 @@ import Library from './pages/Library';
 import client from './api/client';
 import Layout from './components/Layout';
 import { ToastProvider } from './context/ToastContext';
+import { logEvent } from './api/analytics';
 
 import MLMonitor from './pages/MLMonitor';
 
@@ -32,6 +33,37 @@ function App() {
       client.post('/api/settings/provider', { provider: savedProvider.toLowerCase(), model: savedModel })
         .catch(err => console.error("Failed to restore provider on load", err));
     }
+  }, []);
+
+  useEffect(() => {
+    let lastActivity = Date.now();
+    const sessionId = Math.random().toString(36).substring(2, 15);
+
+    const handleActivity = () => {
+      lastActivity = Date.now();
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('scroll', handleActivity);
+
+    // Initial session start
+    const userId = localStorage.getItem('user_id') || 'default';
+    logEvent({ session_id: sessionId, user_id: userId, event_type: 'session_start' }).catch(() => {});
+
+    const intervalId = setInterval(() => {
+      // If user was active in the last minute
+      if (Date.now() - lastActivity < 60000) {
+        logEvent({ session_id: sessionId, user_id: userId, event_type: 'study_active' }).catch(() => {});
+      }
+    }, 60000);
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('scroll', handleActivity);
+      clearInterval(intervalId);
+    };
   }, []);
 
   return (

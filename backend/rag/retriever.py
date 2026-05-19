@@ -16,24 +16,7 @@ import database
 logger = logging.getLogger(__name__)
 
 
-async def retrieve_chunks(query: str, top_k: int = 5) -> List[ContentChunk]:
-    """
-    Retrieve the most relevant content chunks for a given query.
-
-    The process follows these steps:
-    1. Embed the query string using the local embedder module.
-    2. Search the FAISS index for the top-k nearest neighbour's chunk IDs.
-    3. Fetch the full chunk documents (metadata + text) from MongoDB.
-    4. Re-sort the documents to match the distance-based order from FAISS.
-
-    Args:
-        query: User-provided query or prompt.
-        top_k: Number of chunks to retrieve. Defaults to 5.
-
-    Returns:
-        A list of ContentChunk Pydantic models.
-        Returns an empty list if no chunks are found or the index is empty.
-    """
+async def retrieve_chunks(query: str, user_id: str = None, top_k: int = 5) -> List[ContentChunk]:
     # 1. Embed query
     query_vector = embed_query(query)
     
@@ -41,11 +24,11 @@ async def retrieve_chunks(query: str, top_k: int = 5) -> List[ContentChunk]:
         logger.warning("Query embedding failed or query is empty.")
         return []
 
-    # 2. Search FAISS index for candidate IDs
+    # 2. Search FAISS index for candidate IDs (fetch more to allow for filtering)
+    search_k = 50 if user_id else top_k
     try:
-        chunk_ids = search_index(query_vector, top_k=top_k)
+        chunk_ids = search_index(query_vector, top_k=search_k)
     except RuntimeError as exc:
-        # search_index raises RuntimeError if index doesn't exist
         logger.error("FAISS search failed: %s", exc)
         return []
 
@@ -53,15 +36,19 @@ async def retrieve_chunks(query: str, top_k: int = 5) -> List[ContentChunk]:
         logger.info("No matching chunks found in FAISS for query: '%s'", query)
         return []
 
-    # 3. Fetch full chunks from MongoDB
-    # Note: database.init_db() must have been called for database._db to be set.
     if database._db is None:
         logger.error("Database handle is None. Ensure init_db() was called.")
         raise RuntimeError("Database not initialised.")
 
     collection = database._db["chunks"]
-    cursor = collection.find({"chunk_id": {"$in": chunk_ids}})
-    docs = await cursor.to_list(length=top_k)
+    
+    # 3. Fetch full chunks from MongoDB, filtering by user_id if provided
+    query_filter = {"chunk_id": {"$in": chunk_ids}}
+    if user_id:
+        query_filter["user_id"] = user_id
+        
+    cursor = collection.find(query_filter)
+    docs = await cursor.to_list(length=search_k)
 
     # 4. Map back to ContentChunk objects, maintaining FAISS distance order
     doc_map = {doc["chunk_id"]: doc for doc in docs}
@@ -72,5 +59,5 @@ async def retrieve_chunks(query: str, top_k: int = 5) -> List[ContentChunk]:
             # Pydantic validates the DB dict into a ContentChunk object
             ordered_chunks.append(ContentChunk(**doc_map[cid]))
 
-    logger.info("Retrieved %d relevant chunks for query.", len(ordered_chunks))
-    return ordered_chunks
+    logger.info("Retrieved %d relevant chunks for query.", min(len(ordered_chunks), top_k))
+    return ordered_chunks[:top_k]

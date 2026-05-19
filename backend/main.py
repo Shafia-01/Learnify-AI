@@ -99,12 +99,38 @@ app.include_router(websocket_router)
 
 # ── Health check ─────────────────────────────────────────────────────────
 
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
-@app.get("/", include_in_schema=False)
-async def root_redirect():
-    """Redirect root to /docs for easier navigation."""
-    return RedirectResponse(url="/docs")
+# Serve React frontend if 'static' directory exists
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    # Mount the assets directory explicitly
+    assets_dir = os.path.join(static_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def catch_all(full_path: str):
+        # Don't intercept API or WS routes
+        if full_path.startswith("api/") or full_path.startswith("ws/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Not Found")
+            
+        file_path = os.path.join(static_dir, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        # Fallback to index.html for React Router
+        index_path = os.path.join(static_dir, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"error": "Frontend build not found"}
+else:
+    @app.get("/", include_in_schema=False)
+    async def root_redirect():
+        """Redirect root to /docs for easier navigation."""
+        return RedirectResponse(url="/docs")
 
 
 @app.get("/health", tags=["System"])
