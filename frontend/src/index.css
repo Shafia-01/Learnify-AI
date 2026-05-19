@@ -5,16 +5,37 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-pill: 9999px;
-  --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
-  --shadow-hover: 0 6px 24px rgba(0,0,0,0.10);
-  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 32px rgba(0,0,0,0.14);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.18);
   --transition: all 0.18s ease;
-  --border-default: 0.5px solid rgba(0,0,0,0.08);
-  --border-hover: 0.5px solid rgba(0,0,0,0.16);
+  --border-default: 1px solid rgba(0,0,0,0.12);
+  --border-hover: 1px solid rgba(0,0,0,0.22);
   --sidebar-bg: #1a1a1a;
   --topbar-bg: #1a1a1a;
   --sidebar-width: 72px;
   --topbar-height: 80px;
+}
+
+/* Hide scrollbars globally for no-scrollbar elements */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Ensure clean high-contrast overrides for inputs and select lists */
+input, select, textarea {
+  background-color: #ffffff !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.16) !important;
+  color: #000000 !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent) !important;
 }
 
 body {

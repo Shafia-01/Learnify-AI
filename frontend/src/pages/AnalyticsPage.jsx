@@ -40,10 +40,10 @@ const AnalyticsPage = () => {
     };
 
     const stats = [
-        { label: 'Study Time', value: formatMinutes(data?.total_time_spent_minutes || 0), trend: '+12%', color: '#6366F1' },
-        { label: 'Avg Accuracy', value: `${data?.avg_quiz_score || 0}%`, trend: '+5%', color: '#10B981' },
-        { label: 'Topics', value: data?.topics_covered || 0, trend: '+2', color: '#F59E0B' },
-        { label: 'Sessions', value: data?.sessions_last_7_days || 0, trend: 'Last 7d', color: '#EC4899' },
+        { label: 'Study Time', value: formatMinutes(data?.total_time_spent_minutes || 0), color: '#6366F1' },
+        { label: 'Avg Accuracy', value: `${data?.avg_quiz_score || 0}%`, color: '#10B981' },
+        { label: 'Topics', value: data?.topics_covered || 0, color: '#F59E0B' },
+        { label: 'Sessions', value: data?.sessions_last_7_days || 0, color: '#EC4899' },
     ];
 
     return (
@@ -64,12 +64,9 @@ const AnalyticsPage = () => {
                         <div className="text-[11px] font-bold text-gray-900 uppercase tracking-widest mb-1">{s.label}</div>
                         <div className="flex items-baseline gap-2">
                             <div className="text-2xl font-black text-gray-900" style={{ color: s.color }}>{s.value}</div>
-                            <div className={`text-[10px] font-bold ${s.trend.startsWith('+') ? 'text-green-500' : 'text-gray-900'}`}>
-                                {s.trend}
-                            </div>
                         </div>
                         <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden mt-3">
-                            <div className="h-full opacity-60 transition-all duration-1000" style={{ width: '70%', backgroundColor: s.color }}></div>
+                            <div className="h-full opacity-60 transition-all duration-1000" style={{ width: '75%', backgroundColor: s.color }}></div>
                         </div>
                     </div>
                 ))}

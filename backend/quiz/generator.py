@@ -15,7 +15,8 @@ async def generate_questions(
     db: AsyncIOMotorDatabase,
     chunk_texts: List[str],
     n: int,
-    question_types: List[str]
+    question_types: List[str],
+    user_id: str = ""
 ) -> List[QuizQuestion]:
     """
     Generates n questions from the provided text chunks.
@@ -74,6 +75,7 @@ async def generate_questions(
                     options = [item.get("correct_answer")]
                 
                 q = QuizQuestion(
+                    user_id=user_id,
                     question_text=item.get("question_text", "Unknown"),
                     question_type=q_type,
                     options=options,

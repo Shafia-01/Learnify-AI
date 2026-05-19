@@ -5,11 +5,18 @@ import { getLearningPath } from '../api/query';
 import client from '../api/client';
 import Avatar from '../components/Avatar';
 
+const ALL_BADGES = [
+    { id: 'streak_7', name: 'Week Warrior', emoji: '⚡', description: '7-day learning streak', bgClass: 'bg-purple-100 border-purple-200 text-purple-700' },
+    { id: 'xp_100', name: 'Century Scholar', emoji: '🥇', description: 'Earn 100 XP', bgClass: 'bg-amber-100 border-amber-200 text-amber-700' },
+    { id: 'xp_500', name: 'Knowledge Knight', emoji: '⚔️', description: 'Earn 500 XP', bgClass: 'bg-blue-100 border-blue-200 text-blue-700' },
+    { id: 'xp_1000', name: 'Learning Legend', emoji: '🔮', description: 'Earn 1000 XP', bgClass: 'bg-emerald-100 border-emerald-200 text-emerald-700' },
+];
+
 const Dashboard = () => {
     const navigate = useNavigate();
     const userId = localStorage.getItem('user_id') || 'default';
     
-    const [profile, setProfile] = useState({ xp: 0, streak: 0, badges: 0 });
+    const [profile, setProfile] = useState({ xp: 0, streak_days: 0, badges: [] });
     const [stats, setStats] = useState({ quizAvg: 0, chunksIndexed: 0 });
     const [learningPath, setLearningPath] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
@@ -88,11 +95,11 @@ const Dashboard = () => {
                 
                 <div className="flex gap-3 mt-6 md:mt-0">
                     <div className="bg-white/12 border border-white/10 px-5 py-3 rounded-[10px] text-center min-w-[110px]">
-                        <div className="text-[18px] font-bold font-mono">{profile.xp.toLocaleString()}</div>
+                        <div className="text-[18px] font-bold font-mono">{(profile?.xp || 0).toLocaleString()}</div>
                         <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">XP Points</div>
                     </div>
                     <div className="bg-white/12 border border-white/10 px-5 py-3 rounded-[10px] text-center min-w-[110px]">
-                        <div className="text-[18px] font-bold font-mono">{profile.streak_days} Days</div>
+                        <div className="text-[18px] font-bold font-mono">{profile?.streak_days || 0} Days</div>
                         <div className="text-[10px] uppercase tracking-wider text-white/60 font-bold">Current Streak</div>
                     </div>
                 </div>
@@ -102,23 +109,26 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="bg-[#FEF3C7] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#FDE68A]">
                     <span className="text-[11px] font-bold text-[#92400E]/60 uppercase tracking-tight">Total XP</span>
-                    <div className="text-[22px] font-bold text-[#92400E] leading-none group-hover:scale-105 transition-transform origin-left">{profile.xp.toLocaleString()}</div>
-                    <div className="text-[11px] font-semibold text-green-600">+50 today</div>
+                    <div className="text-[22px] font-bold text-[#92400E] leading-none group-hover:scale-105 transition-transform origin-left">{(profile?.xp || 0).toLocaleString()}</div>
+                    <div className="text-[11px] font-semibold text-green-600">Keep it up!</div>
                 </div>
                 <div className="bg-[#D1FAE5] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#A7F3D0]">
                     <span className="text-[11px] font-bold text-[#065F46]/60 uppercase tracking-tight">Quiz Avg</span>
                     <div className="text-[22px] font-bold text-[#065F46] leading-none group-hover:scale-105 transition-transform origin-left">{stats.quizAvg}%</div>
-                    <div className="text-[11px] font-semibold text-green-600">+6% this week</div>
+                    <div className="text-[11px] font-semibold text-green-600">Accuracy rate</div>
                 </div>
                 <div className="bg-[#DBEAFE] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#BFDBFE]">
                     <span className="text-[11px] font-bold text-[#1E40AF]/60 uppercase tracking-tight">Chunks Indexed</span>
                     <div className="text-[22px] font-bold text-[#1E40AF] leading-none group-hover:scale-105 transition-transform origin-left">{stats.chunksIndexed}</div>
-                    <div className="text-[11px] font-semibold text-[#1E40AF]/60">3 sources</div>
+                    <div className="text-[11px] font-semibold text-[#1E40AF]/60">Topics processed</div>
                 </div>
-                <div className="bg-[#EDE9FE] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#DDD6FE]">
+                <div 
+                    onClick={() => navigate('/games')}
+                    className="bg-[#EDE9FE] p-4 rounded-[8px] space-y-1 shadow-sm hover:shadow-md transition-all group border border-[#DDD6FE] cursor-pointer"
+                >
                     <span className="text-[11px] font-bold text-[#5B21B6]/60 uppercase tracking-tight">Badges Earned</span>
-                    <div className="text-[22px] font-bold text-[#5B21B6] leading-none group-hover:scale-105 transition-transform origin-left">{profile.badges}</div>
-                    <div className="text-[11px] font-semibold text-amber-600">2 nearly unlocked</div>
+                    <div className="text-[22px] font-bold text-[#5B21B6] leading-none group-hover:scale-105 transition-transform origin-left">{Array.isArray(profile?.badges) ? profile.badges.length : (profile?.badges || 0)}</div>
+                    <div className="text-[11px] font-semibold text-[#7C3AED]">View in Games →</div>
                 </div>
             </div>
 
@@ -156,7 +166,7 @@ const Dashboard = () => {
                         <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wider mb-3">Weekly Streak</h3>
                         <div className="flex justify-between items-center px-1">
                             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
-                                const isDone = i < profile.streak % 7;
+                                const isDone = i < (profile?.streak_days || 0) % 7;
                                 const isToday = i === (new Date().getDay() + 6) % 7;
                                 return (
                                     <div key={i} className="flex flex-col items-center gap-1.5">
@@ -209,28 +219,47 @@ const Dashboard = () => {
                     </div>
 
                     {/* Badges & Progress */}
-                    <div className="card p-5 bg-white relative overflow-hidden">
+                    <div className="card p-5 bg-gradient-to-br from-purple-50 to-white border border-purple-100 relative overflow-hidden">
                         <div className="flex justify-between items-start mb-4">
                             <h2 className="text-[14px] font-bold text-gray-900">Your Badges</h2>
                             <div className="text-[11px] font-bold text-[#7C3AED] bg-[#EDE9FE] px-2 py-0.5 rounded-full">
-                                {profile.badges} Total
+                                {profile?.badges?.length || 0} Total
                             </div>
                         </div>
-                        <div className="flex gap-2 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center border border-amber-200 shadow-sm" title="Top Performer">🥇</div>
-                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center border border-purple-200 shadow-sm" title="Week Warrior">⚡</div>
-                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center border border-emerald-200 shadow-sm" title="Fast Learner">🚀</div>
-                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-200 text-gray-900 text-xs font-bold">?</div>
+                        <div className="flex gap-3 mb-6 flex-wrap">
+                            {ALL_BADGES.map(badge => {
+                                const hasBadge = Array.isArray(profile?.badges) && profile.badges.includes(badge.id);
+                                return (
+                                    <div 
+                                        key={badge.id}
+                                        className={`w-11 h-11 rounded-full flex flex-col items-center justify-center border shadow-sm transition-all relative group/item ${
+                                            hasBadge 
+                                                ? `${badge.bgClass} scale-100` 
+                                                : 'bg-gray-100 border-gray-300 text-gray-400 opacity-50 grayscale'
+                                        }`}
+                                        title={`${badge.name}: ${badge.description} (${hasBadge ? 'Unlocked' : 'Locked'})`}
+                                    >
+                                        <span className="text-xl">{badge.emoji}</span>
+                                        {!hasBadge && (
+                                            <span className="absolute bottom-[-2px] right-[-2px] text-[10px] bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center border border-white">🔒</span>
+                                        )}
+                                        {/* Tooltip */}
+                                        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover/item:opacity-100 pointer-events-none transition-opacity z-10 shadow-md">
+                                            <strong>{badge.name}</strong> - {badge.description}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between text-[11px] font-bold">
                                 <span className="text-gray-900 uppercase tracking-wider">Level 5 Progress</span>
-                                <span className="text-[#7C3AED] font-mono">{profile.xp} / 2,000 XP</span>
+                                <span className="text-[#7C3AED] font-mono">{profile?.xp || 0} / 2,000 XP</span>
                             </div>
-                            <div className="h-[6px] w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-[6px] w-full bg-purple-100 rounded-full overflow-hidden">
                                 <div 
                                     className="h-full bg-gradient-to-r from-[#7C3AED] to-[#A855F7] transition-all duration-1000"
-                                    style={{ width: `${(profile.xp / 2000) * 100}%` }}
+                                    style={{ width: `${((profile?.xp || 0) / 2000) * 100}%` }}
                                 ></div>
                             </div>
                         </div>

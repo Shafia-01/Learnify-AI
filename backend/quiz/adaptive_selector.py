@@ -19,10 +19,19 @@ async def select_next_questions(db: AsyncIOMotorDatabase, user_id: str, n: int =
     current_level = get_difficulty_level(score)
     
     # Fetch questions from DB
-    cursor = db["quiz_questions"].find({"difficulty": current_level}).limit(n)
+    cursor = db["quiz_questions"].find({"user_id": user_id, "difficulty": current_level}).limit(n)
     db_questions_docs = await cursor.to_list(length=n)
     
-    questions = [QuizQuestion(**doc) for doc in db_questions_docs]
+    questions = []
+    from uuid import uuid4
+    for doc in db_questions_docs:
+        if "question_id" not in doc or not doc["question_id"]:
+            doc["question_id"] = str(doc.get("_id")) or uuid4().hex
+            await db["quiz_questions"].update_one(
+                {"_id": doc["_id"]},
+                {"$set": {"question_id": doc["question_id"]}}
+            )
+        questions.append(QuizQuestion(**doc))
     
     if len(questions) < n:
         shortfall = n - len(questions)
@@ -46,7 +55,8 @@ async def select_next_questions(db: AsyncIOMotorDatabase, user_id: str, n: int =
             db=db,
             chunk_texts=chunk_texts,
             n=shortfall,
-            question_types=["mcq", "short"]
+            question_types=["mcq", "short"],
+            user_id=user_id
         )
         
         questions.extend(new_questions)

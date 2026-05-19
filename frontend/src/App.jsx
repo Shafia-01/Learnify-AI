@@ -48,13 +48,14 @@ function App() {
     window.addEventListener('scroll', handleActivity);
 
     // Initial session start
-    const userId = localStorage.getItem('user_id') || 'default';
-    logEvent({ session_id: sessionId, user_id: userId, event_type: 'session_start' }).catch(() => {});
+    const initialUserId = localStorage.getItem('user_id') || 'default';
+    logEvent({ session_id: sessionId, user_id: initialUserId, event_type: 'session_start' }).catch(() => {});
 
     const intervalId = setInterval(() => {
       // If user was active in the last minute
       if (Date.now() - lastActivity < 60000) {
-        logEvent({ session_id: sessionId, user_id: userId, event_type: 'study_active' }).catch(() => {});
+        const currentUserId = localStorage.getItem('user_id') || 'default';
+        logEvent({ session_id: sessionId, user_id: currentUserId, event_type: 'study_active' }).catch(() => {});
       }
     }, 60000);
 

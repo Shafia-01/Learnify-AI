@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 
@@ -16,13 +16,46 @@ const TicTacToe = () => {
     const [isEnded, setIsEnded] = useState(false);
     const [scoreResponse, setScoreResponse] = useState(null);
 
+    const questionIndexRef = useRef(0);
+
+    const shuffleArray = (array) => {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+
+    const checkAnswerCorrect = (option, correctAnswer) => {
+        if (!option || !correctAnswer) return false;
+        const optClean = option.toString().trim().toLowerCase();
+        const ansClean = correctAnswer.toString().trim().toLowerCase();
+        
+        if (optClean === ansClean) return true;
+        
+        const removePrefix = (str) => {
+            return str.replace(/^[a-d0-9][\.\)\-\s]+/i, '').trim();
+        };
+        
+        const optNoPrefix = removePrefix(optClean);
+        const ansNoPrefix = removePrefix(ansClean);
+        
+        if (optNoPrefix === ansNoPrefix) return true;
+        
+        if (optClean.includes(ansClean) || ansClean.includes(optClean)) return true;
+        if (optNoPrefix.includes(ansNoPrefix) || ansNoPrefix.includes(optNoPrefix)) return true;
+        
+        return false;
+    };
+
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
                 const subject = localStorage.getItem('study_subject');
                 const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
                 const res = await client.get(`/api/games/quiz-content/${userId}${queryParams}`);
-                setQuestions(res.data);
+                setQuestions(shuffleArray(res.data));
             } catch (err) { console.error("Failed to fetch quiz content for TicTacToe", err); }
             finally { setIsLoading(false); }
         };
@@ -43,12 +76,15 @@ const TicTacToe = () => {
         
         // Show question barrier
         setPendingMove(idx);
-        const q = questions[Math.floor(Math.random() * questions.length)];
-        setCurrentQuestion(q);
+        if (questions.length > 0) {
+            const qIdx = questionIndexRef.current % questions.length;
+            questionIndexRef.current += 1;
+            setCurrentQuestion(questions[qIdx]);
+        }
     };
 
     const handleAnswer = (option) => {
-        const isCorrect = option?.toString().trim().toLowerCase() === currentQuestion.correct_answer?.toString().trim().toLowerCase();
+        const isCorrect = checkAnswerCorrect(option, currentQuestion.correct_answer);
         if (isCorrect) {
             const newBoard = [...board];
             newBoard[pendingMove] = 'X';

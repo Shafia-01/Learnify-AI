@@ -102,6 +102,7 @@ class QuizQuestion(BaseModel):
     """An auto-generated quiz question linked to a source chunk."""
 
     question_id: str = Field(default_factory=lambda: uuid4().hex, description="Unique question identifier")
+    user_id: str = Field(default="", description="ID of the user this question belongs to")
     question_text: str = Field(..., description="The question prompt shown to the learner")
     question_type: QuestionType = Field(..., description="Format of the question")
     options: Optional[List[str]] = Field(

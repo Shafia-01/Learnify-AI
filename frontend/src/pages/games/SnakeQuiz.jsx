@@ -22,13 +22,45 @@ const SnakeQuiz = () => {
 
     // Ref to track current score without stale closure issues inside setInterval
     const scoreRef = useRef(0);
+    const questionIndexRef = useRef(0);
+
+    const shuffleArray = (array) => {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+
+    const checkAnswerCorrect = (option, correctAnswer) => {
+        if (!option || !correctAnswer) return false;
+        const optClean = option.toString().trim().toLowerCase();
+        const ansClean = correctAnswer.toString().trim().toLowerCase();
+        
+        if (optClean === ansClean) return true;
+        
+        const removePrefix = (str) => {
+            return str.replace(/^[a-d0-9][\.\)\-\s]+/i, '').trim();
+        };
+        
+        const optNoPrefix = removePrefix(optClean);
+        const ansNoPrefix = removePrefix(ansClean);
+        
+        if (optNoPrefix === ansNoPrefix) return true;
+        
+        if (optClean.includes(ansClean) || ansClean.includes(optClean)) return true;
+        if (optNoPrefix.includes(ansNoPrefix) || ansNoPrefix.includes(optNoPrefix)) return true;
+        
+        return false;
+    };
 
     const fetchQuestions = useCallback(async () => {
         try {
             const subject = localStorage.getItem('study_subject');
             const queryParams = subject ? `?subject=${encodeURIComponent(subject)}` : '';
             const res = await client.get(`/api/games/quiz-content/${userId}${queryParams}`);
-            setQuestions(res.data);
+            setQuestions(shuffleArray(res.data));
         } catch (err) { console.error(err); }
         finally { setIsLoading(false); }
     }, [userId]);
@@ -82,8 +114,11 @@ const SnakeQuiz = () => {
 
             if (newHead.x === food.x && newHead.y === food.y) {
                 setIsPaused(true);
-                const nextQ = questions[Math.floor(Math.random() * questions.length)];
-                setCurrentQuestion(nextQ);
+                if (questions.length > 0) {
+                    const qIdx = questionIndexRef.current % questions.length;
+                    questionIndexRef.current += 1;
+                    setCurrentQuestion(questions[qIdx]);
+                }
             } else {
                 newSnake.pop();
                 setSnake(newSnake);
@@ -95,25 +130,33 @@ const SnakeQuiz = () => {
     }, [snake, direction, food, isPaused, isGameOver, questions, isLoading]);
 
     const handleAnswer = (option) => {
-        const isCorrect = option?.toString().trim().toLowerCase() === currentQuestion.correct_answer?.toString().trim().toLowerCase();
+        const isCorrect = checkAnswerCorrect(option, currentQuestion.correct_answer);
         if (isCorrect) {
             setScore(prev => {
                 const next = prev + 500;
                 scoreRef.current = next;
                 return next;
             });
-            setSnake(prev => [...prev, {}]);
-            setFood({
-                x: Math.floor(Math.random() * GRID_SIZE),
-                y: Math.floor(Math.random() * GRID_SIZE)
-            });
+            // Eat food and grow: prepend the newHead position to snake
+            setSnake(prev => [{ x: food.x, y: food.y }, ...prev]);
         } else {
             setScore(prev => {
                 const next = Math.max(0, prev - 200);
                 scoreRef.current = next;
                 return next;
             });
+            // Move snake onto food, but don't grow: prepend and pop tail
+            setSnake(prev => {
+                const newSnake = [{ x: food.x, y: food.y }, ...prev];
+                newSnake.pop();
+                return newSnake;
+            });
         }
+        // Always relocate food
+        setFood({
+            x: Math.floor(Math.random() * GRID_SIZE),
+            y: Math.floor(Math.random() * GRID_SIZE)
+        });
         setCurrentQuestion(null);
         setIsPaused(false);
     };

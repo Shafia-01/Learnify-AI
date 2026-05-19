@@ -18,8 +18,8 @@ const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-[--sidebar-width] h-full bg-[#0d0d0d] text-white flex flex-col z-40 border-r border-[#ffffff0a] shadow-[10px_0_30px_-15px_rgba(0,0,0,0.5)] flex-shrink-0">
-      <div className="flex-1 flex flex-col items-center pt-12 pb-8 space-y-8">
+    <aside className="w-[--sidebar-width] h-full bg-[#0d0d0d] text-white flex flex-col z-40 border-r border-[#ffffff0a] shadow-[10px_0_30px_-15px_rgba(0,0,0,0.5)] flex-shrink-0 overflow-y-auto no-scrollbar">
+      <div className="flex-1 flex flex-col items-center pt-12 pb-8 space-y-8 overflow-y-auto no-scrollbar w-full">
         {navItems.map((item, index) => {
           const isActive = location.pathname === item.path;
           
@@ -35,8 +35,8 @@ const Sidebar = () => {
                 className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 group relative ${
                   isActive 
                     ? 'bg-white/10 text-white shadow-[0_4px_15px_-3px_rgba(255,255,255,0.1)] border border-white/5' 
-                    : 'text-gray-900 hover:bg-white/[0.03] hover:text-white'
-                }`}
+                    : 'text-white/40 hover:bg-white/[0.03] hover:text-white'
+                } border-transparent`}
               >
                 <Icon name={item.label} color={item.iconColor} isActive={isActive} />
                 {isActive && (

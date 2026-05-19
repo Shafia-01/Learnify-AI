@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 async def update_streak(db: AsyncIOMotorDatabase, user_id: str) -> int:
@@ -20,7 +20,7 @@ async def update_streak(db: AsyncIOMotorDatabase, user_id: str) -> int:
     if not user_doc:
         # If user doesn't exist, we can't really update streak.
         # But for robust testing, we'll create a default one.
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         await db["users"].insert_one({
             "user_id": user_id,
             "name": f"Learner_{user_id[:4]}",
@@ -33,7 +33,7 @@ async def update_streak(db: AsyncIOMotorDatabase, user_id: str) -> int:
     
     last_active = user_doc.get("last_active_date")
     streak_days = user_doc.get("streak_days", 0)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     today = now.date()
     
     if last_active:

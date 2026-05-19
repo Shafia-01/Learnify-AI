@@ -57,23 +57,23 @@ const MLMonitor = () => {
 
             {/* Analysis Stats */}
             <div className="card p-6 bg-white border border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">ML Telemetry (Session Stats)</h2>
+                <h2 className="text-lg font-bold text-gray-900 mb-4">ML Telemetry (Historical / Demo Stats)</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div className="text-center p-4 bg-purple-50 rounded-xl">
                         <div className="text-3xl font-mono font-bold text-purple-600">92%</div>
-                        <div className="text-xs text-purple-800 uppercase tracking-widest mt-1 font-bold">Focus Score</div>
+                        <div className="text-xs text-purple-800 uppercase tracking-widest mt-1 font-bold">Focus Score (Demo)</div>
                     </div>
                     <div className="text-center p-4 bg-emerald-50 rounded-xl">
                         <div className="text-3xl font-mono font-bold text-emerald-600">42m</div>
-                        <div className="text-xs text-emerald-800 uppercase tracking-widest mt-1 font-bold">Deep Learning</div>
+                        <div className="text-xs text-emerald-800 uppercase tracking-widest mt-1 font-bold">Deep Learning (Demo)</div>
                     </div>
                     <div className="text-center p-4 bg-amber-50 rounded-xl">
                         <div className="text-3xl font-mono font-bold text-amber-600">2</div>
-                        <div className="text-xs text-amber-800 uppercase tracking-widest mt-1 font-bold">Interventions</div>
+                        <div className="text-xs text-amber-800 uppercase tracking-widest mt-1 font-bold">Interventions (Demo)</div>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-xl">
                         <div className="text-3xl font-mono font-bold text-blue-600">0</div>
-                        <div className="text-xs text-blue-800 uppercase tracking-widest mt-1 font-bold">Fatigue Alerts</div>
+                        <div className="text-xs text-blue-800 uppercase tracking-widest mt-1 font-bold">Fatigue Alerts (Demo)</div>
                     </div>
                 </div>
             </div>

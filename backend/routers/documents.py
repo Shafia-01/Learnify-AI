@@ -58,10 +58,16 @@ async def delete_documents(
     if filename:
         query["source_file"] = filename
         
+    # Retrieve chunk_ids to remove from FAISS index
+    cursor = db["chunks"].find(query, {"chunk_id": 1})
+    chunks_to_delete = await cursor.to_list(length=None)
+    chunk_ids = [c["chunk_id"] for c in chunks_to_delete if "chunk_id" in c]
+    
     result = await db["chunks"].delete_many(query)
     
-    # We do not delete from FAISS currently as it's complex to delete by metadata in base FAISS,
-    # but the game/quiz generator samples from MongoDB directly so it will no longer use these chunks.
-    # The RAG pipeline might still retrieve them if queried via vector similarity, but games/quizzes are fixed.
-    
+    # Remove vectors from FAISS index
+    if chunk_ids:
+        from vector_store import remove_from_index
+        remove_from_index(chunk_ids)
+        
     return {"message": "deleted", "deleted_count": result.deleted_count}

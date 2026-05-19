@@ -48,7 +48,8 @@ def transcribe_audio(audio_bytes: bytes) -> str:
             import tempfile
             tmp_dir = tempfile.gettempdir()
     
-    file_path = os.path.join(tmp_dir, "audio.webm")
+    import uuid
+    file_path = os.path.join(tmp_dir, f"audio_{uuid.uuid4().hex}.webm")
 
     try:
         # Save bytes to temp file

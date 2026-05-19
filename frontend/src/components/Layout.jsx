@@ -5,16 +5,16 @@ import Topbar from './Topbar';
 import EmotionPanel from './EmotionPanel';
 
 const pageStyles = {
-  '/dashboard': { bg: '#FDFAF4', accent: '#7C3AED' },
-  '/chat': { bg: '#F5F0FF', accent: '#8B5CF6' },
-  '/quiz': { bg: '#F7FFED', accent: '#84CC16' },
-  '/upload': { bg: '#FFF7F3', accent: '#F97316' },
-  '/games': { bg: '#FEFCE8', accent: '#EAB308' },
-  '/settings': { bg: '#EFF6FF', accent: '#3B82F6' },
-  '/knowledge-graph': { bg: '#F0FDFA', accent: '#14B8A6' },
-  '/analytics': { bg: '#F0F9FF', accent: '#60A5FA' },
-  '/ml-monitor': { bg: '#FDF2F8', accent: '#F472B6' },
-  '/onboarding': { bg: '#FFF0F6', accent: '#EC4899' },
+  '/dashboard': { bg: '#F2EADF', accent: '#7C3AED' },
+  '/chat': { bg: '#EAE2FC', accent: '#8B5CF6' },
+  '/quiz': { bg: '#EAF5DB', accent: '#84CC16' },
+  '/upload': { bg: '#FCECE5', accent: '#F97316' },
+  '/games': { bg: '#FBF8D3', accent: '#EAB308' },
+  '/settings': { bg: '#E0ECFC', accent: '#3B82F6' },
+  '/knowledge-graph': { bg: '#E0F4F1', accent: '#14B8A6' },
+  '/analytics': { bg: '#E0F1FC', accent: '#60A5FA' },
+  '/ml-monitor': { bg: '#FCE5F3', accent: '#F472B6' },
+  '/onboarding': { bg: '#FCE3EE', accent: '#EC4899' },
 };
 
 const Layout = ({ children }) => {

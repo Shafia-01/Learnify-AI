@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from langchain_core.prompts import PromptTemplate
 from rag.llm_provider import get_llm
@@ -34,7 +34,7 @@ async def generate_daily_summary(db: AsyncIOMotorDatabase, user_id: str, session
         doc = {
             "user_id": user_id,
             "summary": summary,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
         await db["sessions"].insert_one(doc)
         

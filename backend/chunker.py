@@ -58,7 +58,8 @@ def chunk_content(
             page_or_timestamp = str(item.get("page", ""))
         elif source_type == "ppt":
             page_or_timestamp = str(item.get("slide", ""))
-
+        elif source_type in ("audio", "video", "voice"):
+            page_or_timestamp = str(item.get("timestamp") or item.get("timestamp_start") or "")
         else:
             # For plain text and any unknown types, no positional info
             page_or_timestamp = ""

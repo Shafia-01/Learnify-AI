@@ -127,6 +127,50 @@ def build_or_update_index(
     )
 
 
+def remove_from_index(chunk_ids_to_remove: List[str]) -> None:
+    """
+    Remove the specified chunk_ids from both the FAISS index and the sidecar.
+    """
+    if not _INDEX_PATH.exists():
+        return
+
+    index = _load_index()
+    existing_ids = _load_sidecar()
+
+    # Find the indices of the chunk IDs to remove
+    indices_to_remove = []
+    ids_set = set(chunk_ids_to_remove)
+    
+    for idx, cid in enumerate(existing_ids):
+        if cid in ids_set:
+            indices_to_remove.append(idx)
+
+    if not indices_to_remove:
+        return
+
+    # Convert to numpy array of int64
+    ids_arr = np.array(indices_to_remove, dtype=np.int64)
+    
+    # Remove from FAISS index
+    index.remove_ids(ids_arr)
+    
+    # Remove from sidecar
+    # Sort indices in descending order to delete from list without shifting indices during deletion
+    for idx in sorted(indices_to_remove, reverse=True):
+        existing_ids.pop(idx)
+
+    # Persist the updated index and sidecar
+    _INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+    faiss.write_index(index, str(_INDEX_PATH))
+    _save_sidecar(existing_ids)
+
+    logger.info(
+        "FAISS index updated after removal — total vectors: %d, removed: %d.",
+        index.ntotal,
+        len(indices_to_remove),
+    )
+
+
 def search_index(
     query_embedding: np.ndarray,
     top_k: int = 5,

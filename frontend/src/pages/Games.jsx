@@ -13,6 +13,13 @@ const games = [
     { id: 'flashcard', name: 'Flashcard Flip', tagline: 'Flip and memorize', color: '#8B5CF6', icon: '🗂️' },
 ];
 
+const ALL_BADGES = [
+    { id: 'streak_7', name: 'Week Warrior', emoji: '⚡', description: '7-day learning streak' },
+    { id: 'xp_100', name: 'Century Scholar', emoji: '🥇', description: 'Earn 100 XP' },
+    { id: 'xp_500', name: 'Knowledge Knight', emoji: '⚔️', description: 'Earn 500 XP' },
+    { id: 'xp_1000', name: 'Learning Legend', emoji: '🔮', description: 'Earn 1000 XP' },
+];
+
 const Games = () => {
     const navigate = useNavigate();
     const userId = localStorage.getItem('user_id') || 'default';
@@ -35,6 +42,8 @@ const Games = () => {
         }
     };
 
+    const [profile, setProfile] = useState({ xp: 0, streak_days: 0, badges: [] });
+
     useEffect(() => {
         const fetchScores = async () => {
             try {
@@ -44,7 +53,14 @@ const Games = () => {
                 else if (res.data) setHighScores(res.data);
             } catch (err) { console.error("Failed to fetch high scores", err); }
         };
+        const fetchUserProfile = async () => {
+            try {
+                const res = await client.get(`/api/gamification/profile/${userId}`);
+                if (res.data) setProfile(res.data);
+            } catch (err) { console.error("Failed to fetch user profile", err); }
+        };
         fetchScores();
+        fetchUserProfile();
     }, [userId]);
 
     useEffect(() => {
@@ -120,6 +136,41 @@ const Games = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Badges Shelf */}
+            <div className="card p-6 bg-white border border-gray-100 space-y-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-[15px] font-bold text-gray-900">Your Badges & Trophies</h2>
+                        <p className="text-[11px] text-gray-500">Complete achievements across the platform to unlock exclusive medals.</p>
+                    </div>
+                    <div className="text-[12px] font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                        {profile?.badges?.length || 0} / {ALL_BADGES.length} Unlocked
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {ALL_BADGES.map(badge => {
+                        const hasBadge = Array.isArray(profile?.badges) && profile.badges.includes(badge.id);
+                        return (
+                            <div 
+                                key={badge.id}
+                                className={`p-4 rounded-xl flex flex-col items-center justify-center text-center border relative transition-all duration-300 ${
+                                    hasBadge 
+                                        ? 'bg-amber-50 border-amber-200 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 opacity-50 grayscale'
+                                }`}
+                            >
+                                <div className="text-3xl mb-2">{badge.emoji}</div>
+                                <h3 className={`text-[13px] font-bold ${ hasBadge ? 'text-gray-900' : 'text-gray-500' }`}>{badge.name}</h3>
+                                <p className={`text-[10px] mt-1 max-w-[150px] ${ hasBadge ? 'text-gray-600' : 'text-gray-400' }`}>{badge.description}</p>
+                                {!hasBadge && (
+                                    <div className="absolute top-2 right-2 text-xs" title="Locked">🔒</div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Leaderboard Section */}

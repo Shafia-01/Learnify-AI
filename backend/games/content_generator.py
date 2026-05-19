@@ -31,7 +31,8 @@ async def generate_game_questions(db: AsyncIOMotorDatabase, user_id: str, count:
 
     prompt = PromptTemplate.from_template(
         "Generate {count} multiple choice questions (MCQ) based on this text:\n{context}\n\n"
-        "Return a JSON array of objects with: question_text, options (list of 4), correct_answer, difficulty (1-5)."
+        "Return a JSON array of objects with: question_text, options (list of 4), correct_answer, difficulty (1-5).\n"
+        "Crucial: The correct_answer string must be EXACTLY identical to one of the options in the options list.\n"
         "Output ONLY raw JSON."
     )
     

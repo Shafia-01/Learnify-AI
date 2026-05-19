@@ -65,9 +65,9 @@ const FlashcardFlip = () => {
         const finalScore = scoreResponse?.submitted_score || (currentIndex + 1) * 10;
         return (
             <div className="max-w-2xl mx-auto space-y-8 animate-page-enter">
-                <div className="card p-10 text-center space-y-6 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white">
-                    <h2 className="text-3xl font-black">Session Complete! 🎉</h2>
-                    <div className="text-5xl font-black">{finalScore} pts</div>
+                <div className="p-10 text-center space-y-6 bg-gradient-to-br from-[#5B21B6] to-[#2E1065] text-white rounded-3xl shadow-2xl border border-purple-900/50">
+                    <h2 className="text-3xl font-black text-white">Session Complete! 🎉</h2>
+                    <div className="text-5xl font-black text-amber-300">{finalScore} pts</div>
                     <p className="text-purple-200 font-bold">
                         You reviewed {currentIndex + 1} of {cards.length} cards
                     </p>
@@ -81,8 +81,8 @@ const FlashcardFlip = () => {
                         </div>
                     )}
                     <div className="flex gap-3 justify-center mt-2">
-                        <button onClick={() => window.location.reload()} className="bg-white text-[#7C3AED] px-6 py-3 rounded-xl font-bold">Play Again</button>
-                        <button onClick={() => navigate('/games')} className="bg-white/10 border border-white/20 px-6 py-3 rounded-xl font-bold">Back to Games</button>
+                        <button onClick={() => window.location.reload()} className="bg-white text-[#7C3AED] hover:bg-purple-50 px-6 py-3 rounded-xl font-bold transition-all shadow-md">Play Again</button>
+                        <button onClick={() => navigate('/games')} className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-6 py-3 rounded-xl font-bold border border-purple-400 shadow-md transition-all">Back to Games</button>
                     </div>
                 </div>
             </div>
