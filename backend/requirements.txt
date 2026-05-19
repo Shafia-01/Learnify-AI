@@ -57,3 +57,4 @@ bcrypt
 python-jose[cryptography]
 
 nltk
+tf-keras
