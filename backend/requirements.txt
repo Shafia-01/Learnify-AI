@@ -55,3 +55,5 @@ pytest-asyncio
 # Authentication
 bcrypt
 python-jose[cryptography]
+
+nltk
