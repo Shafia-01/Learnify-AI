@@ -60,14 +60,29 @@ const KnowledgeGraph = ({ data, onNodeClick }) => {
       });
 
     const label = svg.append("g")
-      .selectAll("text")
+      .selectAll("g")
       .data(nodesData)
-      .join("text")
+      .join("g");
+
+    label.append("text")
       .attr("dy", 4)
       .attr("dx", d => d.radius + 5)
       .text(d => d.label)
       .attr("font-size", "12px")
-      .attr("fill", "#e5e7eb")
+      .attr("font-weight", "bold")
+      .attr("stroke", "white")
+      .attr("stroke-width", 3)
+      .attr("stroke-linejoin", "round")
+      .attr("fill", "white")
+      .attr("pointer-events", "none");
+
+    label.append("text")
+      .attr("dy", 4)
+      .attr("dx", d => d.radius + 5)
+      .text(d => d.label)
+      .attr("font-size", "12px")
+      .attr("font-weight", "bold")
+      .attr("fill", "#111827")
       .attr("pointer-events", "none");
 
     simulation.on("tick", () => {
@@ -82,8 +97,7 @@ const KnowledgeGraph = ({ data, onNodeClick }) => {
         .attr("cy", d => d.y);
         
       label
-        .attr("x", d => d.x)
-        .attr("y", d => d.y);
+        .attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
     function drag(simulation) {

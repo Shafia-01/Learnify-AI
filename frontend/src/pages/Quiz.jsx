@@ -13,14 +13,35 @@ const Quiz = () => {
     const [totalXp, setTotalXp] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
 
+    const [hasStarted, setHasStarted] = useState(false);
+    const [library, setLibrary] = useState([]);
+    const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('study_subject') || '');
+    
+    // Import dynamically to avoid top-level dependency issues if any
     useEffect(() => {
-        const fetchQuestions = async () => {
-            try {
-                const userId = localStorage.getItem('user_id') || 'default';
-                const topic = localStorage.getItem('quiz_topic') || 'overall';
-                const subject = localStorage.getItem('study_subject') || '';
-                // generateQuiz posts to /api/quiz/generate with correct schema
-                const data = await generateQuiz(userId, topic, 5, subject);
+        import('../api/documents').then(({ getDocuments }) => {
+            getDocuments().then(data => setLibrary(data)).catch(console.error);
+        });
+    }, []);
+
+    const handleSubjectChange = (e) => {
+        setSelectedSubject(e.target.value);
+        if (e.target.value) {
+            localStorage.setItem('study_subject', e.target.value);
+        } else {
+            localStorage.removeItem('study_subject');
+        }
+    };
+
+    const startQuiz = async () => {
+        setHasStarted(true);
+        setLoading(true);
+        try {
+            const userId = localStorage.getItem('user_id') || 'default';
+            const topic = localStorage.getItem('quiz_topic') || 'overall';
+            const subject = selectedSubject;
+            // generateQuiz posts to /api/quiz/generate with correct schema
+            const data = await generateQuiz(userId, topic, 5, subject);
                 // Backend returns a List[QuizQuestion] directly (not wrapped)
                 if (Array.isArray(data) && data.length > 0) {
                     setQuestions(data);
@@ -32,20 +53,10 @@ const Quiz = () => {
                         { question_id: '3', question_type: 'short', question_text: 'Explain what a REST API is.', options: null, correct_answer: 'A REST API is an architectural style for networked applications.', difficulty: 3 }
                     ]);
                 }
-            } catch (err) {
-                console.error("Quiz generation failed", err);
-                // Fallback for demo
-                setQuestions([
-                    { question_id: '1', question_type: 'mcq', question_text: 'Which React hook is used for side effects?', options: ['useState', 'useContext', 'useEffect', 'useMemo'], correct_answer: 'useEffect', difficulty: 3 },
-                    { question_id: '2', question_type: 'mcq', question_text: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Counter Style Sheets', 'Creative Style Syntax', 'Color Styling System'], correct_answer: 'Cascading Style Sheets', difficulty: 2 },
-                    { question_id: '3', question_type: 'short', question_text: 'Explain what a REST API is.', options: null, correct_answer: 'A REST API is an architectural style for networked applications.', difficulty: 3 }
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchQuestions();
-    }, []);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async () => {
         if (!selectedAnswer) return;
@@ -93,10 +104,39 @@ const Quiz = () => {
         }
     };
 
+    if (!hasStarted) return (
+        <div className="max-w-[680px] mx-auto space-y-8 animate-page-enter card p-8 bg-white border border-[#84CC16]/25 shadow-lg mt-8">
+            <h1 className="text-3xl font-black text-gray-900 text-center mb-6">Quiz Setup</h1>
+            
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-[14px] font-bold text-gray-700 mb-2">Select Study Subject</label>
+                    <select 
+                        value={selectedSubject} 
+                        onChange={handleSubjectChange}
+                        className="w-full bg-white border border-gray-300 rounded-[10px] px-4 py-3 text-[14px] font-semibold text-gray-900 focus:outline-none focus:border-[#84CC16] focus:ring-1 focus:ring-[#84CC16]"
+                    >
+                        <option value="">All Uploads (Mixed)</option>
+                        {library.map(s => (
+                            <option key={s.subject} value={s.subject}>{s.subject}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <button 
+                onClick={startQuiz}
+                className="w-full mt-8 bg-[#84CC16] hover:bg-[#65a30d] text-white py-4 rounded-[12px] text-[16px] font-black shadow-lg shadow-lime-500/20 transition-all uppercase tracking-wider"
+            >
+                Start Quiz
+            </button>
+        </div>
+    );
+
     if (loading) return (
-        <div className="flex flex-col items-center justify-center h-full space-y-4">
-            <div className="w-12 h-12 border-4 border-[#84CC16] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-[#3a5c10] font-bold animate-pulse">Generating your personalized quiz...</p>
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4 animate-page-enter">
+            <div className="w-16 h-16 border-4 border-[#84CC16] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-[#3a5c10] font-bold text-[15px] animate-pulse">Generating your personalized quiz...</p>
         </div>
     );
 

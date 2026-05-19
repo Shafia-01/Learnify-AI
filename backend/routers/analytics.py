@@ -101,7 +101,12 @@ async def _get_study_time_velocity(user_id: str, db: AsyncIOMotorDatabase):
         }},
         {"$group": {
             "_id": "$_id.day",
-            "minutes": {"$sum": {"$divide": [{"$subtract": ["$end", "$start"]}, 60000]}}
+            "minutes": {"$sum": {
+                "$max": [
+                    1,
+                    {"$divide": [{"$subtract": ["$end", "$start"]}, 60000]}
+                ]
+            }}
         }},
         {"$sort": {"_id": 1}}
     ]
@@ -122,7 +127,7 @@ async def _get_knowledge_retention(user_id: str, db: AsyncIOMotorDatabase):
         {"$match": {"user_id": user_id, "timestamp": {"$gte": seven_days_ago}}},
         {"$group": {
             "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$timestamp"}},
-            "accuracy": {"$avg": {"$cond": ["$is_correct", 100, 0]}}
+            "accuracy": {"$avg": {"$cond": [{"$eq": ["$is_correct", True]}, 100, 0]}}
         }},
         {"$sort": {"_id": 1}}
     ]
