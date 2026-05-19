@@ -1,7 +1,8 @@
 # Stage 1: Build the React frontend
 FROM node:20 as build-stage
 WORKDIR /app/frontend
-COPY frontend/package*.json ./
+COPY frontend/package.json ./
+COPY frontend/package-lock.json ./
 RUN npm install
 COPY frontend/ ./
 # We don't need to specify VITE_API_BASE_URL because we updated the code 
