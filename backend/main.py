@@ -52,9 +52,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     try:
         await init_db()
+        # Automatically sync/rebuild the FAISS index if missing
+        import database
+        from vector_store import sync_faiss_with_db
+        await sync_faiss_with_db(database._db)
     except Exception as e:
         import logging
-        logging.getLogger(__name__).warning("Could not initialize MongoDB. Running without DB: %s", e)
+        logging.getLogger(__name__).warning("Could not initialize MongoDB or sync FAISS. Running without DB/FAISS sync: %s", e)
     yield
     await close_db()
 
