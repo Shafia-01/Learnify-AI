@@ -5,7 +5,7 @@ from database import get_db
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-@router.get("/")
+@router.get("")
 async def get_documents(
     db: AsyncIOMotorDatabase = Depends(get_db),
     user_id: str = Header(default="anonymous", alias="user_id"),
@@ -38,7 +38,7 @@ async def get_documents(
     response = [{"subject": k, "documents": v} for k, v in library.items()]
     return response
 
-@router.delete("/")
+@router.delete("")
 async def delete_documents(
     subject: str = Query(...),
     filename: Optional[str] = Query(None),
