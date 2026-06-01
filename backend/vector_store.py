@@ -227,3 +227,40 @@ def search_index(
             )
 
     return result_ids
+
+
+async def sync_faiss_with_db(db) -> None:
+    """
+    Checks if the FAISS index file exists. If it does not exist but MongoDB 
+    contains chunks, automatically rebuilds the FAISS index from MongoDB.
+    This is extremely important for ephemeral deployments like Hugging Face Spaces.
+    """
+    if not _INDEX_PATH.exists():
+        logger.info("FAISS index not found on disk. Checking MongoDB for existing chunks...")
+        try:
+            # Check if there are documents in the chunks collection
+            count = await db["chunks"].count_documents({})
+            if count > 0:
+                logger.info("Found %d chunks in MongoDB. Rebuilding FAISS index from scratch...", count)
+                cursor = db["chunks"].find({}, {"chunk_id": 1, "text": 1})
+                chunks = await cursor.to_list(length=None)
+                
+                # Filter out invalid documents
+                valid_chunks = [c for c in chunks if c.get("chunk_id") and c.get("text")]
+                if valid_chunks:
+                    from embedder import embed_chunks
+                    # Regenerate embeddings
+                    _, embeddings_array = embed_chunks(valid_chunks)
+                    chunk_ids = [c["chunk_id"] for c in valid_chunks]
+                    
+                    # Build and save FAISS index
+                    build_or_update_index(embeddings_array, chunk_ids)
+                    logger.info("FAISS index successfully rebuilt from MongoDB chunks.")
+                else:
+                    logger.warning("No valid chunks containing text and chunk_id were found in MongoDB.")
+            else:
+                logger.info("MongoDB chunks collection is empty. FAISS index will be created on first ingestion.")
+        except Exception as exc:
+            logger.exception("Failed to auto-rebuild FAISS index from MongoDB: %s", exc)
+    else:
+        logger.info("FAISS index already exists on disk at '%s'. Rebuild not required.", _INDEX_PATH)
