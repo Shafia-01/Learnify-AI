@@ -7,6 +7,7 @@ All other modules import `settings` from this file instead of reading
 os.environ directly.
 """
 
+import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str = "http://localhost:11434"
 
     # ── FAISS vector store ───────────────────────────────────────────
-    FAISS_INDEX_PATH: str = str(_PROJECT_ROOT / "faiss_index")
+    FAISS_INDEX_PATH: str = "/tmp/faiss_index" if os.getenv("SPACE_ID") else str(_PROJECT_ROOT / "faiss_index")
 
     # ── Feature flags ────────────────────────────────────────────────
     PRIVACY_MODE: bool = False
