@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register, login } from '../api/auth';
+import { register, login, resetPassword } from '../api/auth';
 import { useToast } from '../context/ToastContext';
 
 const Onboarding = () => {
@@ -13,6 +13,8 @@ const Onboarding = () => {
     const [language, setLanguage] = useState('English');
     const [isLoading, setIsLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
     const { addToast } = useToast();
 
     const handleLogin = async () => {
@@ -59,6 +61,23 @@ const Onboarding = () => {
         }
     };
 
+    const handleForgotPassword = async () => {
+        setIsLoading(true);
+        try {
+            await resetPassword(email, newPassword);
+            addToast("Password reset successfully! Please sign in with your new password.", "success");
+            setIsForgotPassword(false);
+            setIsLogin(true);
+            setNewPassword('');
+        } catch (err) {
+            console.error("Password reset failed", err);
+            const errorMessage = err.response?.data?.detail || "Failed to reset password. Please check if the email is correct.";
+            addToast(errorMessage, "error");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const steps = [
         { id: 1, title: 'Name entry' },
         { id: 2, title: 'Level selection' },
@@ -87,82 +106,153 @@ const Onboarding = () => {
                 {/* Content Card */}
                 <div className="bg-white/40 backdrop-blur-xl rounded-[24px] p-8 shadow-xl shadow-pink-500/5 border border-white/60">
                     {step === 1 && (
-                        <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-                            <div className="space-y-1">
-                                <h1 className="text-[20px] font-black text-[#9D174D]">
-                                    {isLogin ? 'Sign in to account' : 'Create your account'}
-                                </h1>
-                                <p className="text-[12px] text-pink-400 font-medium">
-                                    {isLogin ? 'Welcome back, explorer!' : 'Join the community of explorers'}
-                                </p>
-                            </div>
-                            <div className="space-y-3">
-                                {!isLogin && (
+                        isForgotPassword ? (
+                            <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                                <div className="space-y-1">
+                                    <h1 className="text-[20px] font-black text-[#9D174D]">
+                                        Reset your password
+                                    </h1>
+                                    <p className="text-[12px] text-pink-400 font-medium">
+                                        Enter your registered email and a new password
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
                                     <input 
-                                        type="text" 
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="Full Name"
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Registered Email Address"
                                         className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
                                     />
-                                )}
-                                <input 
-                                    type="email" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Email Address"
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
-                                />
-                                <input 
-                                    type="password" 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder={isLogin ? "Password" : "Create Password (min 8 chars)"}
-                                    className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
-                                />
-                            </div>
+                                    <input 
+                                        type="password" 
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="New Password (min 8 chars)"
+                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
+                                    />
+                                </div>
 
-                            {isLogin ? (
                                 <button 
-                                    onClick={handleLogin}
-                                    disabled={!email.includes('@') || !password || isLoading}
-                                    className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
-                                >
-                                    {isLoading ? 'Signing in...' : 'Sign In'}
-                                </button>
-                            ) : (
-                                <button 
-                                    onClick={() => setStep(2)}
+                                    onClick={handleForgotPassword}
                                     disabled={
-                                        !name.trim() || 
                                         !email.includes('@') || 
-                                        password.length < 8 ||
-                                        !/[A-Z]/.test(password) ||
-                                        !/[0-9]/.test(password)
+                                        newPassword.length < 8 ||
+                                        !/[A-Z]/.test(newPassword) ||
+                                        !/[0-9]/.test(newPassword) ||
+                                        isLoading
                                     }
                                     className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
                                 >
-                                    Continue — Personalized Selection
+                                    {isLoading ? 'Resetting...' : 'Reset Password'}
                                 </button>
-                            )}
 
-                            {!isLogin && (
                                 <div className="mt-2 space-y-1">
-                                    <p className={`text-[10px] ${password.length >= 8 ? 'text-green-500' : 'text-pink-300'}`}>• At least 8 characters</p>
-                                    <p className={`text-[10px] ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one uppercase letter</p>
-                                    <p className={`text-[10px] ${/[0-9]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one digit</p>
+                                    <p className={`text-[10px] ${newPassword.length >= 8 ? 'text-green-500' : 'text-pink-300'}`}>• At least 8 characters</p>
+                                    <p className={`text-[10px] ${/[A-Z]/.test(newPassword) ? 'text-green-500' : 'text-pink-300'}`}>• At least one uppercase letter</p>
+                                    <p className={`text-[10px] ${/[0-9]/.test(newPassword) ? 'text-green-500' : 'text-pink-300'}`}>• At least one digit</p>
                                 </div>
-                            )}
 
-                            <div className="text-center pt-2">
-                                <button 
-                                    onClick={() => setIsLogin(!isLogin)}
-                                    className="text-[12px] text-pink-500 font-bold hover:underline"
-                                >
-                                    {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                                </button>
+                                <div className="text-center pt-2">
+                                    <button 
+                                        onClick={() => {
+                                            setIsForgotPassword(false);
+                                            setNewPassword('');
+                                        }}
+                                        className="text-[12px] text-pink-500 font-bold hover:underline"
+                                    >
+                                        Back to Sign In
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                                <div className="space-y-1">
+                                    <h1 className="text-[20px] font-black text-[#9D174D]">
+                                        {isLogin ? 'Sign in to account' : 'Create your account'}
+                                    </h1>
+                                    <p className="text-[12px] text-pink-400 font-medium">
+                                        {isLogin ? 'Welcome back, explorer!' : 'Join the community of explorers'}
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
+                                    {!isLogin && (
+                                        <input 
+                                            type="text" 
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            placeholder="Full Name"
+                                            className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
+                                        />
+                                    )}
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Email Address"
+                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
+                                    />
+                                    <input 
+                                        type="password" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder={isLogin ? "Password" : "Create Password (min 8 chars)"}
+                                        className="w-full bg-white border border-pink-100 rounded-[12px] px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-[#EC4899] transition-all"
+                                    />
+                                    {isLogin && (
+                                        <div className="text-right mt-1">
+                                            <button 
+                                                onClick={() => setIsForgotPassword(true)}
+                                                className="text-[11px] text-pink-500 font-bold hover:underline"
+                                            >
+                                                Forgot Password?
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {isLogin ? (
+                                    <button 
+                                        onClick={handleLogin}
+                                        disabled={!email.includes('@') || !password || isLoading}
+                                        className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
+                                    >
+                                        {isLoading ? 'Signing in...' : 'Sign In'}
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={() => setStep(2)}
+                                        disabled={
+                                            !name.trim() || 
+                                            !email.includes('@') || 
+                                            password.length < 8 ||
+                                            !/[A-Z]/.test(password) ||
+                                            !/[0-9]/.test(password)
+                                        }
+                                        className="w-full bg-[#EC4899] hover:bg-[#D81B60] text-white py-3.5 rounded-[12px] font-bold shadow-lg shadow-pink-500/20 transition-all disabled:opacity-50"
+                                    >
+                                        Continue — Personalized Selection
+                                    </button>
+                                )}
+
+                                {!isLogin && (
+                                    <div className="mt-2 space-y-1">
+                                        <p className={`text-[10px] ${password.length >= 8 ? 'text-green-500' : 'text-pink-300'}`}>• At least 8 characters</p>
+                                        <p className={`text-[10px] ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one uppercase letter</p>
+                                        <p className={`text-[10px] ${/[0-9]/.test(password) ? 'text-green-500' : 'text-pink-300'}`}>• At least one digit</p>
+                                    </div>
+                                )}
+
+                                <div className="text-center pt-2">
+                                    <button 
+                                        onClick={() => setIsLogin(!isLogin)}
+                                        className="text-[12px] text-pink-500 font-bold hover:underline"
+                                    >
+                                        {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                                    </button>
+                                </div>
+                            </div>
+                        )
                     )}
 
                     {step === 2 && (

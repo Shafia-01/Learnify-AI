@@ -26,6 +26,7 @@ from models.schemas import (
     LoginRequest,
     ProfileUpdateRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     UsernameCheckResponse,
 )
 
@@ -162,6 +163,46 @@ async def login(payload: LoginRequest, db: AsyncIOMotorDatabase = Depends(get_db
         access_token=token,
         user=AuthUserResponse(**user)
     )
+
+
+@router.post("/reset-password")
+async def reset_password(payload: ResetPasswordRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Reset user password.
+    
+    Validates email format, new password strength, and verifies that the email is registered.
+    """
+    # 1. Validate email format
+    if not re.match(EMAIL_REGEX, payload.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid email format"
+        )
+
+    # 2. Validate password strength
+    password = payload.new_password
+    if not any(c.isupper() for c in password) or not any(c.isdigit() for c in password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must contain at least one uppercase letter and one digit"
+        )
+
+    # 3. Check if user exists
+    user = await db["registered_users"].find_one({"email": payload.email.lower()})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No account registered with this email"
+        )
+
+    # 4. Update the password
+    new_hashed = hash_password(payload.new_password)
+    await db["registered_users"].update_one(
+        {"email": payload.email.lower()},
+        {"$set": {"hashed_password": new_hashed}}
+    )
+
+    return {"message": "Password updated successfully"}
 
 
 @router.post("/logout")

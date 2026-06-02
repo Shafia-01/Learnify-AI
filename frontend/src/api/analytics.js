@@ -6,9 +6,9 @@ import client from './client';
  * @param {string} userId
  * @returns {Promise<Object>}
  */
-export const getSessionStats = async (userId) => {
+export const getSessionStats = async (userId, days = 7) => {
   const uid = userId || localStorage.getItem('user_id') || 'default';
-  const response = await client.get(`/api/analytics/stats/${encodeURIComponent(uid)}`);
+  const response = await client.get(`/api/analytics/stats/${encodeURIComponent(uid)}?days=${days}`);
   return response.data;
 };
 

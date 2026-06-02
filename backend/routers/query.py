@@ -83,7 +83,7 @@ async def get_learning_path(
     try:
         query = {"user_id": user_id}
         if subject:
-            query["subject"] = subject
+            query["subject"] = subject.strip().title()
         cursor = db["chunks"].find(query).limit(50)
         docs = await cursor.to_list(length=50)
         chunk_texts = [doc["text"] for doc in docs if "text" in doc]
@@ -116,7 +116,7 @@ async def get_knowledge_graph(
     try:
         query = {"user_id": user_id}
         if subject:
-            query["subject"] = subject
+            query["subject"] = subject.strip().title()
         cursor = db["chunks"].find(query).limit(100)
         docs = await cursor.to_list(length=100)
         chunk_texts = [doc["text"] for doc in docs if "text" in doc]

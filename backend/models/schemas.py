@@ -178,6 +178,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ResetPasswordRequest(BaseModel):
+    """Request schema for resetting a user's password."""
+
+    email: str = Field(..., description="The registered email address")
+    new_password: str = Field(..., min_length=8, description="The new password")
+
+
+
 class AuthUserResponse(BaseModel):
     """User profile data safe for public/frontend consumption."""
 

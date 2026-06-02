@@ -56,3 +56,9 @@ export const checkUsername = async (username) => {
     const response = await client.get(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
     return response.data;
 };
+
+export const resetPassword = async (email, newPassword) => {
+    const response = await client.post('/api/auth/reset-password', { email, new_password: newPassword });
+    return response.data;
+};
+

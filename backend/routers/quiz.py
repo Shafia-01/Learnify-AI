@@ -29,7 +29,8 @@ class SubmitRequest(BaseModel):
 
 @router.post("/generate", response_model=List[QuizQuestion])
 async def generate_quiz(req: GenerateRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
-    questions = await select_next_questions(db, req.user_id, req.n, req.topic, req.subject, req.source_file)
+    sub = req.subject.strip().title() if req.subject else None
+    questions = await select_next_questions(db, req.user_id, req.n, req.topic, sub, req.source_file)
     return questions
 
 @router.post("/submit")
@@ -79,7 +80,14 @@ async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(g
         user_answer=req.user_answer,
         is_correct=is_correct
     )
-    await db["quiz_attempts"].insert_one(attempt.model_dump())
+    attempt_dict = attempt.model_dump()
+    if isinstance(attempt_dict.get("timestamp"), str):
+        from datetime import datetime
+        attempt_dict["timestamp"] = datetime.fromisoformat(attempt_dict["timestamp"].replace("Z", "+00:00"))
+    elif attempt_dict.get("timestamp") is None:
+        from datetime import datetime
+        attempt_dict["timestamp"] = datetime.utcnow()
+    await db["quiz_attempts"].insert_one(attempt_dict)
     
     # Update XP and check badges via gamification engine
     from gamification.xp_engine import award_xp

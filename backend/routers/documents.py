@@ -1,7 +1,11 @@
+import re
+import logging
 from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Header, Query, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from database import get_db
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -25,7 +29,8 @@ async def get_documents(
     # Structure: { subject_name: [file1, file2] }
     library = {}
     for doc in results:
-        sub = doc["_id"].get("subject") or "Uncategorized"
+        sub = doc["_id"].get("subject")
+        sub = sub.strip().title() if sub else "Uncategorized"
         filename = doc["_id"].get("source_file") or "Unknown"
         
         if sub not in library:
@@ -48,26 +53,36 @@ async def delete_documents(
     """
     Delete chunks for a specific subject, and optionally a specific document within it.
     """
+    logger.info("Delete request received for user_id=%s, subject=%s, filename=%s", user_id, subject, filename)
     query = {"user_id": user_id}
     
     if subject != "Uncategorized":
-        query["subject"] = subject
+        query["subject"] = {"$regex": f"^{re.escape(subject.strip())}$", "$options": "i"}
     else:
-        query["subject"] = {"$in": [None, ""]}
+        query["subject"] = {"$in": [None, "", "Uncategorized"]}
         
     if filename:
-        query["source_file"] = filename
+        if filename != "Unknown":
+            query["source_file"] = {"$regex": f"^{re.escape(filename.strip())}$", "$options": "i"}
+        else:
+            query["source_file"] = {"$in": [None, "", "Unknown"]}
         
     # Retrieve chunk_ids to remove from FAISS index
     cursor = db["chunks"].find(query, {"chunk_id": 1})
     chunks_to_delete = await cursor.to_list(length=None)
     chunk_ids = [c["chunk_id"] for c in chunks_to_delete if "chunk_id" in c]
     
+    logger.info("Found %d chunks to delete for query: %s", len(chunk_ids), query)
+    
     result = await db["chunks"].delete_many(query)
     
     # Remove vectors from FAISS index
     if chunk_ids:
         from vector_store import remove_from_index
-        remove_from_index(chunk_ids)
+        try:
+            remove_from_index(chunk_ids)
+            logger.info("Successfully removed %d chunks from FAISS index", len(chunk_ids))
+        except Exception as exc:
+            logger.exception("Failed to remove chunks from FAISS index: %s", exc)
         
     return {"message": "deleted", "deleted_count": result.deleted_count}

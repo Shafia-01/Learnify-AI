@@ -129,6 +129,9 @@ async def upload_file(
     db: AsyncIOMotorDatabase = Depends(get_db),
     user_id: str = Header(default="anonymous", alias="user_id"),
 ) -> Dict[str, Any]:
+    if subject:
+        subject = subject.strip().title()
+
     """
     Ingest a document file (PDF, PPT, PPTX, or TXT) into the learning system.
 

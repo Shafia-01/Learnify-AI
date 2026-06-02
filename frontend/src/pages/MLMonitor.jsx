@@ -1,6 +1,33 @@
+import { useState, useEffect } from 'react';
 import EmotionPanel from '../components/EmotionPanel';
+import client from '../api/client';
 
 const MLMonitor = () => {
+    const userId = localStorage.getItem('user_id') || 'default';
+    const [telemetry, setTelemetry] = useState({
+        focus_score: 92,
+        deep_work_minutes: 42,
+        interventions: 2,
+        fatigue_alerts: 0,
+        is_demo: true
+    });
+
+    useEffect(() => {
+        const fetchTelemetry = async () => {
+            try {
+                const res = await client.get(`/api/analytics/ml-telemetry/${userId}`);
+                setTelemetry(res.data);
+            } catch (err) {
+                console.error("Failed to fetch ML telemetry", err);
+            }
+        };
+
+        fetchTelemetry();
+        const interval = setInterval(fetchTelemetry, 3000); // refresh every 3 seconds
+
+        return () => clearInterval(interval);
+    }, [userId]);
+
     return (
         <div className="max-w-6xl mx-auto space-y-8 py-4">
             <header className="flex flex-col gap-2">
@@ -57,23 +84,49 @@ const MLMonitor = () => {
 
             {/* Analysis Stats */}
             <div className="card p-6 bg-white border border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">ML Telemetry (Historical / Demo Stats)</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-bold text-gray-900">
+                        ML Telemetry {telemetry.is_demo ? "(Historical / Demo Stats)" : "(Real-time Stats)"}
+                    </h2>
+                    {!telemetry.is_demo && (
+                        <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold animate-pulse">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            LIVE UPDATING
+                        </span>
+                    )}
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div className="text-center p-4 bg-purple-50 rounded-xl">
-                        <div className="text-3xl font-mono font-bold text-purple-600">92%</div>
-                        <div className="text-xs text-purple-800 uppercase tracking-widest mt-1 font-bold">Focus Score (Demo)</div>
+                        <div className="text-3xl font-mono font-bold text-purple-600">
+                            {telemetry.focus_score}%
+                        </div>
+                        <div className="text-xs text-purple-800 uppercase tracking-widest mt-1 font-bold">
+                            Focus Score
+                        </div>
                     </div>
                     <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                        <div className="text-3xl font-mono font-bold text-emerald-600">42m</div>
-                        <div className="text-xs text-emerald-800 uppercase tracking-widest mt-1 font-bold">Deep Learning (Demo)</div>
+                        <div className="text-3xl font-mono font-bold text-emerald-600">
+                            {telemetry.deep_work_minutes}m
+                        </div>
+                        <div className="text-xs text-emerald-800 uppercase tracking-widest mt-1 font-bold">
+                            Deep Learning
+                        </div>
                     </div>
                     <div className="text-center p-4 bg-amber-50 rounded-xl">
-                        <div className="text-3xl font-mono font-bold text-amber-600">2</div>
-                        <div className="text-xs text-amber-800 uppercase tracking-widest mt-1 font-bold">Interventions (Demo)</div>
+                        <div className="text-3xl font-mono font-bold text-amber-600">
+                            {telemetry.interventions}
+                        </div>
+                        <div className="text-xs text-amber-800 uppercase tracking-widest mt-1 font-bold">
+                            Interventions
+                        </div>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-xl">
-                        <div className="text-3xl font-mono font-bold text-blue-600">0</div>
-                        <div className="text-xs text-blue-800 uppercase tracking-widest mt-1 font-bold">Fatigue Alerts (Demo)</div>
+                        <div className="text-3xl font-mono font-bold text-blue-600">
+                            {telemetry.fatigue_alerts}
+                        </div>
+                        <div className="text-xs text-blue-800 uppercase tracking-widest mt-1 font-bold">
+                            Fatigue Alerts
+                        </div>
                     </div>
                 </div>
             </div>

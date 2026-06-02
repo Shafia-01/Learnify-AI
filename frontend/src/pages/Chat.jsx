@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { askQuestion, getLearningPath, getKnowledgeGraph } from '../api/query';
 import { speakTextFetch, transcribeAudio } from '../api/voice';
 import { getSessionStats } from '../api/analytics';
@@ -421,6 +421,16 @@ const Chat = () => {
                                     </div>
                                 </div>
                             )}
+
+                            <div className="text-center pt-2">
+                                <Link 
+                                    to="/analytics" 
+                                    className="inline-flex items-center gap-1.5 text-[12px] font-extrabold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors"
+                                >
+                                    For a detailed progress report click on "Analytics Page"
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </Link>
+                            </div>
                         </div>
                     )}
                 </div>

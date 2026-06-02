@@ -8,12 +8,14 @@ import {
 const AnalyticsPage = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [days, setDays] = useState(7);
     const userId = localStorage.getItem('user_id') || 'default';
 
     useEffect(() => {
         const fetchStats = async () => {
+            setLoading(true);
             try {
-                const stats = await getSessionStats(userId);
+                const stats = await getSessionStats(userId, days);
                 setData(stats);
             } catch (err) {
                 console.error("Failed to fetch analytics", err);
@@ -22,7 +24,7 @@ const AnalyticsPage = () => {
             }
         };
         fetchStats();
-    }, [userId]);
+    }, [userId, days]);
 
     if (loading) {
         return (
@@ -48,13 +50,30 @@ const AnalyticsPage = () => {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 animate-page-enter pb-12">
-            <header className="flex justify-between items-end">
+            <header className="flex justify-between items-end flex-wrap gap-4">
                 <div>
                     <h1 className="text-[24px] font-black text-gray-900 tracking-tight">Performance Analytics</h1>
                     <p className="text-[14px] text-gray-900 font-medium">Tracking your growth and learning efficiency</p>
                 </div>
-                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-[12px] font-bold text-gray-900 uppercase">
-                    Last 7 Days
+                <div className="flex gap-1.5 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
+                    {[
+                        { label: '7 Days', value: 7 },
+                        { label: '15 Days', value: 15 },
+                        { label: '1 Month', value: 30 },
+                        { label: '3 Months', value: 90 }
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => setDays(option.value)}
+                            className={`px-3 py-1.5 rounded-xl text-[12px] font-extrabold uppercase transition-all duration-200 ${
+                                days === option.value 
+                                ? 'bg-purple-600 text-white shadow-md shadow-purple-200' 
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
                 </div>
             </header>
 
