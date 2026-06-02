@@ -7,7 +7,7 @@ sdk: docker
 pinned: false
 ---
 
-# 🧠 Learnify AI
+# 🧠 LEARNIFY AI
 
 **An adaptive, multimodal AI learning platform that turns your study materials into a personalized tutor.**
 
