@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Onboarding from './pages/Onboarding';
 import Upload from './pages/Upload';
@@ -15,10 +15,13 @@ import client from './api/client';
 import Layout from './components/Layout';
 import { ToastProvider } from './context/ToastContext';
 import { logEvent } from './api/analytics';
+import SplashScreen from './components/SplashScreen';
 
 import MLMonitor from './pages/MLMonitor';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   useEffect(() => {
     // Migration: Remove defunct model names from localStorage
     if (localStorage.getItem('model') === 'gemini-3.1-flash-lite') {
@@ -69,6 +72,7 @@ function App() {
 
   return (
     <ToastProvider>
+      {showSplash && <SplashScreen onFadeComplete={() => setShowSplash(false)} />}
       <BrowserRouter>
         <Layout>
         <Routes>

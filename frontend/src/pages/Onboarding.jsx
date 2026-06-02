@@ -90,7 +90,7 @@ const Onboarding = () => {
                 {/* Logo & Step Indicator */}
                 <div className="text-center space-y-6">
                     <div className="text-2xl font-black text-[#EC4899] tracking-tighter flex items-center justify-center gap-2">
-                        <div className="w-8 h-8 bg-[#EC4899] rounded-lg flex items-center justify-center text-white text-sm">L</div>
+                        <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-9 h-9 object-contain" />
                         Learnify AI
                     </div>
                     <div className="flex gap-2 justify-center">
