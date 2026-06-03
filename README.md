@@ -21,6 +21,12 @@ pinned: false
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19" />
 </p>
 
+<p align="center">
+  <a href="https://your-video-link-here.com" target="_blank">
+    <img src="https://img.shields.io/badge/Demo%20Video-Play-red?style=for-the-badge&logo=youtube" alt="Demo Video" />
+  </a>
+</p>
+
 **Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials (PDFs, PPTs, TXTs) into an interactive, voice-enabled, and emotion-aware personal tutor. Driven by a level-adaptive RAG pipeline and a suite of interactive educational mini-games, the system continuously adjusts to each student’s cognitive and emotional states in real-time. Deployable completely offline for total data privacy, it offers hot-swappable multi-LLM orchestration with no server downtime.**
 
 ---
