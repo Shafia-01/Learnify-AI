@@ -94,7 +94,7 @@ const Onboarding = () => {
                         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
                             <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
                         </div>
-                        <span className="text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Learnify <span className="text-[#EC4899]">AI</span></span>
+                        <span className="text-[#EC4899]">Learnify AI</span>
                     </div>
                     <div className="flex gap-2 justify-center">
                         {steps.map((s) => (

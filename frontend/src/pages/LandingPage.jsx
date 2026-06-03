@@ -240,7 +240,7 @@ const LandingPage = () => {
               <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-6 h-6 object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-black tracking-tight text-white">Learnify AI</span>
+              <span className="text-sm font-black tracking-tight text-white">Learnify <span className="text-[#EC4899]">AI</span></span>
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AI That Learns How You Learn</span>
             </div>
           </div>
