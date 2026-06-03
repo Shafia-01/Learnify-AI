@@ -35,21 +35,21 @@ const features = [
     title: "Smart Knowledge Retrieval",
     description: "RAG-powered contextual answers grounded in your uploaded study material.",
     icon: (
-      <svg className="w-6 h-6 text-[#14B8A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#0D9488]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
     ),
-    color: "bg-[#E0F4F1] border-[#14B8A6]/30 hover:border-[#14B8A6] hover:shadow-[#14B8A6]/20"
+    color: "bg-[#CCFBF1] border-[#0D9488]/30 hover:border-[#0D9488] hover:shadow-[#0D9488]/20"
   },
   {
     title: "Learning Analytics",
     description: "Visual dashboards tracking performance, accuracy trends, weak topics, and study velocity.",
     icon: (
-      <svg className="w-6 h-6 text-[#3B82F6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ),
-    color: "bg-[#E0F1FC] border-[#60A5FA]/30 hover:border-[#60A5FA] hover:shadow-[#60A5FA]/20"
+    color: "bg-[#DCEEFE] border-[#2563EB]/30 hover:border-[#2563EB] hover:shadow-[#2563EB]/20"
   },
   {
     title: "Gamified Learning",
@@ -101,7 +101,7 @@ const LandingPage = () => {
         </div>
         <button 
           onClick={handleSignIn}
-          className="text-sm font-bold text-gray-300 hover:text-white px-5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+          className="text-sm font-bold px-6 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-[#EC4899] text-white shadow-md shadow-pink-500/20 hover:shadow-pink-500/35 hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer"
         >
           Sign In
         </button>
