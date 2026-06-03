@@ -12,6 +12,7 @@ pinned: false
 </p>
 
 <h1 align="center">LEARNIFY AI</h1>
+<p align="center"><strong>AI That Learns How You Learn</strong></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11+-blue" alt="Python" />
