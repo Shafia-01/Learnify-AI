@@ -5,71 +5,71 @@ const features = [
     title: "Intelligent Tutoring",
     description: "AI-powered tutoring that adapts in real time to each learner's level and pace.",
     icon: (
-      <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#7C3AED]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
       </svg>
     ),
-    color: "from-purple-500/10 to-indigo-500/5 hover:border-purple-500/30"
+    color: "bg-[#EAE2FC] border-[#8B5CF6]/30 hover:border-[#8B5CF6] hover:shadow-[#8B5CF6]/20"
   },
   {
     title: "Multimodal Learning",
     description: "Learn from PDFs, PPTs, and text with quiz generation, knowledge graphs, and analytics.",
     icon: (
-      <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#F97316]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    color: "from-emerald-500/10 to-teal-500/5 hover:border-emerald-500/30"
+    color: "bg-[#FCECE5] border-[#F97316]/30 hover:border-[#F97316] hover:shadow-[#F97316]/20"
   },
   {
     title: "Emotion-Aware Assistance",
     description: "Affective computing via webcam detects confusion, fatigue, and frustration to adapt responses.",
     icon: (
-      <svg className="w-6 h-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#EC4899]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    color: "from-pink-500/10 to-rose-500/5 hover:border-pink-500/30"
+    color: "bg-[#FCE5F3] border-[#F472B6]/30 hover:border-[#F472B6] hover:shadow-[#F472B6]/20"
   },
   {
     title: "Smart Knowledge Retrieval",
     description: "RAG-powered contextual answers grounded in your uploaded study material.",
     icon: (
-      <svg className="w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#14B8A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
     ),
-    color: "from-orange-500/10 to-amber-500/5 hover:border-orange-500/30"
+    color: "bg-[#E0F4F1] border-[#14B8A6]/30 hover:border-[#14B8A6] hover:shadow-[#14B8A6]/20"
   },
   {
     title: "Learning Analytics",
     description: "Visual dashboards tracking performance, accuracy trends, weak topics, and study velocity.",
     icon: (
-      <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#3B82F6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ),
-    color: "from-blue-500/10 to-cyan-500/5 hover:border-blue-500/30"
+    color: "bg-[#E0F1FC] border-[#60A5FA]/30 hover:border-[#60A5FA] hover:shadow-[#60A5FA]/20"
   },
   {
     title: "Gamified Learning",
     description: "XP points, badges, streaks, leaderboards, and 6 AI-powered mini-games.",
     icon: (
-      <svg className="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#EAB308]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm-2 4h4M5 13a2 2 0 100-4 2 2 0 000 4zm14 0a2 2 0 100-4 2 2 0 000 4z" />
       </svg>
     ),
-    color: "from-yellow-500/10 to-amber-500/5 hover:border-yellow-500/30"
+    color: "bg-[#FBF8D3] border-[#EAB308]/30 hover:border-[#EAB308] hover:shadow-[#EAB308]/20"
   },
   {
     title: "AI Study Companion",
     description: "A personalized AI mentor available at every step, in your preferred language.",
     icon: (
-      <svg className="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-6 h-6 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
     ),
-    color: "from-cyan-500/10 to-teal-500/5 hover:border-cyan-500/30"
+    color: "bg-[#EAF5DB] border-[#84CC16]/30 hover:border-[#84CC16] hover:shadow-[#84CC16]/20"
   }
 ];
 
@@ -153,7 +153,7 @@ const LandingPage = () => {
       {/* Features Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 relative z-10 border-t border-white/5">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-black tracking-tight">
+          <h2 className="text-3xl font-black tracking-tight text-white">
             Intelligent Features for <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-400">Next-Gen Education</span>
           </h2>
           <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mt-2">
@@ -165,25 +165,25 @@ const LandingPage = () => {
           {features.slice(0, 6).map((feat, index) => (
             <div 
               key={index} 
-              className={`p-6 rounded-2xl bg-gradient-to-b border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 ${feat.color}`}
+              className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${feat.color}`}
             >
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-5 border border-white/10">
+              <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center mb-5 border border-black/5 shadow-sm">
                 {feat.icon}
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{feat.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{feat.description}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{feat.title}</h3>
+              <p className="text-gray-700 text-sm leading-relaxed">{feat.description}</p>
             </div>
           ))}
         </div>
 
         <div className="flex justify-center mt-6">
           <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
-            <div className={`p-6 rounded-2xl bg-gradient-to-b border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 ${features[6].color}`}>
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-5 border border-white/10">
+            <div className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${features[6].color}`}>
+              <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center mb-5 border border-black/5 shadow-sm">
                 {features[6].icon}
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{features[6].title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{features[6].description}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{features[6].title}</h3>
+              <p className="text-gray-700 text-sm leading-relaxed">{features[6].description}</p>
             </div>
           </div>
         </div>
