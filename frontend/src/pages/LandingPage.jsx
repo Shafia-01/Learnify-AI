@@ -93,7 +93,7 @@ const LandingPage = () => {
       <nav className="w-full max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
-            <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
+            <img src="/learnify-logo.webp" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
           </div>
           <span className="text-xl font-black text-white tracking-tighter">
             Learnify <span className="text-[#EC4899]">AI</span>
@@ -120,7 +120,7 @@ const LandingPage = () => {
           <div className="absolute -inset-10 bg-[#EC4899]/25 rounded-full blur-3xl group-hover:bg-[#EC4899]/35 transition-all duration-700"></div>
           <div className="w-36 h-36 md:w-44 md:h-44 rounded-full bg-white flex items-center justify-center p-4 shadow-2xl relative z-10 hover:scale-105 transition-all duration-500">
             <img 
-              src="/learnify-logo.png" 
+              src="/learnify-logo.webp" 
               alt="Learnify AI logo" 
               className="w-full h-full object-contain" 
             />
@@ -237,7 +237,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1 shadow-md">
-              <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-6 h-6 object-contain" />
+              <img src="/learnify-logo.webp" alt="Learnify AI Logo" className="w-6 h-6 object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-black tracking-tight text-white">Learnify <span className="text-[#EC4899]">AI</span></span>

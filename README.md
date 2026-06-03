@@ -8,7 +8,7 @@ pinned: false
 ---
 
 <p align="center">
-  <img src="frontend/public/learnify-logo.png" alt="Learnify AI Logo" width="200" />
+  <img src="frontend/public/learnify-logo.webp" alt="Learnify AI Logo" width="200" />
 </p>
 
 <h3 align="center"><strong>LEARNIFY AI</strong></h3>

@@ -29,7 +29,7 @@ const SplashScreen = ({ onFadeComplete }) => {
                 {/* Logo Image */}
                 <div className="w-36 h-36 md:w-48 md:h-48 rounded-full bg-white flex items-center justify-center p-4 shadow-2xl relative z-10 animate-[bounceIn_1s_ease-out_forwards]">
                     <img 
-                        src="/learnify-logo.png" 
+                        src="/learnify-logo.webp" 
                         alt="Learnify AI Logo" 
                         className="w-full h-full object-contain"
                     />

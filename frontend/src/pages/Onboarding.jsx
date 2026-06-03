@@ -92,7 +92,7 @@ const Onboarding = () => {
                 <div className="text-center space-y-6">
                     <div className="text-2xl font-black tracking-tighter flex items-center justify-center gap-2">
                         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
-                            <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
+                            <img src="/learnify-logo.webp" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
                         </div>
                         <span className="text-[#EC4899]">Learnify AI</span>
                     </div>

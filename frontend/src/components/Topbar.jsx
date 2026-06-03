@@ -33,7 +33,7 @@ const Topbar = () => {
       {/* Center: Learnify AI Branding */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 select-none group pointer-events-none">
         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
-          <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain group-hover:rotate-12 transition-all duration-500" />
+          <img src="/learnify-logo.webp" alt="Learnify AI Logo" className="w-7 h-7 object-contain group-hover:rotate-12 transition-all duration-500" />
         </div>
         <div className="flex flex-col items-start leading-none gap-0.5">
             <span className="text-[20px] font-black text-white tracking-tighter">Learnify <span className="text-[#EC4899]">AI</span></span>
