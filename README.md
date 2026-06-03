@@ -11,7 +11,7 @@ pinned: false
   <img src="frontend/public/learnify-logo.png" alt="Learnify AI Logo" width="200" />
 </p>
 
-<h1 align="center">LEARNIFY AI</h1>
+<h3 align="center"><strong>LEARNIFY AI</strong></h3>
 <p align="center"><strong>AI That Learns How You Learn</strong></p>
 
 <p align="center">
