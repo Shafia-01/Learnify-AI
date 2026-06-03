@@ -32,7 +32,9 @@ const Topbar = () => {
 
       {/* Center: Learnify AI Branding */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 select-none group pointer-events-none">
-        <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-8 h-8 object-contain group-hover:rotate-12 transition-all duration-500" />
+        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
+          <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain group-hover:rotate-12 transition-all duration-500" />
+        </div>
         <div className="flex flex-col items-start leading-none gap-0.5">
             <span className="text-[20px] font-black text-[#EC4899] tracking-tighter">Learnify AI</span>
             <span className="text-[9px] font-bold text-pink-400/60 uppercase tracking-[0.2em] ml-0.5">Live Learning</span>
@@ -54,6 +56,16 @@ const Topbar = () => {
                 {provider} · {model}
             </span>
         </div>
+        
+        <button 
+            onClick={() => {
+                localStorage.clear();
+                window.location.href = '/';
+            }}
+            className="text-xs font-bold bg-white/5 hover:bg-red-500/20 text-white hover:text-red-400 px-3 py-1.5 rounded-xl border border-white/10 hover:border-red-500/30 transition-all cursor-pointer"
+        >
+            Sign Out
+        </button>
         
         <Avatar name={name} size="lg" />
       </div>

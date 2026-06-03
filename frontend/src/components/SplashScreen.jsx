@@ -4,15 +4,15 @@ const SplashScreen = ({ onFadeComplete }) => {
     const [fadeOut, setFadeOut] = useState(false);
 
     useEffect(() => {
-        // Start fading out after 2.2 seconds
+        // Start fading out after 1.8 seconds (giving 700ms transition to hit 2.5 seconds total)
         const fadeTimer = setTimeout(() => {
             setFadeOut(true);
-        }, 2200);
+        }, 1800);
 
-        // Notify parent when fade transition ends (matching CSS duration-700)
+        // Notify parent when fade transition ends at 2.5 seconds
         const completeTimer = setTimeout(() => {
             if (onFadeComplete) onFadeComplete();
-        }, 2900);
+        }, 2500);
 
         return () => {
             clearTimeout(fadeTimer);
@@ -24,22 +24,24 @@ const SplashScreen = ({ onFadeComplete }) => {
         <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-[#0d0d0d] via-[#1a0b12] to-[#0d0d0d] transition-all duration-700 ${fadeOut ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100'}`}>
             <div className="relative flex flex-col items-center space-y-6">
                 {/* Glow effect behind the logo */}
-                <div className="absolute -inset-10 bg-[#EC4899]/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -inset-10 bg-[#EC4899]/25 rounded-full blur-3xl animate-[pulse_2s_infinite]"></div>
                 
                 {/* Logo Image */}
-                <img 
-                    src="/learnify-logo.png" 
-                    alt="Learnify AI Logo" 
-                    className="w-28 h-28 md:w-36 md:h-36 object-contain relative z-10 animate-[bounceIn_1s_ease-out_forwards]"
-                />
+                <div className="w-36 h-36 md:w-48 md:h-48 rounded-full bg-white flex items-center justify-center p-4 shadow-2xl relative z-10 animate-[bounceIn_1s_ease-out_forwards]">
+                    <img 
+                        src="/learnify-logo.png" 
+                        alt="Learnify AI Logo" 
+                        className="w-full h-full object-contain"
+                    />
+                </div>
 
                 {/* App Name */}
                 <div className="text-center relative z-10">
                     <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter flex items-center justify-center gap-1.5">
                         Learnify <span className="text-[#EC4899]">AI</span>
                     </h1>
-                    <p className="text-[11px] font-bold text-pink-400/60 uppercase tracking-[0.25em] mt-2">
-                        Next-Gen Personalized Learning
+                    <p className="text-[11px] font-bold text-pink-400/80 uppercase tracking-[0.2em] mt-2">
+                        AI That Learns How You Learn
                     </p>
                 </div>
 

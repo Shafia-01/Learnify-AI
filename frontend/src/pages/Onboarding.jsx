@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { register, login, resetPassword } from '../api/auth';
 import { useToast } from '../context/ToastContext';
 
 const Onboarding = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -12,7 +13,7 @@ const Onboarding = () => {
     const [level, setLevel] = useState('Intermediate');
     const [language, setLanguage] = useState('English');
     const [isLoading, setIsLoading] = useState(false);
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin, setIsLogin] = useState(location.state?.isLogin || false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const { addToast } = useToast();
@@ -90,7 +91,9 @@ const Onboarding = () => {
                 {/* Logo & Step Indicator */}
                 <div className="text-center space-y-6">
                     <div className="text-2xl font-black text-[#EC4899] tracking-tighter flex items-center justify-center gap-2">
-                        <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-9 h-9 object-contain" />
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-md">
+                            <img src="/learnify-logo.png" alt="Learnify AI Logo" className="w-7 h-7 object-contain" />
+                        </div>
                         Learnify AI
                     </div>
                     <div className="flex gap-2 justify-center">

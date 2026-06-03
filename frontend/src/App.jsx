@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
 import Onboarding from './pages/Onboarding';
 import Upload from './pages/Upload';
 import Chat from './pages/Chat';
@@ -18,6 +19,28 @@ import { logEvent } from './api/analytics';
 import SplashScreen from './components/SplashScreen';
 
 import MLMonitor from './pages/MLMonitor';
+
+const LayoutWrapper = () => {
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
+};
+
+const checkToken = () => {
+  const token = localStorage.getItem('token');
+  return !!(token && token !== 'undefined' && token !== 'null' && token.trim() !== '');
+};
+
+const HomeRedirect = () => {
+  return checkToken() ? <Navigate to="/dashboard" replace /> : <LandingPage />;
+};
+
+const OnboardingRedirect = () => {
+  const token = localStorage.getItem('token');
+  return token ? <Navigate to="/dashboard" replace /> : <Layout><Onboarding /></Layout>;
+};
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -74,24 +97,30 @@ function App() {
     <ToastProvider>
       {showSplash && <SplashScreen onFadeComplete={() => setShowSplash(false)} />}
       <BrowserRouter>
-        <Layout>
         <Routes>
-          <Route path="/" element={<Navigate to="/onboarding" />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/games" element={<Games />} />
-          <Route path="/games/:gameId" element={<GamePlaceholder />} />
-          <Route path="/knowledge-graph" element={<KnowledgePage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/ml-monitor" element={<MLMonitor />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* Public Routes without Layout */}
+          <Route path="/" element={<HomeRedirect />} />
+          <Route path="/onboarding" element={<OnboardingRedirect />} />
+
+          {/* Authenticated Routes with shared Layout */}
+          <Route element={<LayoutWrapper />}>
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/games" element={<Games />} />
+            <Route path="/games/:gameId" element={<GamePlaceholder />} />
+            <Route path="/knowledge-graph" element={<KnowledgePage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/ml-monitor" element={<MLMonitor />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+          
+          {/* Catch-all fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Layout>
-    </BrowserRouter>
+      </BrowserRouter>
     </ToastProvider>
   );
 }
