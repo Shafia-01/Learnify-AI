@@ -25,7 +25,7 @@ pinned: false
 
 ---
 
-## Feature Matrix
+### Feature Matrix
 
 | Feature | Description | Status |
 |---|---|---|
@@ -47,7 +47,7 @@ pinned: false
 
 ---
 
-## Why This Tech Stack?
+### Why This Tech Stack?
 
 | Layer | Chosen Technology | Rejected Alternatives | Technical Rationale & Trade-offs |
 |---|---|---|---|
@@ -63,7 +63,7 @@ pinned: false
 
 ---
 
-## Problems Solved & Technical Decisions
+### Problems Solved & Technical Decisions
 
 1. **LLM Provider Hot-Swapping without Server Restart**
    - **Problem**: Switching between Gemini, Groq, and Ollama typically requires restarts or configuration modifications.
@@ -117,7 +117,7 @@ pinned: false
 
 ---
 
-## System Architecture
+### System Architecture
 
 Learnify AI leverages a decoupled, event-driven architecture split into two primary pipelines.
 
@@ -148,7 +148,7 @@ graph TD
 
 ---
 
-## Prerequisites
+### Prerequisites
 
 - **Python 3.11+**
 - **Node.js 20+**
@@ -157,9 +157,9 @@ graph TD
 
 ---
 
-## Getting Started
+### Getting Started
 
-### Quick Start
+#### Quick Start
 
 ```bash
 git clone https://github.com/Shafia-01/Learnify-AI.git
@@ -169,7 +169,7 @@ cp backend/.env.example backend/.env
 npm install --prefix frontend && pip install -r backend/requirements.txt
 ```
 
-### 1. Backend Setup
+#### 1. Backend Setup
 
 ```bash
 cd backend
@@ -181,7 +181,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Frontend Setup
+#### 2. Frontend Setup
 
 ```bash
 cd frontend
@@ -189,7 +189,7 @@ cp .env.example .env
 npm install
 ```
 
-### 3. Running Locally
+#### 3. Running Locally
 
 Open **two separate terminals**:
 
@@ -207,9 +207,9 @@ npm run dev
 
 ---
 
-## Environment Variables
+### Environment Variables
 
-### Backend (`backend/.env`)
+#### Backend (`backend/.env`)
 
 | Variable | Description | Default | Required? |
 |---|---|---|---|
@@ -220,7 +220,7 @@ npm run dev
 | `FAISS_INDEX_PATH` | Path to FAISS index | `./faiss_index` | Optional |
 | `PRIVACY_MODE` | Enable offline mode | `false` | Optional |
 
-### Frontend (`frontend/.env`)
+#### Frontend (`frontend/.env`)
 
 | Variable | Description | Default | Required? |
 |---|---|---|---|
@@ -228,7 +228,7 @@ npm run dev
 
 ---
 
-## API Reference
+### API Reference
 
 | Endpoint Prefix | Purpose | Key Sub-Endpoints / Operations |
 |---|---|---|
@@ -245,7 +245,7 @@ npm run dev
 
 ---
 
-## Known Limitations
+### Known Limitations
 
 - **Ollama Privacy Mode**: Requires a locally configured and active Ollama instance. It is unavailable on environments lacking local compute resources (e.g. Hugging Face Spaces or Serverless Cloud runtimes).
 - **Compute Overhead**: Local Whisper speech-to-text models and OpenCV/DeepFace emotion analysis run heavily on local CPU/RAM. Performance will degrade on low-end machines.
@@ -255,6 +255,6 @@ npm run dev
 
 ---
 
-## License
+### License
 
-MIT License — Educational Use
+MIT License - Educational Use
