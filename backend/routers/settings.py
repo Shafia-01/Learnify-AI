@@ -81,14 +81,14 @@ async def list_providers():
         {
             "id": "gemini",
             "name": "Google Gemini",
-            "models": ["gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"],
+            "models": ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
             "requires_key": True,
             "status": "available" if settings.GEMINI_API_KEY else "unavailable"
         },
         {
             "id": "groq",
             "name": "Groq LLaMA 3",
-            "models": ["llama-3.1-8b-instant", "llama3-70b-8192"],
+            "models": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
             "requires_key": True,
             "status": "available" if settings.GROQ_API_KEY else "unavailable"
         },

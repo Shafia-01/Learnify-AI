@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Modifiable at runtime to allow provider hot-swapping
 runtime_config = {
     "provider": "groq",  # default to groq during development
-    "gemini_model": "gemini-2.0-flash-lite",
+    "gemini_model": "gemini-2.5-flash-lite",
     "groq_model": "llama-3.1-8b-instant",
     "ollama_model": "llama3",
     "privacy_mode": settings.PRIVACY_MODE
@@ -44,9 +44,13 @@ def set_provider(provider: str, model: str = None) -> Dict[str, str]:
     runtime_config["provider"] = provider
 
     if model:
-        # Fallback for defunct model names
-        if model == "gemini-3.1-flash-lite":
-            model = "gemini-2.0-flash-lite"
+        # Fallback for defunct/discontinued model names
+        if model in ("gemini-3.1-flash-lite", "gemini-2.0-flash-lite", "gemini-2.0-flash-lite-001", "gemini-1.5-flash"):
+            model = "gemini-2.5-flash-lite"
+        elif model in ("gemini-2.0-flash", "gemini-2.0-flash-001", "gemini-1.5-pro"):
+            model = "gemini-2.5-flash"
+        elif model == "llama3-70b-8192":
+            model = "llama-3.3-70b-versatile"
             
         if provider == "gemini":
             runtime_config["gemini_model"] = model
