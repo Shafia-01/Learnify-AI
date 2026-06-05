@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     # ── Optional overrides ───────────────────────────────────────────
     APP_NAME: str = "Learnify AI"
     DEBUG: bool = True
+    ALLOWED_ORIGINS: str = "*"
 
     # ── JWT Authentication ───────────────────────────────────────────
     JWT_SECRET_KEY: str = ""
