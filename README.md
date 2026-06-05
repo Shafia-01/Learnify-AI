@@ -43,7 +43,7 @@ pinned: false
 | **Gamification** | Granular event-based XP system, streaks, and badges (*Week Warrior*, *Century Scholar*, *Knowledge Knight*, *Learning Legend*). | ✅ Active |
 | **6 Content-Driven Mini-Games** | *Snake Quiz*, *Tic-Tac-Toe vs AI*, *Memory Match*, *Word Scramble*, *Falling Quiz*, and *Flashcard Flip* powered by uploaded material. | ✅ Active |
 | **Privacy Mode** | Forces local offline LLM routing via Ollama, throwing a `RuntimeError` immediately if cloud fallbacks are attempted. | ✅ Active |
-| **Runtime Multi-LLM Swap** | Hot-swap between Google Gemini 2.0, Groq LLaMA 3, and Ollama at runtime without restarting the server. | ✅ Active |
+| **Runtime Multi-LLM Swap** | Hot-swap between Google Gemini (2.5/2.0), Groq LLaMA (3.3/3.1), and Ollama at runtime without restarting the server. | ✅ Active |
 | **Zero-API Multilingualism** | Prompt-driven language switching that bypasses dedicated translation APIs. | ✅ Active |
 | **Learning Goals Tracker** | Deadline-driven milestones, concept completion rates, and AI-generated study plans cached for 24 hours. | ✅ Active |
 | **Document Library** | Subject-grouped document organization with vector deletions synced instantly to FAISS index. | ✅ Active |
@@ -71,10 +71,10 @@ pinned: false
 
 ### Problems Solved & Technical Decisions
 
-1. **LLM Provider Hot-Swapping without Server Restart**
-   - **Problem**: Switching between Gemini, Groq, and Ollama typically requires restarts or configuration modifications.
-   - **Solution**: Implemented a global mutable singleton `runtime_config` mapping current settings. The API endpoint changes providers via `set_provider()`, and all downstream LLM invocations dynamically resolve the configuration through the model factory `get_llm()`.
-   - **Files & Functions**: [`backend/rag/llm_provider.py`](backend/rag/llm_provider.py) (`get_llm()`, `set_provider()`, `runtime_config`), [`backend/routers/settings.py`](backend/routers/settings.py).
+1. **LLM Provider Hot-Swapping and User-Specific Settings Persistence**
+   - **Problem**: Switching between Gemini, Groq, and Ollama typically requires restarts or global configuration changes, which doesn't support multi-user environments or persist custom configurations.
+   - **Solution**: Implemented a global mutable singleton `runtime_config` for defaults and a user-specific resolver `get_llm_for_user(user_doc)`. The settings API changes the active provider dynamically, updates the authenticated user's preferences in MongoDB, and downstream LLM chains resolve models per-user, with robust fallback routing for discontinued model names (e.g., mapping legacy models to Gemini 2.5 and LLaMA 3.3).
+   - **Files & Functions**: [`backend/rag/llm_provider.py`](backend/rag/llm_provider.py) (`get_llm_for_user()`, `set_provider()`), [`backend/routers/settings.py`](backend/routers/settings.py).
 
 2. **Privacy Mode Enforcement**
    - **Problem**: Preventing cloud data leakage when a student requests total offline operation.
@@ -117,9 +117,14 @@ pinned: false
    - **Files & Functions**: [`backend/routers/ingest.py`](backend/routers/ingest.py) (`upload_document()`), [`backend/chunker.py`](backend/chunker.py).
 
 10. **Bidirectional Deletion Synced to FAISS Index**
-    - **Problem**: Removing a document or subject should instantly update the vector space to prevent ghost retrievals, but FAISS does not natively support string key mapping.
-    - **Solution**: Implemented a lookup mapping sequence numbers in the flat index to MongoDB chunk ID strings inside a sidecar JSON file. The function `remove_from_index()` maps deleted MongoDB documents to target integer indices, triggers `index.remove_ids()`, rebuilds the mapping sidecar, and persists the updates.
-    - **Files & Functions**: [`backend/vector_store.py`](backend/vector_store.py) (`remove_from_index()`, `_save_sidecar()`), [`backend/routers/documents.py`](backend/routers/documents.py) (`delete_document()`).
+     - **Problem**: Removing a document or subject should instantly update the vector space to prevent ghost retrievals, but FAISS does not natively support string key mapping.
+     - **Solution**: Implemented a lookup mapping sequence numbers in the flat index to MongoDB chunk ID strings inside a sidecar JSON file. The function `remove_from_index()` maps deleted MongoDB documents to target integer indices, triggers `index.remove_ids()`, rebuilds the mapping sidecar, and persists the updates.
+     - **Files & Functions**: [`backend/vector_store.py`](backend/vector_store.py) (`remove_from_index()`, `_save_sidecar()`), [`backend/routers/documents.py`](backend/routers/documents.py) (`delete_document()`).
+
+11. **Hardened JWT Authorization & Rate Limiting**
+    - **Problem**: Relying on client-provided `user_id` inputs in request bodies or paths exposes the backend to resource ownership hijacking and authorization bypasses.
+    - **Solution**: Replaced all client-supplied `user_id` parameters with secure server-side JWT verification. The backend now extracts and verifies user identity via FastAPI dependency injection (`get_current_user`), enforcing rate limits (e.g. `15/minute` for queries, `10/minute` for goals) to prevent automated abuse.
+    - **Files & Functions**: [`backend/auth_utils.py`](backend/auth_utils.py) (`get_current_user()`), [`backend/routers/query.py`](backend/routers/query.py), [`backend/routers/quiz.py`](backend/routers/quiz.py), [`backend/routers/learning_goals.py`](backend/routers/learning_goals.py).
 
 ---
 
