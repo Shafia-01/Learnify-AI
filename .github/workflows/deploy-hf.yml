@@ -20,5 +20,24 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add hf https://Shafia01:$HF_TOKEN@huggingface.co/spaces/Shafia01/learnify-ai
-          git push --force hf main
+          # Configure Git user
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          # Create an orphaned branch containing only the current files (no history of deleted binary files)
+          git checkout --orphan temp-hf-branch
+          git add -A
+          git commit -m "Deploy current release"
+          
+          git remote add hf https://Shafia01:$HF_TOKEN@huggingface.co/spaces/Shafia01/learnify-ai || true
+          for i in {1..5}; do
+            echo "Attempt $i: Pushing to Hugging Face Spaces..."
+            if git push --force hf temp-hf-branch:main; then
+              echo "Push successful!"
+              exit 0
+            fi
+            echo "Push failed. Waiting $((i * 15)) seconds before retrying..."
+            sleep $((i * 15))
+          done
+          echo "Failed to push to Hugging Face Spaces after 5 attempts."
+          exit 1
