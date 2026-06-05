@@ -25,8 +25,10 @@ from models.schemas import (
     WordScrambleWord,
     MemoryPair,
     FlashcardCard,
-    QuizQuestion
+    QuizQuestion,
+    AuthUserResponse,
 )
+from auth_utils import get_current_user
 
 router = APIRouter(prefix="/games", tags=["Games"])
 
@@ -53,12 +55,16 @@ async def _award_xp(db: AsyncIOMotorDatabase, user_id: str, amount: int) -> None
 
 
 @router.post("/score", response_model=GameScoreResponse)
-async def submit_score(payload: SubmitScoreRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def submit_score(
+    payload: SubmitScoreRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: AuthUserResponse = Depends(get_current_user)
+):
     """
     Submits a user's score for a game session.
     Persists the session, updates high scores, and awards XP.
     """
-    user_id = payload.user_id
+    user_id = current_user.user_id
     game_key = payload.game_name.value
     score = payload.score
 

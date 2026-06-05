@@ -89,7 +89,7 @@ class SessionEvent(BaseModel):
     """A timestamped event within a learning session for analytics."""
 
     session_id: str = Field(default_factory=lambda: uuid4().hex, description="Unique session identifier")
-    user_id: str = Field(..., description="ID of the user who owns this session")
+    user_id: Optional[str] = Field(default=None, description="ID of the user who owns this session")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="UTC timestamp of the event")
     event_type: str = Field(..., description="Type of event (e.g. 'query', 'quiz_start', 'upload')")
     metadata: Dict[str, Any] = Field(
@@ -244,7 +244,7 @@ class GameName(str, Enum):
 class SubmitScoreRequest(BaseModel):
     """Payload for submitting a completed game session score."""
 
-    user_id: str
+    user_id: Optional[str] = None
     game_name: GameName
     score: int = Field(..., ge=0)
     duration_seconds: int = Field(..., ge=0)
@@ -338,7 +338,7 @@ class LearningGoal(BaseModel):
 class CreateGoalRequest(BaseModel):
     """Payload for creating a new learning goal."""
 
-    user_id: str
+    user_id: Optional[str] = None
     topic_name: str
     concepts: List[str] = Field(..., min_length=1)
     deadline_days: int = Field(..., ge=1, le=365)

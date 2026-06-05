@@ -2,12 +2,17 @@ from fastapi import APIRouter, Depends, Query
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timedelta
 from database import get_db
-from models.schemas import SessionEvent
+from models.schemas import SessionEvent, AuthUserResponse
+from auth_utils import get_current_user
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 @router.post("/event")
-async def log_event(event: SessionEvent, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def log_event(
+    event: SessionEvent,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: AuthUserResponse = Depends(get_current_user),
+):
     """
     Logs a session event to MongoDB for later analysis.
     
@@ -17,6 +22,7 @@ async def log_event(event: SessionEvent, db: AsyncIOMotorDatabase = Depends(get_
     """
     # Ensure timestamp is datetime object if it comes as string
     event_dict = event.model_dump()
+    event_dict["user_id"] = current_user.user_id
     if isinstance(event_dict["timestamp"], str):
         event_dict["timestamp"] = datetime.fromisoformat(event_dict["timestamp"].replace("Z", "+00:00"))
         

@@ -8,7 +8,7 @@ Endpoints for interacting with the RAG pipeline:
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from main import limiter
@@ -16,7 +16,8 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from database import get_db
-from models.schemas import ContentChunk
+from models.schemas import ContentChunk, AuthUserResponse
+from auth_utils import get_current_user
 from rag.knowledge_graph import build_knowledge_graph
 from rag.learning_path import generate_learning_path
 from rag.llm_chain import generate_answer
@@ -32,7 +33,7 @@ class QueryRequest(BaseModel):
     """Schema for an incoming user query."""
 
     question: str
-    user_id: str
+    user_id: Optional[str] = None
     level: str = "intermediate"
     language: str = "English"
 
@@ -42,24 +43,25 @@ class QueryRequest(BaseModel):
 async def ask_question(
     request: Request,
     query_request: QueryRequest,
-    db: AsyncIOMotorDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: AuthUserResponse = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     Process a user's question through the RAG pipeline.
     Embeds the context, searches FAISS + Mongo, and calls the LLM.
     """
+    user_id = current_user.user_id
     # Fetch user document
     user_doc = None
-    if query_request.user_id:
-        try:
-            user_doc = await db["registered_users"].find_one({"user_id": query_request.user_id})
-        except Exception as exc:
-            logger.warning(f"Error fetching user document for query: {exc}")
+    try:
+        user_doc = await db["registered_users"].find_one({"user_id": user_id})
+    except Exception as exc:
+        logger.warning(f"Error fetching user document for query: {exc}")
 
     llm = get_llm_for_user(user_doc)
 
     try:
-        chunks = await retrieve_chunks(query_request.question, user_id=query_request.user_id, top_k=5)
+        chunks = await retrieve_chunks(query_request.question, user_id=user_id, top_k=5)
     except Exception as exc:
         logger.warning(f"Database/retriever error, falling back to mock chunk: {exc}")
         # Graceful degradation for testing environment lacking MongoDB

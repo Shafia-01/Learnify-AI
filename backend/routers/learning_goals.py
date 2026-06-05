@@ -21,7 +21,9 @@ from models.schemas import (
     GoalSummary,
     LearningGoal,
     UpdateConceptRequest,
+    AuthUserResponse,
 )
+from auth_utils import get_current_user
 from rag.llm_provider import get_llm
 
 router = APIRouter(prefix="/goals", tags=["Learning Goals"])
@@ -148,10 +150,15 @@ async def _generate_daily_plan(
 # ── Endpoints ────────────────────────────────────────────────────────────
 
 @router.post("/create", response_model=LearningGoal, status_code=status.HTTP_201_CREATED)
-async def create_goal(payload: CreateGoalRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def create_goal(
+    payload: CreateGoalRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: AuthUserResponse = Depends(get_current_user)
+):
     """
     Initialize a new deadline-driven learning goal.
     """
+    user_id = current_user.user_id
     now = datetime.utcnow()
     deadline_date = now + timedelta(days=payload.deadline_days)
     
@@ -161,7 +168,7 @@ async def create_goal(payload: CreateGoalRequest, db: AsyncIOMotorDatabase = Dep
     ]
     
     goal = LearningGoal(
-        user_id=payload.user_id,
+        user_id=user_id,
         topic_name=payload.topic_name,
         concepts=concept_items,
         total_concepts=len(concept_items),

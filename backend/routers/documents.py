@@ -14,8 +14,9 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 @router.get("")
 async def get_documents(
     db: AsyncIOMotorDatabase = Depends(get_db),
-    user_id: str = Header(default="anonymous", alias="user_id"),
+    current_user: AuthUserResponse = Depends(get_current_user),
 ):
+    user_id = current_user.user_id
     """
     Fetch all uploaded documents for the user, grouped by subject.
     """
