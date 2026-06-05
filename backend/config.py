@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # The backend directory (where this config.py lives) — .env is here
 _BACKEND_DIR = Path(__file__).resolve().parent
 # Load environment variables from .env explicitly and override system env
-load_dotenv(_BACKEND_DIR / ".env", override=True)
+load_dotenv(_BACKEND_DIR / ".env", override=False)
 
 # The project root (one level up) — faiss_index lives here
 _PROJECT_ROOT = _BACKEND_DIR.parent
