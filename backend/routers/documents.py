@@ -4,6 +4,8 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Header, Query, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from database import get_db
+from auth_utils import get_current_user
+from models.schemas import AuthUserResponse
 
 logger = logging.getLogger(__name__)
 
@@ -48,13 +50,13 @@ async def delete_documents(
     subject: str = Query(...),
     filename: Optional[str] = Query(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
-    user_id: str = Header(default="anonymous", alias="user_id"),
+    current_user: AuthUserResponse = Depends(get_current_user),
 ):
     """
     Delete chunks for a specific subject, and optionally a specific document within it.
     """
-    logger.info("Delete request received for user_id=%s, subject=%s, filename=%s", user_id, subject, filename)
-    query = {"user_id": user_id}
+    logger.info("Delete request received for user_id=%s, subject=%s, filename=%s", current_user.user_id, subject, filename)
+    query = {"user_id": current_user.user_id}
     
     if subject != "Uncategorized":
         query["subject"] = {"$regex": f"^{re.escape(subject.strip())}$", "$options": "i"}
