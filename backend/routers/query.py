@@ -21,6 +21,7 @@ from rag.knowledge_graph import build_knowledge_graph
 from rag.learning_path import generate_learning_path
 from rag.llm_chain import generate_answer
 from rag.retriever import retrieve_chunks
+from rag.llm_provider import get_llm_for_user
 
 logger = logging.getLogger(__name__)
 
@@ -38,11 +39,25 @@ class QueryRequest(BaseModel):
 
 @router.post("/ask")
 @limiter.limit("15/minute")
-async def ask_question(request: Request, query_request: QueryRequest) -> Dict[str, Any]:
+async def ask_question(
+    request: Request,
+    query_request: QueryRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+) -> Dict[str, Any]:
     """
     Process a user's question through the RAG pipeline.
     Embeds the context, searches FAISS + Mongo, and calls the LLM.
     """
+    # Fetch user document
+    user_doc = None
+    if query_request.user_id:
+        try:
+            user_doc = await db["registered_users"].find_one({"user_id": query_request.user_id})
+        except Exception as exc:
+            logger.warning(f"Error fetching user document for query: {exc}")
+
+    llm = get_llm_for_user(user_doc)
+
     try:
         chunks = await retrieve_chunks(query_request.question, user_id=query_request.user_id, top_k=5)
     except Exception as exc:
@@ -65,6 +80,7 @@ async def ask_question(request: Request, query_request: QueryRequest) -> Dict[st
             chunks=chunks,
             level=query_request.level,
             language=query_request.language,
+            llm=llm,
         )
         return result
     except Exception as e:

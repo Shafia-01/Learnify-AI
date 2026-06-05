@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional
 import httpx
 import logging
 from config import settings
 from rag import llm_provider
+from database import get_db
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from jose import jwt
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
 logger = logging.getLogger(__name__)
@@ -44,16 +47,48 @@ async def get_status():
     }
 
 @router.post("/provider")
-async def switch_provider(request: ProviderSwitchRequest):
+async def switch_provider(
+    request: ProviderSwitchRequest,
+    req: Request,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
     """
     Switch the active LLM provider and/or model at runtime.
     """
     try:
         config = llm_provider.set_provider(request.provider, request.model)
         active_provider = config["provider"]
+        resolved_model = config.get(f"{active_provider}_model")
+
+        # Try to find authenticated user
+        user_id = None
+        auth_header = req.headers.get("authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            try:
+                payload = jwt.decode(
+                    token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+                )
+                user_id = payload.get("sub")
+            except Exception:
+                pass
+
+        if not user_id:
+            user_id = req.headers.get("user_id")
+
+        if user_id:
+            try:
+                await db["registered_users"].update_one(
+                    {"user_id": user_id},
+                    {"$set": {"llm_provider": active_provider, f"{active_provider}_model": resolved_model}}
+                )
+                logger.info(f"Updated settings for user {user_id}: {active_provider} - {resolved_model}")
+            except Exception as db_err:
+                logger.error(f"Failed to update MongoDB registered_users for user {user_id}: {db_err}")
+
         return {
             "provider": active_provider,
-            "model": config.get(f"{active_provider}_model"),
+            "model": resolved_model,
             "message": f"Switched to {request.provider} successfully"
         }
     except Exception as e:

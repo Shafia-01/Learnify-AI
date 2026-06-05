@@ -125,3 +125,75 @@ def get_llm() -> Any:
         groq_api_key=settings.GROQ_API_KEY,
         temperature=0.7,
     )
+
+
+def get_llm_for_user(user_doc: dict) -> Any:
+    """
+    Retrieve an active LangChain chat model instance based on a user's configuration,
+    falling back to runtime_config values if fields are absent in user_doc.
+    """
+    if not isinstance(user_doc, dict):
+        user_doc = {}
+
+    privacy_mode = user_doc.get("privacy_mode")
+    if privacy_mode is None:
+        privacy_mode = runtime_config.get("privacy_mode", False)
+
+    ollama_model = user_doc.get("ollama_model")
+    if not ollama_model:
+        ollama_model = runtime_config.get("ollama_model", "llama3")
+
+    # Force Ollama if Privacy Mode is enabled
+    if privacy_mode:
+        try:
+            return ChatOllama(
+                model=ollama_model,
+                base_url=settings.OLLAMA_BASE_URL,
+                temperature=0.7,
+            )
+        except Exception as e:
+            logger.error("Privacy mode enabled but Ollama failed: %s. Blocking fallback to cloud.", e)
+            raise RuntimeError(f"Privacy Mode is ACTIVE but local Ollama failed: {e}") from e
+
+    provider = user_doc.get("llm_provider")
+    if not provider:
+        provider = runtime_config.get("provider", "groq")
+    provider = provider.lower()
+
+    gemini_model = user_doc.get("gemini_model")
+    if not gemini_model:
+        gemini_model = runtime_config.get("gemini_model", "gemini-2.5-flash-lite")
+
+    groq_model = user_doc.get("groq_model")
+    if not groq_model:
+        groq_model = runtime_config.get("groq_model", "llama-3.1-8b-instant")
+
+    if provider == "gemini":
+        try:
+            return ChatGoogleGenerativeAI(
+                model=gemini_model,
+                google_api_key=settings.GEMINI_API_KEY,
+                temperature=0.7,
+            )
+        except Exception as e:
+            logger.error("Failed to initialize Gemini. Falling back to Groq: %s", e)
+            provider = "groq"
+
+    if provider == "ollama":
+        try:
+            return ChatOllama(
+                model=ollama_model,
+                base_url=settings.OLLAMA_BASE_URL,
+                temperature=0.7,
+            )
+        except Exception as e:
+            logger.error("Failed to initialize Ollama. Falling back to Groq: %s", e)
+            provider = "groq"
+
+    # Default / Groq handler
+    return ChatGroq(
+        model_name=groq_model,
+        groq_api_key=settings.GROQ_API_KEY,
+        temperature=0.7,
+    )
+

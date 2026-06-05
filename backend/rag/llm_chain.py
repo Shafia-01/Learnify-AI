@@ -81,6 +81,7 @@ async def generate_answer(
     chunks: List[ContentChunk],
     level: str,
     language: str = "English",
+    llm: Any = None,
 ) -> Dict[str, Any]:
     """
     Generate an answer using RAG context arrays, respecting the user's
@@ -91,6 +92,7 @@ async def generate_answer(
         chunks: List of relevant database chunks mapped to ContentChunk schemas.
         level: "beginner", "intermediate", or "advanced".
         language: E.g. "English", "Hindi", "French". Defaults to English.
+        llm: Optional pre-configured language model instance.
 
     Returns:
         A dict containing the final "answer" text, the parsed "citations" list,
@@ -116,7 +118,8 @@ async def generate_answer(
     context_str = "\n\n".join(context_blocks)
 
     # 4. Construct the chain
-    llm = get_llm()
+    if llm is None:
+        llm = get_llm()
     output_parser = StrOutputParser()
 
     chain = prompt | llm | output_parser
