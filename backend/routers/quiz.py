@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from main import limiter
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from langchain_core.prompts import PromptTemplate
@@ -28,13 +29,15 @@ class SubmitRequest(BaseModel):
     topic: str = "overall"
 
 @router.post("/generate", response_model=List[QuizQuestion])
-async def generate_quiz(req: GenerateRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+@limiter.limit("10/minute")
+async def generate_quiz(request: Request, req: GenerateRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
     sub = req.subject.strip().title() if req.subject else None
     questions = await select_next_questions(db, req.user_id, req.n, req.topic, sub, req.source_file)
     return questions
 
 @router.post("/submit")
-async def submit_answer(req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
+@limiter.limit("30/minute")
+async def submit_answer(request: Request, req: SubmitRequest, db: AsyncIOMotorDatabase = Depends(get_db)):
     question_doc = await db["quiz_questions"].find_one({"question_id": req.question_id})
     if not question_doc:
         raise HTTPException(status_code=404, detail="Question not found")

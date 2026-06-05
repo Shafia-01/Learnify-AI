@@ -10,7 +10,8 @@ Endpoints for interacting with the RAG pipeline:
 import logging
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from main import limiter
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
@@ -36,13 +37,14 @@ class QueryRequest(BaseModel):
 
 
 @router.post("/ask")
-async def ask_question(request: QueryRequest) -> Dict[str, Any]:
+@limiter.limit("15/minute")
+async def ask_question(request: Request, query_request: QueryRequest) -> Dict[str, Any]:
     """
     Process a user's question through the RAG pipeline.
     Embeds the context, searches FAISS + Mongo, and calls the LLM.
     """
     try:
-        chunks = await retrieve_chunks(request.question, user_id=request.user_id, top_k=5)
+        chunks = await retrieve_chunks(query_request.question, user_id=query_request.user_id, top_k=5)
     except Exception as exc:
         logger.warning(f"Database/retriever error, falling back to mock chunk: {exc}")
         # Graceful degradation for testing environment lacking MongoDB
@@ -59,10 +61,10 @@ async def ask_question(request: QueryRequest) -> Dict[str, Any]:
 
     try:
         result = await generate_answer(
-            question=request.question,
+            question=query_request.question,
             chunks=chunks,
-            level=request.level,
-            language=request.language,
+            level=query_request.level,
+            language=query_request.language,
         )
         return result
     except Exception as e:
@@ -71,7 +73,9 @@ async def ask_question(request: QueryRequest) -> Dict[str, Any]:
 
 
 @router.get("/learning-path/{user_id}")
+@limiter.limit("10/minute")
 async def get_learning_path(
+    request: Request,
     user_id: str, 
     subject: str = None,
     db: AsyncIOMotorDatabase = Depends(get_db)
@@ -105,7 +109,9 @@ async def get_learning_path(
 
 
 @router.get("/knowledge-graph/{user_id}")
+@limiter.limit("10/minute")
 async def get_knowledge_graph(
+    request: Request,
     user_id: str, 
     subject: str = None,
     db: AsyncIOMotorDatabase = Depends(get_db)

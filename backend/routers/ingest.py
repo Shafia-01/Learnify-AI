@@ -24,7 +24,8 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, File, Header, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, Form, HTTPException, UploadFile, Request
+from main import limiter
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
@@ -125,7 +126,9 @@ async def _run_pipeline(
 
 
 @router.post("/upload", response_model=IngestResponse, status_code=200)
+@limiter.limit("5/minute")
 async def upload_file(
+    request: Request,
     file: UploadFile = File(...),
     subject: str = Form(None),
     db: AsyncIOMotorDatabase = Depends(get_db),

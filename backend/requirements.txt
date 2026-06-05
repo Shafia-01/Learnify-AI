@@ -58,3 +58,4 @@ python-jose[cryptography]
 
 nltk
 tf-keras
+slowapi
