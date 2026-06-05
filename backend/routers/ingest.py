@@ -35,6 +35,8 @@ from parsers.pdf_parser import parse_pdf
 from parsers.ppt_parser import parse_ppt
 from parsers.txt_parser import parse_txt
 from vector_store import build_or_update_index
+from auth_utils import get_current_user
+from models.schemas import AuthUserResponse
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +129,7 @@ async def upload_file(
     file: UploadFile = File(...),
     subject: str = Form(None),
     db: AsyncIOMotorDatabase = Depends(get_db),
-    user_id: str = Header(default="anonymous", alias="user_id"),
+    current_user: AuthUserResponse = Depends(get_current_user),
 ) -> Dict[str, Any]:
     if subject:
         subject = subject.strip().title()
@@ -179,7 +181,7 @@ async def upload_file(
         for item in raw_items:
             item["source_file"] = file.filename or item.get("source_file", "")
 
-        chunks_created = await _run_pipeline(raw_items, source_type, db, user_id=user_id, subject=subject)
+        chunks_created = await _run_pipeline(raw_items, source_type, db, user_id=current_user.user_id, subject=subject)
 
     except HTTPException:
         raise
