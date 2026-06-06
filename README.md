@@ -7,9 +7,12 @@ sdk: docker
 pinned: false
 ---
 
-# Learnify AI
+<p align="center">
+  <img src="frontend/public/learnify-logo.webp" alt="Learnify AI Logo" width="200" />
+</p>
 
-> **AI That Learns How You Learn**
+<h1 align="center">Learnify AI</h1>
+<p align="center"><strong>AI That Learns How You Learn</strong></p>
 
 Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials—such as PDFs, PPTs, and text documents—into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.
 
