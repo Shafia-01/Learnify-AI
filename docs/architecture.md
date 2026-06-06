@@ -35,7 +35,7 @@ flowchart TD
         end
         
         subgraph Query_Path [Query Path]
-            Ask[/ask Endpoint]
+            Ask["/ask Endpoint"]
             Chains[StrOutputParser Chains]
             Citations[Citation Parser Regex]
         end
