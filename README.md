@@ -7,265 +7,254 @@ sdk: docker
 pinned: false
 ---
 
-<p align="center">
-  <img src="frontend/public/learnify-logo.webp" alt="Learnify AI Logo" width="200" />
-</p>
+# Learnify AI
 
-<h3 align="center"><strong>LEARNIFY AI</strong></h3>
-<p align="center"><strong>AI That Learns How You Learn</strong></p>
+> **AI That Learns How You Learn**
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11+-blue" alt="Python" />
-  <img src="https://img.shields.io/badge/Node-20+-green" alt="Node" />
-  <img src="https://img.shields.io/badge/FastAPI-005571?logo=fastapi" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19" />
-</p>
+Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials—such as PDFs, PPTs, and text documents—into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.
 
-<p align="center">
-  <a href="https://your-video-link-here.com" target="_blank">
-    <img src="https://img.shields.io/badge/Demo%20Video-Play-red?style=for-the-badge&logo=youtube" alt="Demo Video" />
-  </a>
-</p>
+[![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
+[![FAISS](https://img.shields.io/badge/FAISS-000000?style=flat-square)](https://github.com/facebookresearch/faiss)
+[![LangChain](https://img.shields.io/badge/LangChain-1C3C3A?style=flat-square)](https://www.langchain.com/)
+[![Whisper](https://img.shields.io/badge/Whisper-Local-red?style=flat-square)](https://github.com/openai/whisper)
+[![DeepFace](https://img.shields.io/badge/DeepFace-Biometric-orange?style=flat-square)](https://github.com/serengil/deepface)
 
-**Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials (PDFs, PPTs, TXTs) into an interactive, voice-enabled, and emotion-aware personal tutor. Driven by a level-adaptive RAG pipeline and a suite of interactive educational mini-games, the system continuously adjusts to each student’s cognitive and emotional states in real-time. Deployable completely offline for total data privacy, it offers hot-swappable multi-LLM orchestration with no server downtime.**
+[Live Demo →](https://huggingface.co/spaces/Shafia01/learnify-ai)
+
+<!-- ADD DEMO VIDEO / GIF HERE -->
+<!-- Example: ![Learnify AI Walkthrough](docs/demo.gif) -->
 
 ---
 
-### Feature Matrix
+## What Makes This Different
 
-| Feature | Description | Status |
-|---|---|---|
-| **RAG Q&A with Citations** | Natural language chat with documents returning cited answers mapping to source files and page numbers. | ✅ Active |
-| **Adaptive Quiz Engine** | Dynamic question generator that auto-scales difficulties (1–5) per topic based on a rolling 0–100 score. | ✅ Active |
-| **Knowledge Graph** | D3.js force-directed concept visualizer powered by offline NLTK noun-phrase extraction and top-40 pruning. | ✅ Active |
-| **Voice Input & Output** | Local Whisper speech-to-text (STT) for voice questions and gTTS text-to-speech (TTS) supporting 40+ languages. | ✅ Active |
-| **Webcam Emotion Detection** | Real-time facial expression analysis (DeepFace + OpenCV) over WebSockets with 5-frame smoothing and adaptive interventions. | ✅ Active |
-| **Gamification** | Granular event-based XP system, streaks, and badges (*Week Warrior*, *Century Scholar*, *Knowledge Knight*, *Learning Legend*). | ✅ Active |
-| **6 Content-Driven Mini-Games** | *Snake Quiz*, *Tic-Tac-Toe vs AI*, *Memory Match*, *Word Scramble*, *Falling Quiz*, and *Flashcard Flip* powered by uploaded material. | ✅ Active |
-| **Privacy Mode** | Forces local offline LLM routing via Ollama, throwing a `RuntimeError` immediately if cloud fallbacks are attempted. | ✅ Active |
-| **Runtime Multi-LLM Swap** | Hot-swap between Google Gemini (2.5/2.0), Groq LLaMA (3.3/3.1), and Ollama at runtime without restarting the server. | ✅ Active |
-| **Zero-API Multilingualism** | Prompt-driven language switching that bypasses dedicated translation APIs. | ✅ Active |
-| **Learning Goals Tracker** | Deadline-driven milestones, concept completion rates, and AI-generated study plans cached for 24 hours. | ✅ Active |
-| **Document Library** | Subject-grouped document organization with vector deletions synced instantly to FAISS index. | ✅ Active |
-| **JWT Authentication** | Secure stateless authentication featuring bcrypt passwords, refresh endpoints, and revoked-token TTL collection. | ✅ Active |
-| **Analytics Dashboard** | Rich data visualizations tracking daily velocity, weak topics, knowledge retention curves, and aggregated sessions. | ✅ Active |
-| **FAISS Auto-Rebuild** | Startup sync mechanism that regenerates missing vector index embeddings from MongoDB collections. | ✅ Active |
+* **Not a Tutorial Project:** Unlike generic wrapper applications, this platform addresses real-world distributed systems and machine learning integration problems, including state synchronization, edge compute bottlenecks, and hard privacy boundaries.
+* **Production Engineering Solutions:** Implements robust custom mechanisms for synchronizing in-memory vector databases with persistent document stores, mitigating ephemeral storage loss on serverless deployments.
+* **End-to-End Multimodal AI Integration:** Seamlessly combines real-time facial expression analysis over WebSockets, local automatic speech recognition (ASR), and multilingual speech synthesis without relying on expensive, proprietary third-party cloud APIs.
+* **Production-Ready Security & Safeguards:** Features server-side JSON Web Token (JWT) verification, token revocation tracking via MongoDB Time-To-Live (TTL) collections, and strict dependency injection to protect resources from unauthorized access and API abuse.
 
 ---
 
-### Why This Tech Stack?
+## Core Features
 
-| Layer | Chosen Technology | Rejected Alternatives | Technical Rationale & Trade-offs |
-|---|---|---|---|
-| **Backend API** | **FastAPI** | Flask, Django | FastAPI provides native async support required to handle concurrent LLM streams and high-throughput WebSockets. It also enforces strict boundary safety using Pydantic validation. |
-| **RAG Pipeline** | **LangChain + FAISS** | Pinecone, Weaviate | LangChain provides provider-agnostic abstractions for single-line LLM swapping. FAISS runs fully in-process without infrastructure overhead, API cost, or network latency for datasets under ~100k chunks. |
-| **Embeddings** | **sentence-transformers (`all-MiniLM-L6-v2`)** | OpenAI Embeddings | `all-MiniLM-L6-v2` produces dense 384-dimensional vectors fully offline. This avoids external API bills, minimizes latency via CPU-optimized inference, and guarantees zero data leakage. |
-| **Database** | **MongoDB (Motor async)** | PostgreSQL, SQLite | Study paths, games, and quizzes require highly polymorphic document shapes. Motor provides non-blocking async operations that prevent Event Loop starvation. |
-| **Orchestration** | **Gemini + Groq + Ollama** | Closed Single-Vendor (e.g. OpenAI) | A three-tier strategy (Gemini for reasoning quality, Groq for ultra-fast free tier generation, and Ollama for absolute privacy) avoids vendor lock-in and mitigates cloud outage risks. |
-| **Frontend** | **React 19 + Vite + Tailwind 4** | Next.js, Webpack, Tailwind 3 | React 19 concurrent features ensure responsive interfaces during heavy network rendering. Vite yields sub-second hot module replacement. Tailwind 4 compiles zero-runtime CSS utility classes. |
-| **Voice Processing** | **Whisper (Local) + gTTS** | Cloud speech APIs | Whisper STT runs locally to ensure students' voices are never uploaded to commercial servers. gTTS offers native support for over 40 languages without translation overhead. |
-| **Emotion Analysis** | **DeepFace + OpenCV** | Azure Face API, AWS Rekognition | Eliminates biometric subscription costs and guarantees that live webcam streams are parsed entirely in-process on the local machine. |
-| **Graph Processing** | **NLTK + NetworkX + D3.js** | Neo4j, LLM-based extraction | Extracts noun phrases locally using heuristics rather than calling expensive LLM APIs, constructs relationships dynamically using NetworkX, and renders interactively via D3.js. |
+### 1. Adaptive Learning Engine
+* **Contextual RAG with Citations:** Ingests unstructured academic materials, runs document-to-vector embedding pipelines, and delivers responses containing precise document and page-number citations mapped back to the source records.
+* **Multi-Tier Prompt Adaptation:** Dynamically updates system instructions based on the student's current proficiency level (beginner, intermediate, or advanced) to adjust concept complexity and detail level.
+* **5-Tier Difficulty-Gated Quizzing:** Automatically selects and displays multiple-choice, fill-in-the-blank, or short-answer questions tailored to a rolling performance metric calculated from user responses.
+* **Dynamic Concept Sequencing:** Automatically maps ingested files into a structured learning path, using LLM-based sequence planning to order concepts logically.
 
----
+### 2. Multimodal AI Integrations
+* **Low-Latency Facial Emotion Analysis:** Establishes a WebSocket connection to stream webcam frames, running biometrics asynchronously using DeepFace to deliver contextual interventions when the student shows frustration or confusion.
+* **On-Device Automatic Speech Recognition (ASR):** Runs a local Whisper instance to transcribe student voice questions, allowing fully offline voice-driven navigation and learning.
+* **Zero-Translation Multilingual Synthesis:** Generates high-quality spoken explanations using gTTS for over 40 languages, prompting the LLM to format responses natively in the student's language without external translation layers.
 
-### Problems Solved & Technical Decisions
+### 3. Gamification & Analytics
+* **Granular Progress Tracker:** Calculates experience points (XP) based on session activity, tracks consecutive daily login streaks, and awards specific achievement badges based on learning milestones.
+* **Adaptive Educational Mini-Games:** Feeds document context into six dynamic frontend games (*Snake Quiz*, *Tic-Tac-Toe vs AI*, *Memory Match*, *Word Scramble*, *Falling Quiz*, and *Flashcard Flip*) using local text parsers and LLM generators.
+* **Interactive Concept Visualization:** Utilizes NLTK for local noun-phrase extraction and NetworkX to build a force-directed concept graph, rendered interactively on the frontend using D3.js.
+* **Recharts Analytics Dashboard:** Visualizes daily velocity, topic strengths, knowledge retention curves, and aggregated study duration metrics using React charts.
 
-1. **LLM Provider Hot-Swapping and User-Specific Settings Persistence**
-   - **Problem**: Switching between Gemini, Groq, and Ollama typically requires restarts or global configuration changes, which doesn't support multi-user environments or persist custom configurations.
-   - **Solution**: Implemented a global mutable singleton `runtime_config` for defaults and a user-specific resolver `get_llm_for_user(user_doc)`. The settings API changes the active provider dynamically, updates the authenticated user's preferences in MongoDB, and downstream LLM chains resolve models per-user, with robust fallback routing for discontinued model names (e.g., mapping legacy models to Gemini 2.5 and LLaMA 3.3).
-   - **Files & Functions**: [`backend/rag/llm_provider.py`](backend/rag/llm_provider.py) (`get_llm_for_user()`, `set_provider()`), [`backend/routers/settings.py`](backend/routers/settings.py).
-
-2. **Privacy Mode Enforcement**
-   - **Problem**: Preventing cloud data leakage when a student requests total offline operation.
-   - **Solution**: When `PRIVACY_MODE` is enabled, the provider factory `get_llm()` intercepts LLM instantiations and forces all requests through local Ollama. If a non-Ollama LLM (Gemini or Groq) is selected or fallback is triggered, it raises a strict `RuntimeError` to block cloud execution.
-   - **Files & Functions**: [`backend/rag/llm_provider.py`](backend/rag/llm_provider.py) (`get_llm()`), [`backend/config.py`](backend/config.py).
-
-3. **Adaptive Quiz Difficulty Without User Tagging**
-   - **Problem**: Generating quiz questions that match the user's proficiency level per topic without manual sorting.
-   - **Solution**: Tracks a student's rolling quiz performance score (0-100) per topic in MongoDB. The function `get_difficulty_level()` maps these scores to a scale of 1-5. Quizzes are generated by querying existing questions within the calculated difficulty range; if insufficient questions are cached, the LLM is requested to generate questions at that specific difficulty.
-   - **Files & Functions**: [`backend/quiz/difficulty_engine.py`](backend/quiz/difficulty_engine.py) (`get_difficulty_level()`), [`backend/quiz/adaptive_selector.py`](backend/quiz/adaptive_selector.py) (`get_adaptive_quiz()`), [`backend/quiz/generator.py`](backend/quiz/generator.py) (`generate_quiz()`).
-
-4. **Knowledge Graph Scalability & Cost Mitigation**
-   - **Problem**: Massive files cause massive, cluttered graphs that slow down browsers, and extraction via LLM is prohibitively slow and expensive.
-   - **Solution**: Replaced LLM extraction with an offline NLTK-based noun-phrase chunker. Vertices represent concepts, and edges represent text-chunk co-occurrences. Graph clutter is solved by top-40 concept pruning based on frequency and degree centrality.
-   - **Files & Functions**: [`backend/rag/knowledge_graph.py`](backend/rag/knowledge_graph.py) (`generate_knowledge_graph()`), [`backend/routers/query.py`](backend/routers/query.py).
-
-5. **Stale FAISS Index on Ephemeral Deployments (e.g. Hugging Face Spaces)**
-   - **Problem**: Ephemeral container restarts erase local FAISS flat files while persistent metadata collections remain intact in MongoDB.
-   - **Solution**: Implemented `sync_faiss_with_db()`. On startup, if FAISS files are missing, the system scans MongoDB for chunks, embeds them locally, maps integer positions to chunk IDs using a JSON sidecar file, and rebuilds the vector index on the fly.
-   - **Files & Functions**: [`backend/vector_store.py`](backend/vector_store.py) (`sync_faiss_with_db()`, `_load_index()`, `_save_sidecar()`).
-
-6. **Real-time Webcam Emotion Processing Without Frame Latency**
-   - **Problem**: DeepFace inference takes up to 1.5 seconds per frame, which freezes live video streams if run synchronously.
-   - **Solution**: Separated OpenCV frame preview from deep learning execution. The client pushes raw frames over WebSockets. The backend draws and responds at 30 FPS, while a separate background task evaluates every 1.5 seconds and passes results to a non-blocking shared dictionary with a 5-frame smoothing queue.
-   - **Files & Functions**: [`backend/routers/websocket.py`](backend/routers/websocket.py) (`websocket_endpoint()`).
-
-7. **Multilingual LLM Responses Without Translation API Costs**
-   - **Problem**: Supporting global learners without subscribing to Google Translate or DeepL API endpoints.
-   - **Solution**: The user's language selection is passed as a variable directly to the system prompt template. The LLM is instructed to process references and format output citations inside the requested target language natively.
-   - **Files & Functions**: [`backend/rag/prompts.py`](backend/rag/prompts.py), [`backend/rag/llm_chain.py`](backend/rag/llm_chain.py) (`generate_answer()`).
-
-8. **Educational Mini-Game Content Synthesis**
-   - **Problem**: Tailoring mini-games (e.g. Word Scramble, Snake) to the student's text files without human manual authoring.
-   - **Solution**: Samples random text chunks from MongoDB and queries the LLM to construct multiple-choice pairs or flashcards. For Word Scramble, `word_extractor.py` uses heuristic filters (word lengths of 5-12 characters, regex patterns) to extract key vocabulary directly from chunks offline without LLM calls.
-   - **Files & Functions**: [`backend/games/content_generator.py`](backend/games/content_generator.py) (`generate_game_content()`), [`backend/games/word_extractor.py`](backend/games/word_extractor.py) (`extract_educational_words()`), [`backend/routers/games.py`](backend/routers/games.py).
-
-9. **Atomic Concurrent Ingestion Pipeline**
-   - **Problem**: File parsing, text chunking, embedding generation, vector database insertion, and document database metadata mapping must run concurrently without leaving dangling temporary files if exceptions occur.
-   - **Solution**: Orchestrated ingestion as an atomic async pipeline (parse → chunk at 500 chars / 50 overlap → embed → FAISS index write → MongoDB document creation). All temporary files are systematically purged using structured `finally` statements.
-   - **Files & Functions**: [`backend/routers/ingest.py`](backend/routers/ingest.py) (`upload_document()`), [`backend/chunker.py`](backend/chunker.py).
-
-10. **Bidirectional Deletion Synced to FAISS Index**
-     - **Problem**: Removing a document or subject should instantly update the vector space to prevent ghost retrievals, but FAISS does not natively support string key mapping.
-     - **Solution**: Implemented a lookup mapping sequence numbers in the flat index to MongoDB chunk ID strings inside a sidecar JSON file. The function `remove_from_index()` maps deleted MongoDB documents to target integer indices, triggers `index.remove_ids()`, rebuilds the mapping sidecar, and persists the updates.
-     - **Files & Functions**: [`backend/vector_store.py`](backend/vector_store.py) (`remove_from_index()`, `_save_sidecar()`), [`backend/routers/documents.py`](backend/routers/documents.py) (`delete_document()`).
-
-11. **Hardened JWT Authorization & Rate Limiting**
-    - **Problem**: Relying on client-provided `user_id` inputs in request bodies or paths exposes the backend to resource ownership hijacking and authorization bypasses.
-    - **Solution**: Replaced all client-supplied `user_id` parameters with secure server-side JWT verification. The backend now extracts and verifies user identity via FastAPI dependency injection (`get_current_user`), enforcing rate limits (e.g. `15/minute` for queries, `10/minute` for goals) to prevent automated abuse.
-    - **Files & Functions**: [`backend/auth_utils.py`](backend/auth_utils.py) (`get_current_user()`), [`backend/routers/query.py`](backend/routers/query.py), [`backend/routers/quiz.py`](backend/routers/quiz.py), [`backend/routers/learning_goals.py`](backend/routers/learning_goals.py).
+### 4. Platform & Infrastructure
+* **Stateful Sync on Ephemeral Hosts:** Monitors vector index file availability on startup, automatically pulling document chunks from MongoDB and rebuilding the local FAISS index on container restarts.
+* **Runtime LLM Hot-Swapping:** Allows users to switch active AI model providers (Google Gemini, Groq, or Ollama) dynamically at runtime without causing backend server downtime.
+* **Enforced Local Privacy Mode:** Provides a toggle to route all vector ingestion, storage, and generation operations through local Ollama instances, blocking cloud requests with runtime errors.
+* **Containerized Deployment Pipeline:** Utilizes a multi-stage Docker build to package both the React 19 frontend and the FastAPI backend, optimized for automatic deployment via GitHub Actions to HuggingFace Spaces.
 
 ---
 
-### System Architecture
+## System Architecture
 
-Learnify AI leverages a decoupled, event-driven architecture split into two primary pipelines.
+The application is architected around decoupled pipelines that isolate CPU-bound machine learning tasks, I/O-bound database queries, and real-time state synchronization.
 
 ```mermaid
 graph TD
-    subgraph Ingestion Pipeline
-        A[File Upload PDF/PPT/TXT] --> B[Parser]
-        B --> C[Chunker 500 Chars / 50 Overlap]
-        C --> D[Local Embedder all-MiniLM-L6-v2]
-        D --> E[FAISS flat-L2 index]
-        C --> F[(MongoDB Metadata)]
+    User([User])
+    
+    subgraph Frontend [React 19 Frontend]
+        UI[Vite Single Page App]
+        Cam[Webcam / Media Stream]
+        VoiceIn[Microphone Input]
     end
     
-    subgraph Query Pipeline
-        G[User Prompt] --> H[Embed Query]
-        H --> I[FAISS Top-K Search]
-        I --> J[Retrieve Chunk Metadata]
-        J --> K[(MongoDB Metadata)]
-        K --> L[Level-Adaptive Prompt Construction]
-        L --> M[Hot-Swappable LLM Provider]
-        M --> N[Citation Parser]
-        N --> O[User Answer]
+    subgraph Backend [FastAPI Backend]
+        API[FastAPI Server & 12+ Routers]
+        Auth[JWT + bcrypt Auth Dependency]
+        WebSocket[WebSocket Handler]
+        Queue[Async Smoothing Queue]
     end
+    
+    subgraph Storage [Storage Layer]
+        MongoDB[(MongoDB - Motor Async)]
+        FAISS[(FAISS IndexFlatL2)]
+        Sidecar[JSON Sidecar Mapping]
+    end
+    
+    subgraph AI [AI & Orchestration Layer]
+        Embedder[all-MiniLM-L6-v2 Embedder]
+        Whisper[Local Whisper STT]
+        TTS[gTTS Engine]
+        DeepFace[DeepFace Engine]
+        LLM[LLM Provider Resolver]
+    end
+    
+    subgraph Providers [LLM Providers]
+        Gemini[Google Gemini 2.5]
+        Groq[Groq LLaMA 3.3]
+        Ollama[Local Ollama]
+    end
+
+    User --> UI
+    UI --> API
+    Cam --> WebSocket
+    VoiceIn --> Whisper
+    
+    API --> Auth
+    Auth --> MongoDB
+    
+    WebSocket --> Queue
+    Queue --> DeepFace
+    DeepFace --> API
+    
+    Whisper --> API
+    API --> Embedder
+    Embedder --> FAISS
+    FAISS <--> Sidecar
+    
+    API --> LLM
+    LLM --> Gemini
+    LLM --> Groq
+    LLM --> Ollama
+    
+    API --> TTS
+    TTS --> UI
 ```
 
-> [!NOTE]
-> The full architectural design and detailed process maps can be accessed at [`docs/architecture.md`](docs/architecture.md).
+---
+
+## Tech Stack Decisions
+
+| Technology | Role | Why Chosen (Engineering Rationale & Trade-offs) |
+| :--- | :--- | :--- |
+| **FastAPI** | Backend API Framework | Provides high-performance, non-blocking asynchronous event handling necessary for managing WebSockets and streaming LLM responses, while enforcing strict request schema boundaries via Pydantic. |
+| **LangChain + FAISS** | RAG Orchestration & Vector DB | LangChain abstracts model-specific details to support runtime swapping, while FAISS provides a lightweight, in-memory flat vector index that runs entirely in-process to eliminate database hosting costs and API overhead. |
+| **all-MiniLM-L6-v2** | Local Text Embeddings | A compact 384-dimensional sentence-transformer model that runs locally on commodity CPU hardware, reducing vector storage sizes and ensuring user documents are never uploaded to external servers. |
+| **Motor (MongoDB)** | Asynchronous Database Client | Polymorphic structures such as quizzes, custom badges, and learning paths fit naturally into a document-oriented database, while Motor's async driver prevents blocking the FastAPI event loop during heavy operations. |
+| **Gemini / Groq / Ollama** | Tri-Tier LLM Orchestration | Creates a fallback chain that balances reasoning performance (Gemini), sub-second text generation latency (Groq), and absolute data privacy during local offline execution (Ollama). |
+| **React 19 + Vite + Tailwind 4** | Frontend Stack | React 19's concurrent features prevent UI lag during real-time data streaming, Vite delivers sub-second development builds, and Tailwind v4 offers compiled CSS styling with zero runtime overhead. |
+| **Whisper (Local) + gTTS** | Speech-to-Text & Text-to-Speech | Local Whisper instances transcribe user voice inputs locally to protect user privacy, while gTTS provides broad multilingual audio output capabilities without licensing costs. |
+| **DeepFace + OpenCV** | Facial Expression Analysis | Allows facial landmark extraction and classification directly on raw webcam frames without exposing biometric data to cloud-based facial recognition APIs. |
+| **NLTK + NetworkX + D3.js** | Concept Extraction & Visualization | Performs noun-phrase extraction using NLTK patterns locally to avoid expensive LLM indexing costs, models concepts in NetworkX, and renders interactive graphs using D3 force simulations. |
 
 ---
 
-### Prerequisites
+## Engineering Highlights
 
-- **Python 3.11+**
-- **Node.js 20+**
-- **MongoDB**
-- **Ollama** *(optional, for local offline execution)*
+### 1. Stateful Sync for Ephemeral Containers
+When deploying to stateless hosting platforms like HuggingFace Spaces, container restarts wipe local storage, including the FAISS index files, while the MongoDB database persists externally. To solve this, `sync_faiss_with_db()` triggers automatically on startup, verifying index integrity. If index files are missing or out of sync, the system fetches all document chunks from MongoDB, generates embeddings using the local sentence-transformer model, writes the vector database, and rebuilds the JSON sidecar. This ensures zero data loss and immediate availability of the RAG pipeline after container restarts.
+
+### 2. Strict Privacy Mode Enforcement
+To prevent cloud data leakage during sensitive operations, the system implements a strict privacy barrier. When Privacy Mode is enabled, the provider factory `get_llm()` intercepts all downstream LLM calls and forces routing to the local Ollama instance. If a user attempts to call a cloud provider (such as Gemini or Groq) while Privacy Mode is active, the system raises a `RuntimeError` immediately rather than failing silently or falling back to a cloud model. This ensures that no raw user text, document chunks, or metadata leave the local host environment.
+
+### 3. Decoupled Real-Time Emotion Interventions
+Processing facial emotions using deep learning models typically introduces processing latency (up to 1.5 seconds per frame), which would block standard WebSocket connections. The platform resolves this by decoupling the 30 FPS video preview stream from the emotion analysis engine. Webcam frames are pushed to the server via WebSockets and immediately returned to keep the video UI smooth. Simultaneously, a separate background worker thread samples frames every 1.5 seconds, running DeepFace inference asynchronously, pushing results to a 5-frame majority-vote queue to smooth out transient expressions, and delivering adaptive UI changes without affecting the video stream.
+
+### 4. Bidirectional Vector-Document Synchronization
+Because FAISS does not natively support mapping string document IDs to its index keys, deleting a file from the database could result in stale embeddings returning during RAG operations. To address this, the backend maps FAISS integer sequence offsets to MongoDB document chunk IDs using a JSON sidecar file. When a user deletes a document, `remove_from_index()` reads the sidecar, maps the target chunk IDs to their exact integer positions in the FAISS index, calls `index.remove_ids()`, rebuilds the mapping sidecar, and saves the changes, ensuring immediate consistency across the database and search index.
+
+### 5. Multi-LLM Resolution & Model Migration
+To prevent service interruptions caused by upstream API model deprecations, the system resolves LLM calls dynamically per request. The function `get_llm_for_user(user_doc)` reads user-specific provider settings from MongoDB and falls back to global settings if necessary. It also acts as an abstraction layer for model name mapping, translating deprecated Gemini and Groq model strings (e.g., mapping outdated legacy models to Gemini 2.5 and LLaMA 3.3) dynamically. This ensures that the frontend can call a stable API interface without requiring updates when cloud model versions change.
 
 ---
 
-### Getting Started
+## Quick Start
 
-#### Quick Start
+### Installation & Run
 
+Clone the repository and prepare the environment configuration:
 ```bash
 git clone https://github.com/Shafia-01/Learnify-AI.git
 cd Learnify-AI
 cp backend/.env.example backend/.env
-# Edit backend/.env to include MONGODB_URI and GEMINI_API_KEY
-npm install --prefix frontend && pip install -r backend/requirements.txt
+# Open backend/.env and configure MONGODB_URI and at least one LLM API key
 ```
 
-#### 1. Backend Setup
-
+Set up and run the FastAPI Backend:
 ```bash
+# Navigate to the backend directory
 cd backend
 python -m venv venv
-# Windows:
+
+# Activate the virtual environment
+# On Windows:
 venv\Scripts\activate
-# macOS / Linux:
-source venv/bin/activate
+# On macOS/Linux:
+# source venv/bin/activate
+
+# Install dependencies and start the API server
 pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-#### 2. Frontend Setup
-
+Set up and run the React Frontend (in a new terminal):
 ```bash
+# Navigate to the frontend directory
 cd frontend
-cp .env.example .env
 npm install
-```
-
-#### 3. Running Locally
-
-Open **two separate terminals**:
-
-**Terminal 1 — Backend API Server:**
-```bash
-cd backend
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-**Terminal 2 — Frontend Dev Server:**
-```bash
-cd frontend
 npm run dev
 ```
 
----
+### Core Environment Variables
 
-### Environment Variables
-
-#### Backend (`backend/.env`)
-
-| Variable | Description | Default | Required? |
-|---|---|---|---|
-| `GEMINI_API_KEY` | Google Gemini API key | — | Optional |
-| `GROQ_API_KEY` | Groq API key | — | Optional |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/learnify` | **Yes** |
-| `OLLAMA_BASE_URL` | Ollama local URL | `http://localhost:11434` | Optional |
-| `FAISS_INDEX_PATH` | Path to FAISS index | `./faiss_index` | Optional |
-| `PRIVACY_MODE` | Enable offline mode | `false` | Optional |
-
-#### Frontend (`frontend/.env`)
-
-| Variable | Description | Default | Required? |
-|---|---|---|---|
-| `VITE_API_BASE_URL` | Backend API base URL | `http://localhost:8000` | Optional |
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `MONGODB_URI` | **Yes** | Connection string for the MongoDB instance (local or Atlas). |
+| `GEMINI_API_KEY` | No | Google AI Studio key, required if using Gemini models. |
+| `GROQ_API_KEY` | No | Groq API key, required if using Groq cloud models. |
+| `OLLAMA_BASE_URL` | No | Endpoint url for local Ollama instance (defaults to `http://localhost:11434`). |
+| `PRIVACY_MODE` | No | Boolean flag (`true`/`false`) to force all LLM generation offline. |
 
 ---
 
-### API Reference
+## Project Structure
 
-| Endpoint Prefix | Purpose | Key Sub-Endpoints / Operations |
-|---|---|---|
-| `/api/ingest` | Document Ingestion | `POST /upload` |
-| `/api/query` | RAG & Knowledge Graph | `POST /ask`, `GET /learning-path/{id}`, `GET /knowledge-graph/{id}` |
-| `/api/quiz` | Quiz & Adaptive Engine | `POST /generate`, `POST /submit`, `GET /flashcards/{id}` |
-| `/api/gamification` | User Progress | `GET /profile/{id}`, `POST /award/{id}`, `GET /leaderboard` |
-| `/api/auth` | Stateless JWT Sessions | `POST /register`, `POST /login`, `GET /me` |
-| `/api/voice` | Voice I/O Utilities | `POST /transcribe`, `GET /speak` |
-| `/api/games` | Gamified Learning Content | `GET /word-scramble/{id}`, `POST /score`, `GET /leaderboard/{game}` |
-| `/api/settings` | Server Configuration | `GET /status`, `POST /provider`, `POST /privacy` |
-| `/api/goals` | Milestone Tracking | `POST /create`, `GET /{user_id}`, `GET /{goal_id}/daily-plan` |
-| `/ws/emotion/{session_id}` | Facial Analysis | WebSocket Connection Stream |
+```
+backend/
+  rag/           # Context retrieval, LLM generation chain, knowledge graph, prompt templates
+  quiz/          # Adaptive selector, difficulty evaluation engine, MCQ generators
+  gamification/  # XP engine, streak trackers, badge accomplishment systems
+  games/         # Game content synthesis and local vocabulary extraction
+  voice/         # Local Whisper ASR wrapper and multilingual gTTS utilities
+  routers/       # 12+ REST endpoints (ingestion, query, quiz, settings, auth, web sockets)
+  models/        # Pydantic schemas validating all request/response payloads
 
----
-
-### Known Limitations
-
-- **Ollama Privacy Mode**: Requires a locally configured and active Ollama instance. It is unavailable on environments lacking local compute resources (e.g. Hugging Face Spaces or Serverless Cloud runtimes).
-- **Compute Overhead**: Local Whisper speech-to-text models and OpenCV/DeepFace emotion analysis run heavily on local CPU/RAM. Performance will degrade on low-end machines.
-- **NLTK Limitations**: The noun-phrase extraction uses heuristic pattern parsing, which may occasionally miss complex, multi-word academic terminology.
-- **Webcam Constraints**: Facial emotion detection reliability decreases under low-light conditions or when users wear reflective glasses.
-- **Vector Scale Limits**: The flat FAISS index (`IndexFlatL2`) executes exact exhaustive search. Beyond ~100k chunks, it should be migrated to `IndexIVFFlat` or a distributed vector service.
+frontend/src/
+  pages/         # 12 application views (Analytics, ML Monitor, Library, Settings, etc.)
+  components/    # Shared UI blocks (EmotionPanel, D3-based KnowledgeGraphEnhanced, etc.)
+  api/           # Axios clients configured for typed API endpoints
+```
 
 ---
 
-### License
+## Why This Project?
 
-MIT License - Educational Use
+Learnify AI is not a generic tutorial application. It represents a fully integrated, production-ready AI software product featuring 12+ REST endpoints, secure token-revocation authentication, 3-tier LLM orchestration with hot-swapping capabilities, WebSocket-based biometrics, and a local RAG pipeline synced with a document database. Every architectural decision—from decoupling the CPU-bound DeepFace pipeline to implementing transactional vector indexing—reflects real-world software engineering trade-offs between performance, privacy, API cost, and developer complexity.
+
+---
+
+## Roadmap
+
+- **IndexIVFFlat Vector Scaling:** Migrate the current flat FAISS index to an inverted file index (`IndexIVFFlat`) to maintain sub-millisecond retrieval speeds as document chunks scale beyond 100k records.
+- **Multi-User Vector Isolation:** Introduce dedicated namespace partitioning or isolated FAISS files per user to guarantee absolute data separation in multi-tenant environments.
+- **Spaced Repetition Engine:** Implement a SuperMemo-2 (SM-2) algorithm to schedule adaptive quizzes, optimizing long-term information retention.
+- **Automated RAG Evaluation:** Integrate an offline evaluation harness to measure context relevance and generation faithfulness using Ragas or custom scoring models.
+- **Mobile Responsive Redesign:** Complete a comprehensive styling pass across all 12 dashboard views to ensure full usability on mobile web browsers.
+- **Server-Sent Events (SSE):** Re-engineer the query and chat API endpoints to support token-by-token text streaming for improved user experience.
+
+---
+
+## License
+
+MIT License - Educational and Portfolio Use
