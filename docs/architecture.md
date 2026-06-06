@@ -1,179 +1,390 @@
-# Learnify AI Architecture
+# Learnify AI Architecture Reference
 
-## Section 1 — System Overview
+## System Overview
 
-Learnify AI is built on an event-driven and modular architecture designed to provide a multimodal, personalized learning experience. The platform emphasizes a decoupled design where the backend acts as a robust API layer catering to various frontend requests, from real-time emotion detection via WebSockets to standard RESTful RAG queries. By maintaining a provider-agnostic LLM layer, the system ensures flexibility, allowing seamless runtime switching between Google Gemini, Groq, and local Ollama models without requiring application restarts.
+Learnify AI is a production-grade full-stack AI-powered adaptive learning platform. The system delivers customized learning paths through retrievable academic context, real-time webcam-based emotion tracking, and customized quiz generation.
 
-A core philosophy of Learnify AI is its local-first approach for privacy-sensitive operations. Audio transcription via Whisper, emotion analysis via DeepFace, and vector embeddings using sentence-transformers all run entirely on the local machine. This ensures that biometric data and sensitive user documents never leave the device unless explicitly queried against a cloud LLM, which can be fully restricted using the built-in Privacy Mode.
+The codebase is built on four core architectural principles:
+- Local-First Machine Learning Inference: Privacy-sensitive machine learning calculations run entirely on the local device. This includes audio transcription via `whisper` and facial emotion detection via `deepface`, ensuring biometric and voice data do not leak to external cloud services.
+- Provider-Agnostic LLM Layer: A central translation registry isolates downstream business logic from specific cloud model APIs, allowing hot-swapping between Google Gemini, Groq, and local Ollama models.
+- Async-First Application Server: High-concurrency operations, such as chunk streaming and WebSocket connections, are handled asynchronously via FastAPI and Motor.
+- User-Scoped Vector Retrieval: Security boundaries are maintained at the database query layer by scoping FAISS nearest-neighbor searches to specific user identifiers.
 
-## Section 2 — Full System Flow Diagram
+## High-Level Architecture Diagram
+
+The platform splits execution concerns into three separate logical layers.
 
 ```mermaid
 flowchart TD
-    subgraph CLIENT [Client Layer]
-        UI[User Interface]
-        WC[Webcam Feed]
-        MIC[Microphone Input]
+    subgraph Client [Client Layer]
+        SPA[React 19 SPA]
+        WS_Client[WebSocket Connection]
+        Webcam[Webcam Feed Capture]
+        Mic[Microphone Input]
     end
 
-    subgraph INGEST [Ingestion Pipeline]
-        UP[File Upload (PDF/PPT/TXT)]
-        PARSE[Parser Layer (pdf/ppt/txt)]
-        CHUNK[Chunker (500 chars)]
-        EMBED[Embedder (MinLM-L6)]
-        FAISS[(FAISS Index L2)]
-        MONGO[(MongoDB Chunks)]
+    subgraph Backend [Backend Layer]
+        API[FastAPI Router Engine]
+        SlowAPI[SlowAPI Rate Limiter]
+        
+        subgraph Ingestion_Path [Ingestion Path]
+            Upload[Multipart Upload]
+            Parser[File Parsers]
+            Chunker[Recursive Chunker]
+            Embedder[all-MiniLM-L6-v2]
+        end
+        
+        subgraph Query_Path [Query Path]
+            Ask[/ask Endpoint]
+            Chains[StrOutputParser Chains]
+            Citations[Citation Parser Regex]
+        end
+        
+        subgraph Emotion_Path [Emotion Path]
+            WS_Server[WebSocket Handler]
+            Base64_Dec[decode_image]
+            DeepFace_Thr[DeepFace Async Thread]
+            Smooth[Smoothing Deque]
+        end
+        
+        subgraph Auth_Path [Auth Path]
+            JWT_Auth[JWT Dependency]
+            Blacklist[Revocation Check]
+        end
+        
+        subgraph Voice_Path [Voice Path]
+            Whisper_STT[Whisper base STT]
+            GTTS_TTS[gTTS engine]
+        end
     end
 
-    subgraph QUERY [Query Pipeline]
-        Q[User Question]
-        QE[Query Embedder]
-        SEARCH[FAISS Search Top-K]
-        HYDRATE[MongoDB Hydration]
-        LLM_CHAIN[LLM Chain Prompt]
+    subgraph Infra [Infrastructure Layer]
+        MongoDB[(MongoDB Motor async)]
+        FAISS[(FAISS IndexFlatL2 + JSON Sidecar)]
+        LLM[LLM Provider Registry]
     end
 
-    subgraph LLM [LLM Provider Layer]
-        GEMINI[Google Gemini]
-        GROQ[Groq LLaMA]
-        OLLAMA[Ollama Local]
-        PRIVACY{Privacy Mode?}
-    end
-
-    subgraph RESPONSE [Response Layer]
-        ANS[Answer + Citations]
-        LEVEL[Level-Adaptive Prompt]
-        LANG[Language Instruction]
-    end
-
-    subgraph FEATURES [Platform Features]
-        QUIZ[Adaptive Quiz Engine]
-        KG[Knowledge Graph]
-        GAME[Mini Games]
-        GOALS[Learning Goals]
-        GAMIFY[Gamification]
-    end
-
-    subgraph VOICE [Voice Layer]
-        STT[Whisper STT Local]
-        TTS[gTTS 40+ Languages]
-    end
-
-    subgraph EMOTION [Emotion Engine]
-        WS[WebSocket Stream]
-        DEEPFACE[DeepFace Analysis]
-        INTERV[Adaptive Intervention]
-    end
-
-    subgraph AUTH [Auth Layer]
-        JWT[JWT Tokens]
-        BCRYPT[bcrypt Password]
-        REVOKE[(Revoked Tokens)]
-    end
-
-    UI -->|Upload| UP
-    UP --> PARSE
-    PARSE --> CHUNK
-    CHUNK --> EMBED
-    EMBED --> FAISS
-    EMBED --> MONGO
-
-    UI -->|Question| Q
-    Q --> QE
-    QE --> SEARCH
-    SEARCH --> HYDRATE
-    HYDRATE --> LLM_CHAIN
-    LLM_CHAIN --> LEVEL
-    LLM_CHAIN --> LANG
-    LEVEL --> PRIVACY
-    LANG --> PRIVACY
-    PRIVACY -->|Yes| OLLAMA
-    PRIVACY -->|No, Gemini| GEMINI
-    PRIVACY -->|No, Groq| GROQ
-    GEMINI --> ANS
-    GROQ --> ANS
-    OLLAMA --> ANS
-    ANS --> UI
-
-    MIC -->|Audio Bytes| STT
-    STT -->|Transcript| UI
-    UI -->|Text| TTS
-    TTS -->|MP3 Stream| UI
-
-    WC -->|Base64 Frame| WS
-    WS --> DEEPFACE
-    DEEPFACE -->|Emotion State| INTERV
-    INTERV -->|Intervention| UI
-
-    UI --> QUIZ
-    UI --> KG
-    UI --> GAME
-    UI --> GOALS
-    QUIZ --> GAMIFY
-    GAME --> GAMIFY
-    GOALS --> GAMIFY
-
-    UI --> AUTH
-    AUTH --> JWT
-    AUTH --> BCRYPT
-    JWT --> REVOKE
+    SPA -->|API Requests| SlowAPI
+    SlowAPI --> API
+    
+    Webcam -->|Base64 Frames| WS_Client
+    WS_Client <--> WS_Server
+    
+    Mic -->|Audio Bytes| Whisper_STT
+    
+    API --> Ingestion_Path
+    API --> Query_Path
+    API --> Auth_Path
+    API --> Voice_Path
+    
+    WS_Server --> Base64_Dec
+    Base64_Dec --> DeepFace_Thr
+    DeepFace_Thr --> Smooth
+    
+    Parser --> Chunker
+    Chunker --> Embedder
+    Embedder --> FAISS
+    Embedder --> MongoDB
+    
+    Ask --> Chains
+    Chains --> LLM
+    
+    JWT_Auth --> Blacklist
+    Blacklist --> MongoDB
+    
+    Infra <--> Backend
 ```
 
-## Section 3 — Component Descriptions
+## RAG Pipeline
 
-| Module | File(s) | Responsibility |
+The RAG pipeline provides context injection by parsing, indexing, and retrieving course materials.
+
+### Ingestion Pipeline
+
+The ingestion pipeline transforms raw documents into searchable semantic structures.
+
+| Stage | Implementation | Why |
 |---|---|---|
-| Ingestion Router | `routers/ingest.py` | Accepts file uploads, orchestrates parse→chunk→embed→store pipeline |
-| PDF Parser | `parsers/pdf_parser.py` | Extracts text page-by-page using pdfplumber, skips encrypted/image-only pages |
-| PPT Parser | `parsers/ppt_parser.py` | Extracts text from every text frame on each slide using python-pptx |
-| TXT Parser | `parsers/txt_parser.py` | Splits plain text on double newlines into paragraph-level items |
-| Chunker | `chunker.py` | Splits parsed items using LangChain RecursiveCharacterTextSplitter (500 chars, 50 overlap) |
-| Embedder | `embedder.py` | Generates 384-dim vectors using sentence-transformers/all-MiniLM-L6-v2 |
-| Vector Store | `vector_store.py` | Manages FAISS IndexFlatL2 with JSON sidecar mapping positions to chunk_ids |
-| RAG Retriever | `rag/retriever.py` | Embeds query, searches FAISS, hydrates results from MongoDB, returns ContentChunk list |
-| LLM Chain | `rag/llm_chain.py` | Constructs level-adaptive prompt, invokes LLM, parses citations from response |
-| LLM Provider | `rag/llm_provider.py` | Runtime-mutable provider registry; supports Gemini, Groq, Ollama with privacy mode enforcement |
-| Knowledge Graph | `rag/knowledge_graph.py` | Extracts noun phrases via NLTK, builds co-occurrence graph with NetworkX, returns D3-compatible payload |
-| Learning Path | `rag/learning_path.py` | Uses LLM to sequence extracted concepts from foundational to advanced |
-| Quiz Generator | `quiz/generator.py` | LLM-powered MCQ/fill/short-answer generation stored to MongoDB |
-| Adaptive Selector | `quiz/adaptive_selector.py` | Fetches questions at user's current difficulty level, generates new ones if insufficient |
-| Difficulty Engine | `quiz/difficulty_engine.py` | Updates running score per topic (0-100), maps score ranges to difficulty 1-5 |
-| Gamification XP | `gamification/xp_engine.py` | Awards XP per event type, triggers badge evaluation after each award |
-| Badge System | `gamification/badge_system.py` | Evaluates all badge definitions against user profile, persists newly unlocked badges |
-| Streak Tracker | `gamification/streak_tracker.py` | Updates consecutive-day streak based on last_active_date comparison |
-| Word Extractor | `games/word_extractor.py` | Samples user chunks, extracts 5-12 char educational words, scrambles for game |
-| Content Generator | `games/content_generator.py` | LLM-generates MCQs, memory pairs, and flashcards from user material |
-| STT | `voice/stt.py` | Transcribes audio bytes using local Whisper 'base' model |
-| TTS | `voice/tts.py` | Synthesizes speech using gTTS, returns MP3 bytes |
-| Emotion Engine | `app/ml_utils.py` | Decodes base64 frames, runs DeepFace analysis async, applies 5-frame smoothing buffer |
-| Auth Utils | `auth_utils.py` | JWT encode/decode, bcrypt hashing, FastAPI dependency for current user extraction |
-| Database | `database.py` | Motor async client, collection bootstrapping, index creation on startup |
+| Parsing | `pdfplumber` for page-by-page extraction, `python-pptx` for shape and slide iteration, and paragraph splitting on double newlines for plain text files. | Layout-aware extraction. Using `pdfplumber` isolates structural page breaks and extracts academic text blocks more reliably than `PyPDF2`. |
+| Chunking | `RecursiveCharacterTextSplitter` configured for 500 characters with a 50 character overlap. | Granular text sizing. Chunks of 500 characters fit comfortably within LLM context windows while preserving sentence coherence, and the 50 character overlap maintains context across split boundaries. |
+| Embedding | `all-MiniLM-L6-v2` SentenceTransformer generating 384-dimensional floating point vectors. | Local resource efficiency. The model runs fully offline, has a small footprint of 74MB, and provides adequate semantic mapping for text without API fees or latency. |
+| Vector Storage | `faiss.IndexFlatL2` storing vectors in-memory. | Low latency and low overhead. Exact L2 similarity searches run in sub-millisecond times for small scale environments, removing the need for a standalone vector database. |
+| Metadata Storage | MongoDB `chunks` collection storing the document text, subject, filename, and chunk identifier. | Decoupled queries. Metadata query filtering operates within MongoDB, allowing the system to run vector searches without re-embedding or pre-filtering. |
 
-## Section 4 — Data Flow: Ingestion Pipeline
+Vector indexing uses a decoupled design. Since `faiss` does not store metadata natively within `IndexFlatL2`, the system writes a parallel JSON sidecar mapping file to disk at `FAISS_INDEX_PATH.json`. This sidecar holds an ordered list of string `chunk_id` values. When a vector is inserted, its position in the FAISS array matches its position in the JSON sidecar list. To delete chunks, the function `remove_from_index()` maps string `chunk_id` values to integer positions using the sidecar, calls `index.remove_ids()` with those indices, and updates the sidecar file.
 
-1. **Upload/Input**: The user uploads a file (PDF, PPT, TXT) via the React interface.
-2. **Parsing**: The API routing delegates the input to the appropriate parser. Text is extracted linearly into raw strings.
-3. **Chunking**: `RecursiveCharacterTextSplitter` breaks the raw text into manageable chunks of ~500 characters with a 50-character overlap to preserve context between segments.
-4. **Embedding**: Each chunk is passed to the local `all-MiniLM-L6-v2` model, generating a 384-dimensional dense vector representation.
-5. **Vector Storage**: The vectors are inserted into an in-memory FAISS flat-L2 index. A standalone JSON mapping maintains the linkage between FAISS integer IDs and string `chunk_id`s.
-6. **Metadata Storage**: The raw text, metadata, and string `chunk_id` for each chunk are persisted asynchronously to the MongoDB `chunks` collection.
+### Query Pipeline
 
-## Section 5 — Data Flow: Query Pipeline
+The query pipeline executes a 7-stage sequence to generate referenced responses.
 
-1. **Query Embed**: The user asks a question via the UI. The question is embedded using the exact same local `all-MiniLM-L6-v2` model to produce a 384-dimensional query vector.
-2. **FAISS Search**: The query vector is compared against the FAISS index using L2 distance to retrieve the Top-K nearest neighbour integer IDs.
-3. **ID Mapping**: The JSON sidecar maps the Top-K integer IDs back to string `chunk_id`s.
-4. **Hydration**: The corresponding full-text chunks and their metadata are fetched from MongoDB using the mapped `chunk_id`s.
-5. **Prompt Construction**: The hydrated chunks are compiled into a comprehensive prompt along with the user's explicit language preferences and current difficulty level.
-6. **LLM Invocation**: The constructed prompt is routed to the active LLM provider (Gemini, Groq, or Ollama) to generate an answer.
-7. **Response & Citations**: The LLM output is parsed to extract citations, combined with the retrieved chunks, and streamed back to the user interface.
+1. Query Embedding: The user query text is sent to the shared `all-MiniLM-L6-v2` model. Matching the exact model used for ingestion is required to ensure query vectors exist in the same vector space.
+2. Vector Search: The query vector is queried against the local `faiss` index via `search_index()`. If a user identifier is present, the system requests 50 nearest-neighbor candidate indices to allow for post-retrieval filtering. If no user identifier is present, the system requests the target count directly.
+3. Metadata Identification: The returned integer array indices are converted to string `chunk_id` values using the sidecar file.
+4. Security Filtering: The system queries the MongoDB `chunks` collection with the candidate `chunk_id` list and applies a filter matching the current `user_id`.
+5. Score Reordering: MongoDB returns matching documents out of order. The backend sorts the retrieved database documents to restore the ascending distance order established by the initial FAISS search.
+6. Context Synthesis: The text content of the nearest neighbor chunks is injected into the selected prompt template along with target language rules. The system selects `BEGINNER_PROMPT`, `INTERMEDIATE_PROMPT`, or `ADVANCED_PROMPT` depending on the user preference.
+7. Prompt Processing and Citation Extraction: The active LLM generates an answer, which is parsed with a regular expression matching the sources block. The final JSON payload returns the clean answer and deduplicated citation dictionary objects.
 
-## Section 6 — Privacy Mode Architecture
+### User-Scoped Retrieval
 
-Privacy Mode is enforced at the lowest possible level in the LLM provider registry. The system utilizes a mutable singleton dictionary, `runtime_config`, to manage global state. When `runtime_config["privacy_mode"]` is enabled, the `get_llm()` factory function actively intercepts requests. It will block all non-Ollama calls and raise a `RuntimeError` rather than silently cascading to alternative cloud providers. This rigid constraint enforces a strict local-only execution boundary, ensuring absolutely zero cloud-bound telemetries or API queries occur.
+Scoping retrieval requests by `user_id` prevents unauthorized data access between users. Because FAISS searches are performed globally on a shared server-side index, candidate filtering occurs immediately after vector retrieval. By fetching a larger candidate window of 50 items, the query engine accommodates document filtering inside MongoDB without suffering from under-retrieval. The filtered results are then sorted to match the original FAISS metric order before the top 5 chunks are selected.
 
-## Section 7 — Scalability Notes
+## LLM Provider Architecture
 
-- **Index Growth**: The default FAISS flat-L2 index performs exhaustive exact search. To maintain sub-millisecond latencies, this will need to be transitioned to `IndexIVFFlat` (Inverted File Index) or a clustered vector database (e.g., Milvus, Qdrant) once the chunk count exceeds ~100k.
-- **MongoDB Optimization**: Compound indices (e.g., on user_id + session_id) must be proactively expanded as querying combinations scale. Existing indices established on startup mitigate initial performance bottlenecks.
-- **Horizontal Scaling Constraints**: Currently, FAISS operates in-process with a JSON map stored locally on disk. To horizontally scale the backend API layer across multiple containers or instances, this architecture will require migrating the vector store away from the standalone disk to a distributed vector service to avoid state fragmentation.
+The LLM interface resolves model connections at runtime.
+
+### Runtime Config Singleton
+
+A system-wide mutable dictionary named `runtime_config` tracks configuration states:
+
+```python
+runtime_config = {
+    "provider": "groq",
+    "gemini_model": "gemini-2.5-flash-lite",
+    "groq_model": "llama-3.1-8b-instant",
+    "ollama_model": "llama3",
+    "privacy_mode": settings.PRIVACY_MODE
+}
+```
+
+The system uses `runtime_config` to allow live changes to the active LLM provider, active models, and privacy enforcement states without requiring application restarts.
+
+### Provider Resolution Chain
+
+The function `get_llm()` determines which chat model to instantiate:
+
+```
+get_llm() resolution order:
+1. Check if runtime_config["privacy_mode"] is True:
+   - Returns ChatOllama instance
+   - If initialization fails, raises RuntimeError immediately to prevent cloud fallbacks
+2. Check if runtime_config["provider"] is "gemini":
+   - Returns ChatGoogleGenerativeAI instance
+   - Falls back to ChatGroq if an exception is raised during initialization
+3. Check if runtime_config["provider"] is "ollama":
+   - Returns ChatOllama instance
+   - Falls back to ChatGroq if an exception is raised during initialization
+4. Default resolution:
+   - Returns ChatGroq instance using settings.GROQ_API_KEY
+```
+
+For authenticated endpoints, `get_llm_for_user(user_doc)` resolves settings on a per-user basis:
+
+```
+get_llm_for_user(user_doc) resolution order:
+1. Read user_doc for overrides ("privacy_mode", "llm_provider", "gemini_model", "groq_model", "ollama_model")
+2. Fall back to global runtime_config values for any missing keys
+3. Execute the standard get_llm() initialization logic with the resolved configuration
+```
+
+### Model Name Migration
+
+The function `set_provider()` intercept and map discontinued model identifiers to current equivalents. This prevents saved database preferences from failing when cloud vendors deprecate old names:
+- Discontinued Google models, such as `gemini-3.1-flash-lite`, `gemini-2.0-flash-lite`, `gemini-2.0-flash-lite-001`, and `gemini-1.5-flash`, map to `gemini-2.5-flash-lite`.
+- Models such as `gemini-2.0-flash`, `gemini-2.0-flash-001`, and `gemini-1.5-pro` map to `gemini-2.5-flash`.
+- Groq models such as `llama3-70b-8192` map to `llama-3.3-70b-versatile`.
+
+### Privacy Mode Enforcement
+
+When privacy mode is enabled, the system restricts data flow to the local device. The application forces the resolution chain to return local `ChatOllama` connections. If the local Ollama service is unreachable, the system raises a `RuntimeError` rather than silently reverting to cloud API keys. This prevents silent privacy leaks.
+
+## FAISS Vector Store Design
+
+The vector database maintains local semantic representations.
+
+### Index Architecture
+
+Vector operations are handled by `IndexFlatL2` to perform exact L2 distance comparisons. The index structure is represented by two files on disk:
+- `faiss_index`: The binary vector database file.
+- `faiss_index.json`: The sidecar file mapping sequential integer index values to string `chunk_id` values.
+
+The system loads these files into memory at startup and writes updates back to disk.
+
+### Insertion
+
+The function `build_or_update_index(embeddings, chunk_ids)` runs in four steps:
+1. Loads the existing index file if present, or creates a new `IndexFlatL2` instance.
+2. Calls `index.add(embeddings)` to append the floating point vectors to the FAISS index.
+3. Extends the sidecar array with the string `chunk_id` list.
+4. Writes the updated binary index and the JSON sidecar file to disk.
+
+### Deletion
+
+The function `remove_from_index(chunk_ids_to_remove)` deletes records in four steps:
+1. Maps target string `chunk_id` values to their sequential integer array indices by scanning the sidecar file.
+2. Calls `index.remove_ids()` with a NumPy array containing the resolved indices.
+3. Deletes matching indices from the sidecar list in descending order to avoid index shifts during deletion.
+4. Saves both updated files back to disk.
+
+The FAISS method `remove_ids` only supports flat vector index collections. The choice of `IndexFlatL2` over clustered structures allows vector removals without rebuilding the entire database.
+
+### Auto-Rebuild on Startup
+
+Hugging Face Spaces run on ephemeral container file systems that discard local changes on restart. While MongoDB instances persist, the FAISS index file is lost. During startup, the function `sync_faiss_with_db()` checks if the index is missing. If MongoDB contains records, the server queries the text fields, regenerates the embeddings, and recreates the binary index and JSON sidecar files. The backend uses the `SPACE_ID` environment variable to detect Hugging Face containers and routes storage files to the writable `/tmp` directory.
+
+## Adaptive Quiz System
+
+The quiz system generates questions on demand to match learner capabilities.
+
+### Difficulty Engine
+
+The quiz engine tracks and modifies user scores:
+- Topic scores are saved in the `users` collection under the `quiz_scores` nested document.
+- New users start with a default score of 50.
+- Correct answers increase the score by 10 points (capped at 100).
+- Incorrect answers decrease the score by 10 points (floored at 0).
+
+The system maps scores to difficulty levels:
+- Scores 0 to 30 map to Level 1.
+- Scores 31 to 50 map to Level 2.
+- Scores 51 to 70 map to Level 3.
+- Scores 71 to 85 map to Level 4.
+- Scores 86 to 100 map to Level 5.
+
+### Question Selection Flow
+
+Questions are resolved when requested by the frontend:
+
+```
+select_next_questions(user_id, n, topic) sequence:
+1. Retrieve quiz_scores[topic] from MongoDB (defaults to 50)
+2. Map the score to a difficulty level between 1 and 5
+3. Query the quiz_questions collection for questions matching the user_id and difficulty level
+4. If the database returns fewer than n questions:
+   - Calculate the missing count (shortfall)
+   - Retrieve a random sample of document chunks matching the user_id from MongoDB
+   - Call generate_questions() to request the LLM to generate MCQ and short-answer questions
+   - Validate and insert the generated questions into the quiz_questions collection
+5. Return the full set of n questions
+```
+
+The system lazy-builds the question collection and caches questions for future quiz sessions.
+
+## Authentication & Authorization
+
+The authorization subsystem handles session creation, rate limiting, and access control.
+
+### Registration Flow
+
+When a user registers, the backend writes to two separate databases collections to preserve compatibility:
+- `registered_users`: Holds credentials, hashed passwords, active states, and runtime provider configuration.
+- `users`: Holds legacy gamification records, XP counts, badge list arrays, and quiz scores.
+
+### Token Lifecycle
+
+Session validation uses JWT tokens:
+
+```
+Token Lifecycle:
+Login  --> Create JWT with sub=user_id, exp=now+7d (signed using HS256)
+API Call --> OAuth2PasswordBearer extracts token from Authorization Header
+         --> decode_access_token() verifies signature and expiry
+         --> Checks revoked_tokens collection; returns 401 if token is found
+         --> Checks registered_users collection; returns 401 if user is missing
+         --> Checks user is_active flag; returns 403 if false
+Logout --> Inserts token into revoked_tokens with an expires_at value
+       --> MongoDB TTL index automatically removes expired tokens (expireAfterSeconds=0)
+```
+
+The revoked token collection relies on a TTL index on the `expires_at` field, ensuring the blacklist does not grow indefinitely.
+
+### Rate Limiting
+
+The application uses `SlowAPI` to prevent service abuse. Rate limits are calculated using client IP addresses:
+- Ingestion uploads are limited to 5 requests per minute.
+- RAG queries are limited to 15 requests per minute.
+- Learning path and knowledge graph generations are limited to 10 requests per minute.
+- Quiz generations are limited to 10 requests per minute.
+- Quiz submissions are limited to 30 requests per minute.
+
+## Emotion Detection System
+
+The emotion tracking subsystem uses computer vision to trigger learning interventions.
+
+### Architecture
+
+The system receives messages through a unified WebSocket endpoint:
+
+```
+Path A — Raw Frame (Live Web Camera):
+Browser (EmotionPanel.jsx) --> Sends base64 image data every 2 seconds
+                           --> cv2.imdecode parses data into a NumPy array
+                           --> asyncio.to_thread() runs DeepFace.analyze() in a separate thread
+                           --> Appends dominant emotion to a deque buffer (maxlen=5)
+                           --> Counter() calculates majority vote (smoothed_emotion)
+                           --> EMOTION_MAP translates emotion to learning state
+                           --> Returns state and face coordinates to client
+
+Path B — Pre-processed State (Local ML Scripts):
+Script (emotion_detector.py) --> Sends processed state directly through websocket
+                             --> Skips image parsing and DeepFace calculation steps
+                             --> Dispatches intervention rules directly
+```
+
+### Intervention Logic
+
+The system translates emotional states into academic adjustments:
+- `confusion` maps to a `simplify` intervention. The backend decreases the user quiz score to lower the difficulty level and suggests simplified content.
+- `fatigue` maps to a `break` intervention. The client displays a recommendation to take a break. Topic scores are not modified.
+- `frustration` maps to an `analogy` intervention. The tutor provides a simplified analogy. Topic scores are not modified.
+- `attention` triggers no intervention.
+
+The system pre-computes valid state values in `_VALID_STATES` at the module level, preventing runtime validation overhead during WebSocket streaming.
+
+### Smoothing
+
+Biometric calculations can return noisy results. The backend assigns a `deque(maxlen=5)` buffer to each session. The system evaluates the last 5 frames and applies a majority vote to determine the smoothed emotional state, preventing rapid or incorrect intervention triggers.
+
+## Database Schema
+
+The MongoDB instance holds 11 collections:
+
+| Collection | Key Fields | Indexes | Purpose |
+|---|---|---|---|
+| `registered_users` | `user_id`, `username`, `email`, `hashed_password`, `is_active`, `xp`, `badges`, `llm_provider` | `email` (unique), `username` (unique) | Holds auth configurations and user data. |
+| `users` | `user_id`, `name`, `xp`, `badges`, `streak_days`, `quiz_scores`, `last_active_date` | None | Backward-compatible gamification store. |
+| `chunks` | `chunk_id`, `user_id`, `subject`, `source_file`, `source_type`, `page_or_timestamp`, `text`, `embedding_id` | Implicit index on `user_id` | Stores text fragments. |
+| `quiz_questions` | `question_id`, `user_id`, `question_text`, `question_type`, `options`, `correct_answer`, `difficulty` | Compound index on `user_id` + `difficulty` | Stores the question bank. |
+| `quiz_attempts` | `attempt_id`, `user_id`, `question_id`, `user_answer`, `is_correct`, `timestamp` | Compound index on `user_id` + `timestamp` | Tracks quiz history. |
+| `sessions` | `session_id`, `user_id`, `event_type`, `timestamp`, `metadata` | Compound index on `session_id` + `user_id` | Logs user events. |
+| `emotion_events` | `session_id`, `emotion_state`, `intervention_triggered`, `timestamp` | Index on `session_id` | Tracks emotion telemetry. |
+| `revoked_tokens` | `token`, `expires_at` | TTL index on `expires_at` | Stores logged-out JWT tokens. |
+| `game_sessions` | `user_id`, `game_name`, `score`, `duration_seconds`, `is_high_score` | Compound index on `user_id` + `game_name` | Stores game statistics. |
+| `learning_goals` | `goal_id`, `user_id`, `concepts`, `deadline_date`, `status`, `progress_percent` | Compound index on `user_id` + `status`, index on `deadline_date` | Tracks goal progress. |
+| `knowledge_nodes` | `node_id`, `label`, `related_node_ids` | None | Reserved for future knowledge graph structures. |
+
+## Deployment Architecture
+
+The system supports containerized production deployments.
+
+### Docker Build (Multi-stage)
+
+The `Dockerfile` splits build tasks into two stages:
+- Stage 1: Utilizes `node:20` to download npm packages and run `npm run build`. The static files are output to `/app/frontend/dist`.
+- Stage 2: Utilizes `python:3.11-slim` to install system packages (`libgl1` and `libglib2.0-0` for OpenCV compatibility) and python dependencies from `requirements.txt`. The stage copies backend files and mounts the static frontend output to the `/app/backend/static` directory. The configuration creates a non-root user account with a user identifier of 1000 and starts `uvicorn` on port 7860.
+
+FastAPI serves the React Single Page Application using a catch-all route. Assets matching the prefix `/assets` load static files directly. API routes and WebSocket connections are exempted from static file queries. Any unmapped URLs are routed to `index.html` to allow React Router to handle client-side paths.
+
+### Hugging Face Spaces CI/CD
+
+The workflow `.github/workflows/deploy-hf.yml` deploys the code on push events:
+1. Clears local file systems and checks out the main branch.
+2. Creates an orphaned Git branch named `temp-hf-branch` containing only current code blocks. This removes Git history and prevents large deleted binary files from bloating the push request.
+3. Force pushes the clean state to the Hugging Face Spaces Git server. The deploy script executes up to 5 attempts with a backoff delay.
+
+### Environment Detection
+
+The configuration script `config.py` evaluates system variables to determine context. If `SPACE_ID` is present, the server routes the FAISS index database to the writable `/tmp/faiss_index` folder instead of the project root. This file redirection signals the lifespan controller to trigger the index rebuild function `sync_faiss_with_db()`.
+
+## Scalability Considerations & Known Limits
+
+The system has scalability bounds that require updates under higher traffic loads.
+
+| Concern | Current State | Migration Path |
+|---|---|---|
+| FAISS index scale | Exhaustive searches run on `IndexFlatL2`. Query latency will degrade as the document store grows beyond 100k chunks. | Upgrade vector storage to `IndexIVFFlat` to enable approximate neighbor calculations, or migrate to a cloud service such as Qdrant or Milvus. |
+| FAISS statefulness | Index binary files run inside the API process. Multiple server containers cannot run the index without state mismatch. | Migrate the vector store to a distributed vector service shared across container instances. |
+| MongoDB indexing | Document search queries scan the entire collection when filtering by user. | Create a compound index on the `chunks` collection matching `user_id` + `subject` and `user_id` + `source_file`. |
+| LLM concurrency | Chat completions run inline without scheduling queues. Multiple concurrent calls can exhaust API rate limits or block resources. | Implement a job queue system using Celery or RQ to handle task loads, and stream outputs via Server-Sent Events to reduce perceived user latency. |
+| FAISS rebuild time | The system embeds all chunks from MongoDB at startup if the index file is missing. This can take several minutes for large collections. | Pre-warm index files before swapping container instances, or persist index files using external storage volumes. |
+| Session isolation | Vector searches are run on a shared global index and filtered after retrieval. | Partition vector databases by user identifier once the user base scales to prevent under-retrieval issues. |

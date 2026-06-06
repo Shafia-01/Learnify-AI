@@ -22,7 +22,7 @@ Learnify AI is a production-grade, full-stack AI-powered adaptive learning platf
 [![Whisper](https://img.shields.io/badge/Whisper-Local-red?style=flat-square)](https://github.com/openai/whisper)
 [![DeepFace](https://img.shields.io/badge/DeepFace-Biometric-orange?style=flat-square)](https://github.com/serengil/deepface)
 
-[Live Demo →](https://huggingface.co/spaces/Shafia01/learnify-ai)
+<!--[Live Demo →](Link-here) -->
 
 <!-- ADD DEMO VIDEO / GIF HERE -->
 <!-- Example: ![Learnify AI Walkthrough](docs/demo.gif) -->
