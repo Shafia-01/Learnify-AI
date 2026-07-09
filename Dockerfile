@@ -24,6 +24,10 @@ RUN apt-get update && apt-get install -y \
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Ensure OpenCV Haar Cascade XML file is present (required by DeepFace's default OpenCV backend)
+RUN python -c "import os, urllib.request; os.makedirs('/usr/local/lib/python3.11/site-packages/cv2/data', exist_ok=True); urllib.request.urlretrieve('https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml', '/usr/local/lib/python3.11/site-packages/cv2/data/haarcascade_frontalface_default.xml')"
+
+
 # Copy backend code
 COPY backend/ ./
 
