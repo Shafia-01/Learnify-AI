@@ -29,10 +29,18 @@ pinned: false
 </p>
 
 <div align="center">
-  <h3> <a href="VIDEO_DEMO_LINK_HERE">Learnify AI - AI That Learns How You Learn</a></h3>
+  
   <p>
     <i>Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials such as PDFs, PPTs, and text documents into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.</i>
   </p>
+
+  <h3>🔗 <a href="VIDEO_DEMO_LINK_HERE">Learnify AI - AI That Learns How You Learn</a></h3>
+  
+  <p>
+    The demo link above features a video walkthrough demonstrating Learnify AI running the adaptive tutoring pipeline, real-time facial expression and emotion analysis streaming, interactive D3-based concept graph visualization, and adaptive gamified learning modules.
+  </p>
+
+  <p><sub><strong>Note:</strong> While Learnify AI features a fully automated continuous-deployment pipeline that pushes updates to Hugging Face Spaces, the hosted instance is kept private to preserve API credit limits and quota budgets for upstream LLM and API providers.</sub></p>
 </div>
 
 ---
