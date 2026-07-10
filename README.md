@@ -12,23 +12,28 @@ pinned: false
 </p>
 
 <h1 align="center">Learnify AI</h1>
-<p align="center"><strong>AI That Learns How You Learn</strong></p>
+<p align="center"><strong>A Multimodal Intelligent Tutoring System with RAG, Affective Computing, and Gamified Adaptive Learning</strong></p>
 
-Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials—such as PDFs, PPTs, and text documents—into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python" alt="Python"></a>
+  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi" alt="FastAPI"></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" alt="React 19"></a>
+  <a href="https://www.mongodb.com/"><img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB"></a>
+  <a href="https://github.com/facebookresearch/faiss"><img src="https://img.shields.io/badge/FAISS-000000?style=flat-square" alt="FAISS"></a>
+  <a href="https://www.langchain.com/"><img src="https://img.shields.io/badge/LangChain-1C3C3A?style=flat-square" alt="LangChain"></a>
+  <a href="https://github.com/openai/whisper"><img src="https://img.shields.io/badge/Whisper-Local-red?style=flat-square" alt="Whisper"></a>
+  <a href="https://github.com/serengil/deepface"><img src="https://img.shields.io/badge/DeepFace-Biometric-orange?style=flat-square" alt="DeepFace"></a>
+  <a href="https://opencv.org/"><img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white" alt="OpenCV"></a>
+  <a href="https://jwt.io/"><img src="https://img.shields.io/badge/JWT-black?style=flat-square&logo=json-web-tokens" alt="JWT"></a>
+  <a href="https://huggingface.co/"><img src="https://img.shields.io/badge/Hugging%20Face-Spaces-FFD21E?style=flat-square&logo=huggingface" alt="Hugging Face"></a>
+</p>
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
-[![FAISS](https://img.shields.io/badge/FAISS-000000?style=flat-square)](https://github.com/facebookresearch/faiss)
-[![LangChain](https://img.shields.io/badge/LangChain-1C3C3A?style=flat-square)](https://www.langchain.com/)
-[![Whisper](https://img.shields.io/badge/Whisper-Local-red?style=flat-square)](https://github.com/openai/whisper)
-[![DeepFace](https://img.shields.io/badge/DeepFace-Biometric-orange?style=flat-square)](https://github.com/serengil/deepface)
-
-<!--[Live Demo →](Link-here) -->
-
-<!-- ADD DEMO VIDEO / GIF HERE -->
-<!-- Example: ![Learnify AI Walkthrough](docs/demo.gif) -->
+<div align="center">
+  <h3> <a href="VIDEO_DEMO_LINK_HERE">Learnify AI - AI That Learns How You Learn</a></h3>
+  <p>
+    <i>Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials such as PDFs, PPTs, and text documents into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.</i>
+  </p>
+</div>
 
 ---
 
