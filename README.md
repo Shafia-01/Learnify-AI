@@ -40,7 +40,7 @@ pinned: false
     The demo link above features a video walkthrough demonstrating Learnify AI running the adaptive tutoring pipeline, real-time facial expression and emotion analysis streaming, interactive D3-based concept graph visualization, and adaptive gamified learning modules.
   </p>
 
-  <p><sub><strong>Note:</strong> While Learnify AI features a fully automated continuous-deployment pipeline that pushes updates to Hugging Face Spaces, the hosted instance is kept private to preserve API credit limits and quota budgets for upstream LLM and API providers.</sub></p>
+  <p><strong>Note:</strong> While Learnify AI features a fully automated continuous-deployment pipeline that pushes updates to Hugging Face Spaces, the hosted instance is kept private to preserve API credit limits and quota budgets for upstream LLM and API providers.</p>
 </div>
 
 ---
