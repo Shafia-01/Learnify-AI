@@ -34,7 +34,7 @@ pinned: false
     <i>Learnify AI is a production-grade, full-stack AI-powered adaptive learning platform designed to transform static study materials such as PDFs, PPTs, and text documents into interactive, voice-enabled, and emotion-aware personal tutoring sessions. The platform implements a custom level-adaptive Retrieval-Augmented Generation (RAG) pipeline alongside dynamic educational mini-games, continuously tailoring content to a student's cognitive capability and emotional state in real time. Architected with a strong focus on data privacy, the system supports fully offline local deployment, zero-downtime hot-swappable multi-LLM orchestration, and bidirectional database-vector synchronization.</i>
   </p>
 
-  <h3>🔗 <a href="https://youtu.be/oSdFB1jBh4M">Learnify AI - AI That Learns How You Learn</a></h3>
+  <h3><a href="https://youtu.be/oSdFB1jBh4M"><img src="https://img.shields.io/badge/YouTube-Demo%20Video-red?style=flat-square&logo=youtube&logoColor=white" alt="YouTube Demo Video"></a></h3>
   
   <p>
     The demo link above features a video walkthrough demonstrating Learnify AI running the adaptive tutoring pipeline, real-time facial expression and emotion analysis streaming, interactive D3-based concept graph visualization, and adaptive gamified learning modules.
@@ -45,7 +45,7 @@ pinned: false
 
 ---
 
-## What Makes This Different
+## 🌟 What Makes This Different
 
 * **Not a Tutorial Project:** Unlike generic wrapper applications, this platform addresses real-world distributed systems and machine learning integration problems, including state synchronization, edge compute bottlenecks, and hard privacy boundaries.
 * **Production Engineering Solutions:** Implements robust custom mechanisms for synchronizing in-memory vector databases with persistent document stores, mitigating ephemeral storage loss on serverless deployments.
@@ -54,7 +54,7 @@ pinned: false
 
 ---
 
-## Core Features
+## 🚀 Core Features
 
 ### 1. Adaptive Learning Engine
 * **Contextual RAG with Citations:** Ingests unstructured academic materials, runs document-to-vector embedding pipelines, and delivers responses containing precise document and page-number citations mapped back to the source records.
@@ -81,7 +81,7 @@ pinned: false
 
 ---
 
-## System Architecture
+## 🏗️ System Architecture
 
 The application is architected around decoupled pipelines that isolate CPU-bound machine learning tasks, I/O-bound database queries, and real-time state synchronization.
 
@@ -150,7 +150,7 @@ graph TD
 
 ---
 
-## Tech Stack Decisions
+## 🛠️ Tech Stack Decisions
 
 | Technology | Role | Why Chosen (Engineering Rationale & Trade-offs) |
 | :--- | :--- | :--- |
@@ -166,7 +166,7 @@ graph TD
 
 ---
 
-## Engineering Highlights
+## ⚙️ Engineering Highlights
 
 ### 1. Stateful Sync for Ephemeral Containers
 When deploying to stateless hosting platforms like HuggingFace Spaces, container restarts wipe local storage, including the FAISS index files, while the MongoDB database persists externally. To solve this, `sync_faiss_with_db()` triggers automatically on startup, verifying index integrity. If index files are missing or out of sync, the system fetches all document chunks from MongoDB, generates embeddings using the local sentence-transformer model, writes the vector database, and rebuilds the JSON sidecar. This ensures zero data loss and immediate availability of the RAG pipeline after container restarts.
@@ -185,7 +185,7 @@ To prevent service interruptions caused by upstream API model deprecations, the 
 
 ---
 
-## Quick Start
+## ⚡ Quick Start
 
 ### Installation & Run
 
@@ -234,7 +234,7 @@ npm run dev
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 backend/
@@ -254,13 +254,13 @@ frontend/src/
 
 ---
 
-## Why This Project?
+## 🎯 Why This Project
 
 Learnify AI is not a generic tutorial application. It represents a fully integrated, production-ready AI software product featuring 12+ REST endpoints, secure token-revocation authentication, 3-tier LLM orchestration with hot-swapping capabilities, WebSocket-based biometrics, and a local RAG pipeline synced with a document database. Every architectural decision—from decoupling the CPU-bound DeepFace pipeline to implementing transactional vector indexing—reflects real-world software engineering trade-offs between performance, privacy, API cost, and developer complexity.
 
 ---
 
-## Future Roadmap
+## 🔮 Future Roadmap
 
 - **IndexIVFFlat Vector Scaling:** Migrate the current flat FAISS index to an inverted file index (`IndexIVFFlat`) to maintain sub-millisecond retrieval speeds as document chunks scale beyond 100k records.
 - **Multi-User Vector Isolation:** Introduce dedicated namespace partitioning or isolated FAISS files per user to guarantee absolute data separation in multi-tenant environments.
