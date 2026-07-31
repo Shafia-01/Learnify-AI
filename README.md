@@ -260,7 +260,7 @@ Learnify AI is not a generic tutorial application. It represents a fully integra
 
 ---
 
-## Roadmap
+## Future Roadmap
 
 - **IndexIVFFlat Vector Scaling:** Migrate the current flat FAISS index to an inverted file index (`IndexIVFFlat`) to maintain sub-millisecond retrieval speeds as document chunks scale beyond 100k records.
 - **Multi-User Vector Isolation:** Introduce dedicated namespace partitioning or isolated FAISS files per user to guarantee absolute data separation in multi-tenant environments.
@@ -268,9 +268,3 @@ Learnify AI is not a generic tutorial application. It represents a fully integra
 - **Automated RAG Evaluation:** Integrate an offline evaluation harness to measure context relevance and generation faithfulness using Ragas or custom scoring models.
 - **Mobile Responsive Redesign:** Complete a comprehensive styling pass across all 12 dashboard views to ensure full usability on mobile web browsers.
 - **Server-Sent Events (SSE):** Re-engineer the query and chat API endpoints to support token-by-token text streaming for improved user experience.
-
----
-
-## License
-
-MIT License - Educational and Portfolio Use
