@@ -65,7 +65,7 @@ pinned: false
 ### 2. Multimodal AI Integrations
 * **Low-Latency Facial Emotion Analysis:** Establishes a WebSocket connection to stream webcam frames, running biometrics asynchronously using DeepFace to deliver contextual interventions when the student shows frustration or confusion.
 * **On-Device Automatic Speech Recognition (ASR):** Runs a local Whisper instance to transcribe student voice questions, allowing fully offline voice-driven navigation and learning.
-* **Zero-Translation Multilingual Synthesis:** Generates high-quality spoken explanations using gTTS for over 40 languages, prompting the LLM to format responses natively in the student's language without external translation layers.
+* **Zero-Translation Multilingual Synthesis:** Generates high-quality spoken explanations using gTTS for over 6 languages, prompting the LLM to format responses natively in the student's language without external translation layers.
 
 ### 3. Gamification & Analytics
 * **Granular Progress Tracker:** Calculates experience points (XP) based on session activity, tracks consecutive daily login streaks, and awards specific achievement badges based on learning milestones.
